@@ -37,9 +37,9 @@ public class Character : Entity
             Max = (Transform.Position + direction) + halfSize
         };
 
-        foreach (Cell cell in World.CellList)
+        foreach(var cellData in World.GetCells())
         {
-            if (World.IsCollidingWithCell(cell, sweepCollider))
+            if (World.IsCollidingWithCell(cellData.cell, sweepCollider))
             {
                 return false;
             }

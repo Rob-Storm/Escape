@@ -7,7 +7,8 @@ public class Level
 {
     public Vector2 PlayerStart { get; set; }
     public List<Entity> EntityList { get; set; }
-    public List<Cell> CellList { get; set; }
+    public Cell[,] Cells { get; protected set; }
+
 
     private static JsonSerializerOptions _options;
 
@@ -51,7 +52,7 @@ public class Level
     {
         Level level = new Level();
         level.EntityList = world.EntityList.Where(e => e is not Player).ToList();
-        level.CellList = world.CellList;
+        level.Cells = world.Cells;
 
         return level;
     }

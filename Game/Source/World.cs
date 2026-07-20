@@ -6,22 +6,44 @@ namespace Game;
 public class World
 {
     public List<Entity> EntityList { get; protected set; }
-    public List<Cell> CellList { get; protected set; }
+
+    public Cell[,] Cells { get; protected set; }
 
     protected Player _player;
     protected Camera _camera;
-    protected string walls, floor, ceiling;
+
+    public const int WORLD_WIDTH = 10, WORLD_HEIGHT = 10;
 
     public World()
     {
         EntityList = new List<Entity>();
-        CellList = new List<Cell>();
-
-        walls = "Assets/Textures/Wall.png";
-        floor = "Assets/Textures/Floor.png";
-        ceiling = "Assets/Textures/Ceiling.png";
+        Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
     }
 
+    public Cell GetCell(int x, int y)
+    {
+        return Cells[x,y];
+    }
+    public void SetCell(int x, int y, Cell cell)
+    {
+        Cells[x,y] = cell;
+    }
+
+    public IEnumerable<(int x, int y, Cell cell)> GetCells()
+    {
+        for(int x = 0; x < WORLD_WIDTH;  x++)
+        {
+            for (int y = 0; y < WORLD_HEIGHT; y++)
+            {
+                if (Cells[x, y] != null)
+                {
+                    yield return (x, y, Cells[x, y]);
+                }
+            }
+        }
+
+
+    }
 
     public void LoadLevel(Level level)
     {
@@ -29,7 +51,7 @@ public class World
         _player.World = this;
         _camera = _player.Camera;
         EntityList = level.EntityList;
-        CellList = level.CellList;
+        Cells = level.Cells;
 
         _player.Transform.Position = new Vector3(level.PlayerStart.X, 0.5f, level.PlayerStart.Y);
 
@@ -55,9 +77,9 @@ public class World
             entity.Render(_camera);
         }
 
-        foreach (Cell cell in CellList)
+        foreach(var cellData in GetCells())
         {
-            cell.Render();
+            cellData.cell.Render();
         }
 
         Raylib.EndMode3D();

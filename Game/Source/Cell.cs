@@ -26,7 +26,7 @@ public class Cell
     public Texture2D FloorTexture => AssetManager.Load<Texture2D>(FloorTexturePath);
     public Texture2D CeilingTexture => AssetManager.Load<Texture2D>(CeilingTexturePath);
 
-    public Vector3 Position { get; set; }
+    public Vector3 Position { get; private set; }
     public Walls Walls { get; set; } = Walls.None;
 
     private Mesh _horizontalPlane;
@@ -36,8 +36,10 @@ public class Cell
     private Matrix4x4 _transform;
     private  Model _verticalModel;
 
-    public Cell()
+    public Cell(int x, int y)
     {
+        Position = new Vector3(x, 0, y);
+
         _horizontalPlane = Raylib.GenMeshPlane(1.0f, 1.0f, 1, 1);
         _verticalPlane = Raylib.GenMeshPlane(1.0f, 1.5f, 1, 1);
         _verticalModel = Raylib.LoadModelFromMesh(_verticalPlane);

@@ -32,8 +32,14 @@ public class Editor : World
 
     private bool _previousControlState;
 
-    private Cell selectedCell;
-    private int selectedIndex;
+    private Cell _selectedCell;
+
+    private Cell selectedCell
+    {
+        get => selectedX >= 0 && selectedY >= 0 ? GetCell(selectedX, selectedY): null;
+    }
+
+    private int selectedX, selectedY;
 
     private string _draggedTexturePath;
 
@@ -93,24 +99,6 @@ public class Editor : World
 
         if(selectedCell != null)
         {
-            if (Raylib.IsKeyPressed(KeyboardKey.Up))
-            {
-                selectedCell.Position += Directions.Forward;
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Down))
-            {
-                selectedCell.Position += Directions.Backward;
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Left))
-            {
-                selectedCell.Position += Directions.Right;
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Right))
-            {
-                selectedCell.Position += Directions.Left;
-            }
-
-
             if (Raylib.IsKeyPressed(KeyboardKey.One))
             {
                 selectedCell.Walls ^= Walls.North;
@@ -143,17 +131,17 @@ public class Editor : World
             entity.Render(_camera);
         }
 
-        foreach (Cell cell in CellList)
+        foreach(var cellData in GetCells())
         {
-            cell.Render();
+            cellData.cell.Render();
         }
 
         if(selectedCell != null)
         {
             selectedCell.RenderBounds(Color.Orange, Color.Green);
-        }
+        }        
 
-        Raylib.DrawGrid(10, 1);
+        DrawWorldGrid();
 
         Raylib.EndMode3D();
 
@@ -184,6 +172,33 @@ public class Editor : World
         rlImGui.End();
     }
 
+    private void DrawWorldGrid()
+    {
+        float cellSize = 1f;
+
+        Vector3 offset = new Vector3(-0.5f, 0, -0.5f);
+
+        for (int x = 0; x <= WORLD_WIDTH; x++)
+        {
+            Raylib.DrawLine3D
+                (
+                    new Vector3(x * cellSize, 0, 0) + offset, 
+                    new Vector3(x * cellSize, 0, WORLD_HEIGHT * cellSize) + offset, 
+                    Color.Gray
+                );
+        }
+
+        for (int z = 0; z <= WORLD_HEIGHT; z++)
+        {
+            Raylib.DrawLine3D
+                (
+                    new Vector3(0, 0, z * cellSize) + offset, 
+                    new Vector3(WORLD_WIDTH * cellSize, 0, z * cellSize) + offset, 
+                    Color.Gray
+                );
+        }
+    }
+
     private void DrawMenuBar()
     {
         if (ImGui.BeginMainMenuBar())
@@ -193,24 +208,6 @@ public class Editor : World
                 if (ImGui.MenuItem("New")) { NewLevel(); }
                 if (ImGui.MenuItem("Save")) { SaveLevel(); }
                 if (ImGui.MenuItem("Load")) { LoadEditorLevel(); }
-                ImGui.EndMenu();
-            }
-
-            if (ImGui.BeginMenu("Edit"))
-            {
-                if (ImGui.MenuItem("Add Cell")) 
-                {
-                    Cell cell = new Cell();
-                    cell.NorthWallTexturePath = @"Assets\Textures\Wall.png";
-                    cell.EastWallTexturePath = @"Assets\Textures\Wall.png";
-                    cell.SouthWallTexturePath = @"Assets\Textures\Wall.png";
-                    cell.WestWallTexturePath = @"Assets\Textures\Wall.png";
-
-                    cell.FloorTexturePath = @"Assets\Textures\Floor.png";
-                    cell.CeilingTexturePath = @"Assets\Textures\Ceiling.png";
-
-                    CellList.Add(cell); 
-                }
                 ImGui.EndMenu();
             }
 
@@ -265,44 +262,81 @@ public class Editor : World
     {
         ImGui.Begin("Map");
 
-        if(ImGui.BeginListBox("Cells"))
-        {
-            for (int i = 0; i < CellList.Count; i++)
-            {
-                bool isSelected = selectedIndex == i;
+        var drawList = ImGui.GetWindowDrawList();
 
-                if (ImGui.Selectable($"Cell {i}##cell_{i}", isSelected))
+        Vector2 origin = ImGui.GetCursorScreenPos();
+
+        float cellSize = 32f;
+
+        uint gridColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+
+        uint filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.3f, 0.7f, 0.3f, 1.0f));
+
+        uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 1.0f));
+
+        for (int y = 0; y < WORLD_HEIGHT; y++)
+        {
+            for (int x = 0; x < WORLD_WIDTH; x++)
+            {
+                Cell cell = GetCell(x, y);
+
+                Vector2 cellMin = origin + new Vector2(x * cellSize, y * cellSize);
+
+                Vector2 cellMax = cellMin + new Vector2(cellSize, cellSize);
+
+                ImGui.SetCursorScreenPos(cellMin);
+
+                ImGui.InvisibleButton($"Cell##{x}_{y}", new Vector2(cellSize, cellSize));
+
+                bool hovered = ImGui.IsItemHovered();
+
+                if (cell != null)
                 {
-                    selectedIndex = i;
+                    drawList.AddRectFilled(cellMin, cellMax, filledColor);
                 }
 
-                if(isSelected)
+                if (selectedX == x && selectedY == y)
                 {
-                    ImGui.SetItemDefaultFocus();
-                    selectedCell = CellList[i];
+                    drawList.AddRectFilled(cellMin, cellMax, selectedColor);
+                }
 
-                    if (ImGui.BeginPopupContextItem("Options"))
+                drawList.AddRect(cellMin, cellMax, gridColor);
+
+                if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                {
+                    selectedX = x;
+                    selectedY = y;
+                }
+
+                if (ImGui.BeginPopupContextItem($"CellOptions##{x}_{y}"))
+                {
+                    if (cell == null)
                     {
-                        ImGui.PushID(i);
-
-                        if (ImGui.MenuItem("Delete"))
+                        if (ImGui.MenuItem("Add Cell"))
                         {
-                            selectedCell = null;
-
-                            CellList.Remove(CellList[i]);
-                            i--;
+                            SetCell(x, y, CreateDefaultCell(x,y));
                         }
-
-                        ImGui.PopID();
-
-                        ImGui.EndPopup();
-
                     }
+                    else
+                    {
+                        if (ImGui.MenuItem("Remove Cell"))
+                        {
+                            SetCell(x, y, null);
+
+                            if (selectedX == x && selectedY == y)
+                            {
+                                selectedX = -1;
+                                selectedY = -1;
+                            }
+                        }
+                    }
+
+                    ImGui.EndPopup();
                 }
             }
-
-            ImGui.EndListBox();
         }
+
+        ImGui.Dummy(new Vector2(WORLD_WIDTH * cellSize, WORLD_HEIGHT * cellSize));
 
         ImGui.End();
     }
@@ -313,12 +347,6 @@ public class Editor : World
 
         if(selectedCell != null)
         {
-            Vector3 position = selectedCell.Position;
-            if(ImGui.InputFloat3("Position", ref position))
-            {
-                selectedCell.Position = new Vector3(position.X, 0, position.Z);
-            }
-
             uint flags = (uint)selectedCell.Walls;
 
             if (ImGui.BeginTable("Walls", 2))
@@ -517,7 +545,7 @@ public class Editor : World
     private void NewLevel()
     {
         EntityList.Clear();
-        CellList.Clear();
+        Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
         _levelName = "New Level";
         _playerStart = Vector2.Zero;
 
@@ -553,7 +581,7 @@ public class Editor : World
             Level editorLevel = Level.LoadFromFile(result.Path);
 
             EntityList = editorLevel.EntityList;
-            CellList = editorLevel.CellList;
+            Cells = editorLevel.Cells;
 
             _playerStart = editorLevel.PlayerStart;
             _levelName = Path.GetFileNameWithoutExtension(result.Path);
@@ -584,6 +612,19 @@ public class Editor : World
             Debug.Log("End play session");
             Debug.Log($"Exit code: {process.ExitCode}");
         }
+    }
+
+    private Cell CreateDefaultCell(int x, int y)
+    {
+        return new Cell(x, y)
+        {
+            NorthWallTexturePath = @"Assets\Textures\Wall.png",
+            EastWallTexturePath = @"Assets\Textures\Wall.png",
+            SouthWallTexturePath = @"Assets\Textures\Wall.png",
+            WestWallTexturePath = @"Assets\Textures\Wall.png",
+            FloorTexturePath = @"Assets\Textures\Floor.png",
+            CeilingTexturePath = @"Assets\Textures\Ceiling.png"
+        };
     }
 
 }
