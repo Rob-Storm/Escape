@@ -44,7 +44,7 @@ public class Level
 
         Debug.Log($"Saving level '{Path.GetFileName(fileName)}' to '{fileName}'");
 
-        File.WriteAllText(fileName + ".hdl", contents);
+        File.WriteAllText(fileName, contents);
 
         return fileName;
     }

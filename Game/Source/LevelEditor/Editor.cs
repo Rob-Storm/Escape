@@ -45,6 +45,8 @@ public class Editor : World
 
     private string _defaultPath = Paths.MapsFolder;
 
+    private string _pendingPopup = null;
+
     public Editor()
     {
         _camera = new EditorCamera();
@@ -154,6 +156,22 @@ public class Editor : World
     {
         rlImGui.Begin();
 
+        DrawMenuBar();
+
+        ImGui.DockSpaceOverViewport();
+
+        DrawLevelViewport();
+
+        DrawConsole();
+
+        DrawAssets();
+
+        DrawProperties();
+
+        DrawMapGrid();
+
+        DrawLevelSettings();
+
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
             SaveLevel();
@@ -174,51 +192,9 @@ public class Editor : World
             RunLevel(SaveLevel().path);
         }
 
-        DrawMenuBar();
-
-        ImGui.DockSpaceOverViewport();
-
-        DrawLevelViewport();
-
-        DrawConsole();
-
-        DrawAssets();
-
-        DrawProperties();
-
-        DrawMapGrid();
-
-        DrawLevelSettings();
-
         rlImGui.End();
     }
 
-    private bool DrawConfirmationPopup(string id)
-    {
-        bool result = false;
-
-        if(ImGui.BeginPopupModal(id))
-        {
-            ImGui.Text("Are you sure?");
-
-            if(ImGui.Button("Ok"))
-            {
-                result = true;
-                ImGui.CloseCurrentPopup();
-            }
-
-            ImGui.SameLine();
-
-            if(ImGui.Button("Cancel"))
-            {
-                ImGui.CloseCurrentPopup();
-            }
-
-            ImGui.EndPopup();
-        }
-
-        return result;
-    }
 
     private void DrawWorldGrid()
     {
@@ -657,11 +633,6 @@ public class Editor : World
 
     private void NewLevel()
     {
-        if (!DrawConfirmationPopup("Confirm New"))
-        {
-            return;
-        }
-
         EntityList.Clear();
         Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
         _levelName = "New Level";
@@ -689,11 +660,6 @@ public class Editor : World
 
     private void LoadEditorLevel()
     {
-        if(!DrawConfirmationPopup("Confirm Load"))
-        {
-            return;
-        }
-
         var result = Dialog.FileOpen("hdl", Paths.MapsFolder);
 
         if(result.IsOk)
@@ -725,10 +691,22 @@ public class Editor : World
             process.Start();
 
             Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+            Task<string> errorTask = process.StandardError.ReadToEndAsync();
 
             await process.WaitForExitAsync();
 
-            string result = await outputTask;
+            string output = await outputTask;
+            string error = await errorTask;
+
+            if(!string.IsNullOrEmpty(output))
+            {
+                Debug.Log(output);
+            }
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                Debug.Log(error, LogLevel.Error);
+            }
 
             Debug.Log("End play session");
             Debug.Log($"Exit code: {process.ExitCode}");
