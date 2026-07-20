@@ -26,7 +26,7 @@ public class Cell
     public Texture2D FloorTexture => AssetManager.Load<Texture2D>(FloorTexturePath);
     public Texture2D CeilingTexture => AssetManager.Load<Texture2D>(CeilingTexturePath);
 
-    public Vector3 Position { get; private set; }
+    public Vector3 Position { get; set; }
     public Walls Walls { get; set; } = Walls.None;
 
     private Mesh _horizontalPlane;
@@ -35,6 +35,8 @@ public class Cell
     private Model _horizontalModel;
     private Matrix4x4 _transform;
     private  Model _verticalModel;
+
+    public Cell() : this(0, 0) { }
 
     public Cell(int x, int y)
     {
@@ -49,7 +51,6 @@ public class Cell
 
         _horizontalModel = Raylib.LoadModelFromMesh(_horizontalPlane);
     }
-
 
     public BoundingBox[] GetWallColliders()
     {

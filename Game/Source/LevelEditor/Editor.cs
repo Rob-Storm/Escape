@@ -43,11 +43,12 @@ public class Editor : World
 
     private string _draggedTexturePath;
 
-    private string _defaultPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "Maps");
+    private string _defaultPath = Paths.MapsFolder;
 
     public Editor()
     {
         _camera = new EditorCamera();
+        _camera.Transform.Position = new Vector3(WORLD_WIDTH / 2, 1, WORLD_HEIGHT / 2);
         _consoleHistory = new List<string>();
         CreateViewportRenderTarget();
 
@@ -97,7 +98,7 @@ public class Editor : World
 
         _camera.Update();
 
-        if(selectedCell != null && !ViewportControlled)
+        if (selectedCell != null && !ViewportControlled)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.W))
             {
@@ -153,6 +154,26 @@ public class Editor : World
     {
         rlImGui.Begin();
 
+        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
+        {
+            SaveLevel();
+        }
+
+        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
+        {
+            NewLevel();
+        }
+
+        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))
+        {
+            LoadEditorLevel();
+        }
+
+        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.R))
+        {
+            RunLevel(SaveLevel().path);
+        }
+
         DrawMenuBar();
 
         ImGui.DockSpaceOverViewport();
@@ -170,6 +191,33 @@ public class Editor : World
         DrawLevelSettings();
 
         rlImGui.End();
+    }
+
+    private bool DrawConfirmationPopup(string id)
+    {
+        bool result = false;
+
+        if(ImGui.BeginPopupModal(id))
+        {
+            ImGui.Text("Are you sure?");
+
+            if(ImGui.Button("Ok"))
+            {
+                result = true;
+                ImGui.CloseCurrentPopup();
+            }
+
+            ImGui.SameLine();
+
+            if(ImGui.Button("Cancel"))
+            {
+                ImGui.CloseCurrentPopup();
+            }
+
+            ImGui.EndPopup();
+        }
+
+        return result;
     }
 
     private void DrawWorldGrid()
@@ -205,9 +253,9 @@ public class Editor : World
         {
             if (ImGui.BeginMenu("File"))
             {
-                if (ImGui.MenuItem("New")) { NewLevel(); }
-                if (ImGui.MenuItem("Save")) { SaveLevel(); }
-                if (ImGui.MenuItem("Load")) { LoadEditorLevel(); }
+                if (ImGui.MenuItem("New", "Ctrl+N")) { NewLevel(); }
+                if (ImGui.MenuItem("Save", "Ctrl+S")) { SaveLevel(); }
+                if (ImGui.MenuItem("Open", "Ctrl+O")) { LoadEditorLevel(); }
                 ImGui.EndMenu();
             }
 
@@ -331,6 +379,11 @@ public class Editor : World
                                 selectedY = -1;
                             }
                         }
+
+                        if (ImGui.MenuItem("Set Player Start"))
+                        {
+                            _playerStart = new Vector2(x, y);
+                        }
                     }
 
                     ImGui.EndPopup();
@@ -369,8 +422,6 @@ public class Editor : World
                 }
             }
         }
-
-                ImGui.Dummy(new Vector2(WORLD_WIDTH * cellSize, WORLD_HEIGHT * cellSize));
 
         ImGui.End();
     }
@@ -606,6 +657,11 @@ public class Editor : World
 
     private void NewLevel()
     {
+        if (!DrawConfirmationPopup("Confirm New"))
+        {
+            return;
+        }
+
         EntityList.Clear();
         Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
         _levelName = "New Level";
@@ -616,7 +672,7 @@ public class Editor : World
 
     private (DialogResult result, string path) SaveLevel()
     {
-        var result = Dialog.FileSave("hdl", _defaultPath);
+        var result = Dialog.FileSave("hdl", Paths.MapsFolder);
 
         string path = null;
 
@@ -625,9 +681,7 @@ public class Editor : World
             Level level = Level.FromWorld(this);
             level.PlayerStart = _playerStart;
 
-            path = Level.SaveToFile(level, _levelName);
-
-            Debug.Log("Saving level");
+            path = Level.SaveToFile(level, result.Path);
         }
 
         return (result, path);
@@ -635,7 +689,12 @@ public class Editor : World
 
     private void LoadEditorLevel()
     {
-        var result = Dialog.FileOpen("hdl", _defaultPath);
+        if(!DrawConfirmationPopup("Confirm Load"))
+        {
+            return;
+        }
+
+        var result = Dialog.FileOpen("hdl", Paths.MapsFolder);
 
         if(result.IsOk)
         {
@@ -654,7 +713,7 @@ public class Editor : World
     {
         Debug.Log("Starting play session");
 
-        ProcessStartInfo info = new ProcessStartInfo(Path.Combine(Directory.GetCurrentDirectory(), "Game.exe"), $"--level \"{path}\"");
+        ProcessStartInfo info = new ProcessStartInfo(Paths.ApplicationExecutable, $"--level \"{path}\"");
 
         info.RedirectStandardOutput = true;
         info.UseShellExecute = false;

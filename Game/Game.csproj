@@ -7,7 +7,6 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
- 
 
   <ItemGroup>
     <PackageReference Include="NativeFileDialogSharp" Version="0.5.0" />
@@ -24,5 +23,9 @@
   <ItemGroup>
     <Folder Include="Assets\Maps\" />
   </ItemGroup>
+
+  <Target Name="CreateEditorBat" AfterTargets="Build">
+    <WriteLinesToFile File="$(TargetDir)Editor.bat" Lines="&quot;$(AssemblyName).exe&quot; --editor" Overwrite="true" />
+  </Target>
 
 </Project>

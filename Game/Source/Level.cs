@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Game;
 
@@ -7,10 +8,11 @@ public class Level
 {
     public Vector2 PlayerStart { get; set; }
     public List<Entity> EntityList { get; set; }
-    public Cell[,] Cells { get; protected set; }
+
+    public Cell[,] Cells { get; set; }
 
 
-    private static JsonSerializerOptions _options;
+    private static JsonSerializerOptions _options = new JsonSerializerOptions();
 
 
     static Level()
@@ -22,28 +24,46 @@ public class Level
         };
 
         _options.Converters.Add(new TextureConverter());
+        _options.Converters.Add(new CellArrayConverter());
     }
 
     public Level()
     {
-        
+        EntityList = new List<Entity>();
+        Cells = new Cell[World.WORLD_WIDTH, World.WORLD_HEIGHT];
     }
 
     public static string SaveToFile(Level level, string fileName)
     {
+        if (!fileName.EndsWith(".hdl", StringComparison.OrdinalIgnoreCase))
+        {
+            fileName += ".hdl";
+        }
+
         string contents = JsonSerializer.Serialize(level, options: _options);
-        string path = $@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\{fileName}";
 
-        File.WriteAllText(path, contents);
+        Debug.Log($"Saving level '{Path.GetFileName(fileName)}' to '{fileName}'");
 
-        return path;
+        File.WriteAllText(fileName + ".hdl", contents);
+
+        return fileName;
     }
 
     public static Level LoadFromFile(string path)
     {
+        if(!Path.Exists(path))
+        {
+            throw new Exception("Could not find level");
+        }
+
         string contents = File.ReadAllText(path);
 
-        Level level = JsonSerializer.Deserialize<Level>(contents, _options);
+        Level? level = JsonSerializer.Deserialize<Level>(contents, _options);
+
+        if(level == null)
+        {
+            throw new Exception("Could not load level");
+        }
 
         return level;
     }

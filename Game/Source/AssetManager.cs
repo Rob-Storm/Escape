@@ -29,13 +29,11 @@ public static class AssetManager
 
     public static void ScanRegistries()
     {
-        string assetPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
-
-        string[] files = Directory.GetFiles(assetPath, "*.*", SearchOption.AllDirectories);
+        string[] files = Directory.GetFiles(Paths.AssetsRoot, "*.*", SearchOption.AllDirectories);
 
         foreach(string file in files)
         {
-            string relativePath = Path.Combine("Assets", Path.GetRelativePath(assetPath, file));
+            string relativePath = Path.Combine("Assets", Path.GetRelativePath(Paths.AssetsRoot, file));
 
             switch (Path.GetExtension(file).ToLowerInvariant())
             {
