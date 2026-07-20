@@ -178,6 +178,11 @@ public class Cell
 
         Raylib.DrawModelEx(_horizontalModel, Position, Vector3.UnitX, 0f, Vector3.One, Color.White);
     }
+
+    public override string ToString()
+    {
+        return Position.ToString();
+    }
 }
 
 [Flags]

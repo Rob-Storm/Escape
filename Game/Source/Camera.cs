@@ -6,9 +6,10 @@ namespace Game;
 public class Camera : Entity
 {
     public float FieldOfView { get; protected set; } = 80f;
-    private float _aspectRatio;
 
     public float Sensitivity { get; protected set; } = 0.002f;
+
+    protected float _aspectRatio;
 
     private Sound _sound;
 
@@ -40,6 +41,9 @@ public class Camera : Entity
             Raylib.PlaySound(_sound);
         }
     }
+
+    public void SetAspectRatio(float width, float height) => _aspectRatio = width / height;
+    public void SetAspectRatio(Vector2 size) => SetAspectRatio(size.X, size.Y);
 
     public Matrix4x4 GetViewMatrix() => Matrix4x4.CreateLookAt(Transform.Position, Transform.Position + GetForwardVector(), GetUpVector());
     public Matrix4x4 GetProjectionMatrix() => Matrix4x4.CreatePerspectiveFieldOfView(FieldOfView, _aspectRatio, 0.01f, 5000f);

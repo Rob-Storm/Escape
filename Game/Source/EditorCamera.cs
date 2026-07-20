@@ -1,20 +1,43 @@
-﻿using Raylib_cs;
-using System.Diagnostics;
+﻿using Game.LevelEditor;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game;
 
-public class DebugCamera : Camera
+public class EditorCamera : Camera
 {
     private float _moveSpeed = 1f;
 
     private float _pitch, _yaw;
 
+    private Editor _editor;
+
+    public void SetEditor(Editor editor)
+    {
+        _editor = editor;
+
+        _editor.ViewportControlChanged += (controlled) =>
+        {
+            if(controlled)
+            {
+                Raylib.HideCursor();
+            }
+            else
+            {
+                Raylib.ShowCursor();
+            }
+        };
+    }
+
+
     public override void Update()
     {
-        base.Update();
+        if (!_editor.ViewportControlled)
+        {
+            return;
+        }
 
-        if(Raylib.IsKeyDown(KeyboardKey.W))
+        if (Raylib.IsKeyDown(KeyboardKey.W))
         {
             Move(GetForwardVector());
         }
@@ -46,11 +69,8 @@ public class DebugCamera : Camera
         _pitch -= delta.Y * Sensitivity;
         _pitch = Math.Clamp(_pitch, -89.9f * Raylib.DEG2RAD, 89.9f * Raylib.DEG2RAD);
 
-        if (Raylib.IsCursorHidden())
-        {
-            Transform.Rotation = Quaternion.CreateFromYawPitchRoll(_yaw, 0, 0);
-            Transform.Rotation = Quaternion.Normalize(Transform.Rotation * Quaternion.CreateFromYawPitchRoll(0, _pitch, 0));
-        }
+        Transform.Rotation = Quaternion.CreateFromYawPitchRoll(_yaw, 0, 0);
+        Transform.Rotation = Quaternion.Normalize(Transform.Rotation * Quaternion.CreateFromYawPitchRoll(0, _pitch, 0));
 
     }
 

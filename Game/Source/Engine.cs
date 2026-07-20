@@ -1,4 +1,6 @@
-﻿using Raylib_cs;
+﻿using ImGuiNET;
+using Raylib_cs;
+using rlImGui_cs;
 
 namespace Game;
 
@@ -10,34 +12,29 @@ public class Engine
     private int _screenHeight = 540;
 
     private World _world;
-    private Camera _camera;
-    private Player _player;
-
 
     public void Init(bool isEditorMode = false)
     {
+        Raylib.SetTraceLogLevel(TraceLogLevel.None);
+
         Raylib.InitWindow(_screenWidth, _screenHeight, "Escape");
         Raylib.InitAudioDevice();
 
         if (isEditorMode)
         {
-            DebugCamera debugCamera = new DebugCamera();
-            _camera = debugCamera;
+            rlImGui.Setup(true);
 
-            _world = new LevelEditor.Editor(debugCamera);
+            ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+
+            _world = new LevelEditor.Editor();
+
+            Raylib.ToggleFullscreen();
         }
         else
         {
-            _player = new Player();
-            _camera = _player.Camera;
+            _world = new World();
 
-            _world = new World(_camera);
-
-            _world.LoadLevel(Level.LoadFromFile(@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\Test.level"));
-
-            _world.EntityList.Add(_player);
-
-            _player.World = _world;
+            _world.LoadLevel(Level.LoadFromFile(@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\EditorTest.hdl"));
         }
 
         while (!Raylib.WindowShouldClose())
@@ -59,26 +56,25 @@ public class Engine
         {
             ShowFPS = !ShowFPS;
         }
+
+        if (Raylib.IsKeyReleased(KeyboardKey.F11))
+        {
+            Raylib.ToggleFullscreen();
+        }
     }
 
     private void Render()
     {
         Raylib.BeginDrawing();
 
-        Raylib.ClearBackground(Color.Black);
-
-        Raylib.BeginMode3D(_camera);
-
         _world.Render();
 
-        Raylib.EndMode3D();
+        _world.Render2D();
 
-        if(ShowFPS)
+        if (ShowFPS)
         {
             Raylib.DrawFPS(0, 0);
         }
-
-        _world.Render2D();
 
         Raylib.EndDrawing();
     }

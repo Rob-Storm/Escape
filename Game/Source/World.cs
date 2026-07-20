@@ -1,28 +1,25 @@
 ﻿using Raylib_cs;
-using System.Drawing;
 using System.Numerics;
 
 namespace Game;
 
 public class World
 {
-    public List<Entity> EntityList { get; private set; }
-    public List<Cell> CellList { get; private set; }
+    public List<Entity> EntityList { get; protected set; }
+    public List<Cell> CellList { get; protected set; }
 
+    protected Player _player;
     protected Camera _camera;
+    protected Texture2D walls, floor, ceiling;
 
-    Texture2D walls, floor, ceiling;
-
-    public World(Camera camera)
+    public World()
     {
         EntityList = new List<Entity>();
         CellList = new List<Cell>();
 
-        _camera = camera;
-
-        //walls = AssetManager.Load<Texture2D>("Assets/Textures/Wall.png");
-        //floor = AssetManager.Load<Texture2D>("Assets/Textures/Floor.png");
-        //ceiling = AssetManager.Load<Texture2D>("Assets/Textures/Ceiling.png");
+        walls = AssetManager.Load<Texture2D>("Assets/Textures/Wall.png");
+        floor = AssetManager.Load<Texture2D>("Assets/Textures/Floor.png");
+        ceiling = AssetManager.Load<Texture2D>("Assets/Textures/Ceiling.png");
     }
 
     public void GenerateWorld()
@@ -63,8 +60,15 @@ public class World
 
     public void LoadLevel(Level level)
     {
+        _player = new Player();
+        _player.World = this;
+        _camera = _player.Camera;
         EntityList = level.EntityList;
         CellList = level.CellList;
+
+        _player.Transform.Position = new Vector3(level.PlayerStart.X, 0.5f, level.PlayerStart.Y);
+
+        EntityList.Add(_player);
     }
 
     public virtual void Update()
@@ -77,6 +81,10 @@ public class World
 
     public virtual void Render()
     {
+        Raylib.ClearBackground(Color.Black);
+
+        Raylib.BeginMode3D(_camera);
+
         foreach (Entity entity in EntityList)
         {
             entity.Render(_camera);
@@ -86,6 +94,8 @@ public class World
         {
             cell.Render();
         }
+
+        Raylib.EndMode3D();
     }
 
     public virtual void Render2D()
