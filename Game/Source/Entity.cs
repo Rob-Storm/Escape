@@ -26,11 +26,9 @@ public class Entity
     public Entity()
     {
         Transform = new Transform();
-        Texture2D texture = AssetManager.Load<Texture2D>(@"Assets\Textures\Man.png");
 
         _renderer = new BillboardRenderer
         {
-            Texture = texture
         };
 
         Transform.Translate(Directions.Up * 0.5f);

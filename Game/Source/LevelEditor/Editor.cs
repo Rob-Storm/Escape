@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using Raylib_cs;
 using rlImGui_cs;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -163,7 +164,7 @@ public class Editor : World
 
         DrawLevelViewport();
 
-        //DrawConsole();
+        DrawConsole();
 
         DrawAssets();
 
@@ -172,8 +173,6 @@ public class Editor : World
         DrawMapGrid();
 
         DrawLevelSettings();
-
-        //ImGui.End();
 
         rlImGui.End();
     }
@@ -206,6 +205,11 @@ public class Editor : World
                     CellList.Add(cell); 
                 }
                 ImGui.EndMenu();
+            }
+
+            if (ImGui.MenuItem("Run")) 
+            {
+                RunLevel(SaveLevel()); 
             }
 
             ImGui.EndMainMenuBar();
@@ -366,9 +370,19 @@ public class Editor : World
 
         string test = string.Empty;
 
-        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+        float buttonWidth = 120.0f;
+        float spacing = ImGui.GetStyle().ItemSpacing.X;
+
+        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - buttonWidth - spacing);
+
         ImGui.InputTextWithHint("##ConsoleInput", "Enter Command", ref test, 256,
             ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.EscapeClearsAll);
+
+        ImGui.SameLine();
+
+        if(ImGui.Button("Clear History", new Vector2(buttonWidth, 0))) { _consoleHistory.Clear(); }
+
+        ImGui.End();
     }
 
     private void DrawLevelSettings()
@@ -395,7 +409,6 @@ public class Editor : World
         {
             foreach (var texture in AssetManager.GetAssets<Texture2D>())
             {
-
                 ImGui.TableNextColumn();
 
                 ImGui.PushID(texture.Key);
@@ -417,6 +430,30 @@ public class Editor : World
 
                 ImGui.PopID();
             }
+
+            /*foreach (var asset in AssetManager.Assets)
+            {
+                ImGui.TableNextColumn();
+
+                ImGui.PushID(asset.Key);
+
+                rlImGui.ImageButtonSize("##thumbnail", AssetManager.Load<Texture2D>(@"Assets\Textures\Man.png"), new Vector2(96));
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    ImGui.SetDragDropPayload("texture_path", IntPtr.Zero, 0);
+
+                    _draggedTexturePath = asset.Key;
+
+                    ImGui.Text(asset.Key);
+                    ImGui.EndDragDropSource();
+                }
+
+                ImGui.Text(Path.GetFileNameWithoutExtension(asset.Key));
+                ImGui.TextDisabled(AssetManager.GetAssetType(asset.Value));
+
+                ImGui.PopID();
+            }*/
 
             ImGui.EndTable();
         }
@@ -450,26 +487,54 @@ public class Editor : World
         Debug.Log("New level");
     }
 
-    private void SaveLevel()
+    private string SaveLevel()
     {
         Level level = Level.FromWorld(this);
         level.PlayerStart = _playerStart;
 
-        Level.SaveToFile(level, _levelName);
+        string path = Level.SaveToFile(level, _levelName);
 
         Debug.Log("Saving level");
+
+        return path;
     }
 
     private void LoadEditorLevel()
     {
         Debug.Log("Load level");
-        Level editorLevel = Level.LoadFromFile(@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\EditorTest.hdl");
+        Level editorLevel = Level.LoadFromFile(@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\Level.hdl");
 
         EntityList = editorLevel.EntityList;
         CellList = editorLevel.CellList;
 
         _playerStart = editorLevel.PlayerStart;
         _levelName = "EditorTest";
+    }
+
+    private async Task RunLevel(string path)
+    {
+        Debug.Log("Starting play session");
+
+        ProcessStartInfo info = new ProcessStartInfo(Path.Combine(Directory.GetCurrentDirectory(), "Game.exe"), $"--level \"{path}\"");
+
+        info.RedirectStandardOutput = true;
+        info.UseShellExecute = false;
+        info.CreateNoWindow = false;
+
+        using(Process process = new Process())
+        {
+            process.StartInfo = info;
+            process.Start();
+
+            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+
+            await process.WaitForExitAsync();
+
+            string result = await outputTask;
+
+            Debug.Log("End play session");
+            Debug.Log($"Process Result: {result}");
+        }
     }
 
 }

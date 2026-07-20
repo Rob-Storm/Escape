@@ -28,11 +28,14 @@ public class Level
         
     }
 
-    public static void SaveToFile(Level level, string fileName)
+    public static string SaveToFile(Level level, string fileName)
     {
         string contents = JsonSerializer.Serialize(level, options: _options);
+        string path = $@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\{fileName}.hdl";
 
-        File.WriteAllText($@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\{fileName}.hdl", contents);
+        File.WriteAllText(path, contents);
+
+        return path;
     }
 
     public static Level LoadFromFile(string path)

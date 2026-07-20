@@ -15,8 +15,37 @@ public static class AssetManager
         _assetPaths = new Dictionary<object, string>();
         _resourceLoaders = new Dictionary<Type, Delegate>
         {
-            {  typeof(Texture2D), LoadTexture }
+            {  typeof(Texture2D), LoadTexture },
+            {  typeof(Sound), LoadSound },
+            {  typeof(Music), LoadMusic }
         };
+    }
+
+    public static void ScanRegistries()
+    {
+        string assetPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+
+        string[] files = Directory.GetFiles(assetPath, "*.*", SearchOption.AllDirectories);
+
+        foreach(string file in files)
+        {
+            string relativePath = Path.Combine("Assets", Path.GetRelativePath(assetPath, file));
+
+            switch (Path.GetExtension(file).ToLowerInvariant())
+            {
+                case ".png":
+                    Load<Texture2D>(relativePath);
+                    break;
+                case ".wav":
+                    Load<Sound>(relativePath);
+                    break;
+                case ".ogg":
+                    Load<Music>(relativePath);
+                    break;
+                default:
+                    continue;
+            }
+        }
     }
 
     public static IEnumerable<KeyValuePair<string, T>> GetAssets<T>()
@@ -68,7 +97,7 @@ public static class AssetManager
         }
         else
         {
-            Console.WriteLine("Could not load resource");
+            Debug.Log("Could not load resource", LogLevel.Warning, LogChannel.Asset);
         }
         
         return (T)loadedObject;
@@ -77,6 +106,16 @@ public static class AssetManager
     private static Texture2D LoadTexture(string path)
     {
         return Raylib.LoadTexture(path);
+    }
+
+    private static Sound LoadSound(string path)
+    {
+        return Raylib.LoadSound(path);
+    }
+
+    private static Music LoadMusic(string path)
+    {
+        return Raylib.LoadMusicStream(path);
     }
 }
 

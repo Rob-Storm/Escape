@@ -8,12 +8,12 @@ public class Engine
 {
     public bool ShowFPS = false;
 
-    private int _screenWidth = 960;
-    private int _screenHeight = 540;
+    private int _screenWidth = 1280;
+    private int _screenHeight = 720;
 
     private World _world;
 
-    public void Init(bool isEditorMode = false)
+    public void Init(bool isEditorMode = false, string? levelPath = null)
     {
         Raylib.SetTraceLogLevel(TraceLogLevel.None);
 
@@ -28,13 +28,18 @@ public class Engine
 
             _world = new LevelEditor.Editor();
 
-            Raylib.ToggleFullscreen();
+            AssetManager.ScanRegistries();
+
+            //Raylib.ToggleFullscreen();
         }
         else
         {
             _world = new World();
+        }
 
-            _world.LoadLevel(Level.LoadFromFile(@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\EditorTest.hdl"));
+        if (!string.IsNullOrEmpty(levelPath))
+        {
+            _world.LoadLevel(Level.LoadFromFile(levelPath));
         }
 
         while (!Raylib.WindowShouldClose())
