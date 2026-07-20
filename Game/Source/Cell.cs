@@ -44,7 +44,7 @@ public class Cell
         _verticalPlane = Raylib.GenMeshPlane(1.0f, 1.5f, 1, 1);
         _verticalModel = Raylib.LoadModelFromMesh(_verticalPlane);
 
-        _transform = Matrix4x4.CreateRotationX(MathF.PI / 2) * Matrix4x4.CreateRotationZ(MathF.PI / 2);
+        _transform = Matrix4x4.CreateRotationX(-MathF.PI / 2);
         _verticalModel.Transform = _transform;
 
         _horizontalModel = Raylib.LoadModelFromMesh(_horizontalPlane);
@@ -100,10 +100,10 @@ public class Cell
 
     private static Vector3 GetDirection(Walls wall) => wall switch
     {
-        Walls.North => Directions.Right,
-        Walls.East => Directions.Forward,
-        Walls.South => Directions.Left,
-        Walls.West => Directions.Backward,
+        Walls.North => Directions.Forward,
+        Walls.East => Directions.Left,
+        Walls.South => Directions.Backward,
+        Walls.West => Directions.Right,
         _ => Vector3.Zero
     };
 
@@ -151,26 +151,26 @@ public class Cell
         switch (rotation)
         {
             case 0f:
-                offset = new Vector3(-1, 0, 0);
+                offset = Directions.Forward;
                 color = Color.Red;
                 texture = NorthWallTexture;
                 break;
             case 90f:
-                offset = new Vector3(0, 0, -1);
+                offset = Directions.Left;
                 color = Color.Green;
-                rotation += 180f;
                 texture = EastWallTexture;
+                rotation += 180f;
                 break;
             case 180f:
-                offset = new Vector3(1, 0, 0);
+                offset = Directions.Backward;
                 color = Color.Blue;
                 texture = SouthWallTexture;
                 break;
             case 270f:
-                offset = new Vector3(0, 0, 1);
+                offset = Directions.Right;
                 color = Color.Yellow;
-                rotation += 180f;
                 texture = WestWallTexture;
+                rotation += 180f;
                 break;
         }
 

@@ -97,23 +97,23 @@ public class Editor : World
 
         _camera.Update();
 
-        if(selectedCell != null)
+        if(selectedCell != null && !ViewportControlled)
         {
-            if (Raylib.IsKeyPressed(KeyboardKey.One))
+            if (Raylib.IsKeyPressed(KeyboardKey.W))
             {
                 selectedCell.Walls ^= Walls.North;
             }
-            if (Raylib.IsKeyPressed(KeyboardKey.Two))
-            {
-                selectedCell.Walls ^= Walls.East;
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Three))
+            if (Raylib.IsKeyPressed(KeyboardKey.S))
             {
                 selectedCell.Walls ^= Walls.South;
             }
-            if (Raylib.IsKeyPressed(KeyboardKey.Four))
+            if (Raylib.IsKeyPressed(KeyboardKey.A))
             {
                 selectedCell.Walls ^= Walls.West;
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.D))
+            {
+                selectedCell.Walls ^= Walls.East;
             }
         }
     }
@@ -270,9 +270,11 @@ public class Editor : World
 
         uint gridColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 
-        uint filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.3f, 0.7f, 0.3f, 1.0f));
+        uint wallColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 0f, 0f, 1.0f));
 
-        uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 1.0f));
+        uint filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.75f, 0.75f, 0.75f, 1f));
+
+        uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
 
         for (int y = 0; y < WORLD_HEIGHT; y++)
         {
@@ -333,12 +335,72 @@ public class Editor : World
 
                     ImGui.EndPopup();
                 }
+
             }
         }
 
-        ImGui.Dummy(new Vector2(WORLD_WIDTH * cellSize, WORLD_HEIGHT * cellSize));
+        for (int y = 0; y < WORLD_HEIGHT; y++)
+        {
+            for (int x = 0; x < WORLD_WIDTH; x++)
+            {
+                Cell cell = GetCell(x, y);
+
+                Vector2 cellMin = origin + new Vector2(x * cellSize, y * cellSize);
+
+
+                if (cell != null)
+                {
+                    if (cell.Walls.HasFlag(Walls.North))
+                    {
+                        DrawWallLine(Walls.North, drawList, cellMin, cellSize, wallColor);
+                    }
+                    if (cell.Walls.HasFlag(Walls.East))
+                    {
+                        DrawWallLine(Walls.East, drawList, cellMin, cellSize, wallColor);
+                    }
+                    if (cell.Walls.HasFlag(Walls.South))
+                    {
+                        DrawWallLine(Walls.South, drawList, cellMin, cellSize, wallColor);
+                    }
+                    if (cell.Walls.HasFlag(Walls.West))
+                    {
+                        DrawWallLine(Walls.West, drawList, cellMin, cellSize, wallColor);
+                    }
+                }
+            }
+        }
+
+                ImGui.Dummy(new Vector2(WORLD_WIDTH * cellSize, WORLD_HEIGHT * cellSize));
 
         ImGui.End();
+    }
+
+    private void DrawWallLine(Walls wall, ImDrawListPtr drawList, Vector2 cellMin, float cellSize, uint color)
+    {
+        Vector2 start = cellMin;
+        Vector2 end = cellMin;
+
+        switch (wall)
+        {
+            case Walls.North:
+                start += new Vector2(cellSize, 0);
+                end += new Vector2(0, 0);
+                break;
+            case Walls.East:
+                start += new Vector2(cellSize, cellSize);
+                end += new Vector2(cellSize, 0);
+                break;
+            case Walls.South:
+                start += new Vector2(0, cellSize);
+                end += new Vector2(cellSize, cellSize);
+                break;
+            case Walls.West:
+                start += new Vector2(0, 0);
+                end += new Vector2(0, cellSize);
+                break;
+        }
+
+        drawList.AddLine(start, end, color, 1.5f);
     }
 
     private void DrawProperties()
