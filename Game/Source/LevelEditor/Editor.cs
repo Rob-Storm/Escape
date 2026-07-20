@@ -2,6 +2,7 @@
 using Raylib_cs;
 using rlImGui_cs;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Game.LevelEditor;
 
@@ -10,7 +11,6 @@ namespace Game.LevelEditor;
  * 
  * 2D view,
  * Quick room creation,
- * Way to change textures on a cell,
  * 
  */
 
@@ -33,6 +33,8 @@ public class Editor : World
 
     private Cell selectedCell;
     private int selectedIndex;
+
+    private string _draggedTexturePath;
 
     public Editor()
     {
@@ -161,7 +163,7 @@ public class Editor : World
 
         DrawLevelViewport();
 
-        DrawConsole();
+        //DrawConsole();
 
         DrawAssets();
 
@@ -171,7 +173,7 @@ public class Editor : World
 
         DrawLevelSettings();
 
-        ImGui.End();
+        //ImGui.End();
 
         rlImGui.End();
     }
@@ -190,7 +192,19 @@ public class Editor : World
 
             if (ImGui.BeginMenu("Edit"))
             {
-                if (ImGui.MenuItem("Add Cell")) { CellList.Add(new Cell(walls, floor, ceiling)); }
+                if (ImGui.MenuItem("Add Cell")) 
+                {
+                    Cell cell = new Cell();
+                    cell.NorthWallTexturePath = @"Assets\Textures\Wall.png";
+                    cell.EastWallTexturePath = @"Assets\Textures\Wall.png";
+                    cell.SouthWallTexturePath = @"Assets\Textures\Wall.png";
+                    cell.WestWallTexturePath = @"Assets\Textures\Wall.png";
+
+                    cell.FloorTexturePath = @"Assets\Textures\Floor.png";
+                    cell.CeilingTexturePath = @"Assets\Textures\Ceiling.png";
+
+                    CellList.Add(cell); 
+                }
                 ImGui.EndMenu();
             }
 
@@ -273,10 +287,63 @@ public class Editor : World
 
             uint flags = (uint)selectedCell.Walls;
 
-            ImGui.CheckboxFlags("North", ref flags, (uint)Walls.North);
-            ImGui.CheckboxFlags("East", ref flags, (uint)Walls.East);
-            ImGui.CheckboxFlags("South", ref flags, (uint)Walls.South);
-            ImGui.CheckboxFlags("West", ref flags, (uint)Walls.West);
+            if (ImGui.BeginTable("Walls", 2))
+            {
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("North", ref flags, (uint)Walls.North);
+
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("East", ref flags, (uint)Walls.East);
+
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("South", ref flags, (uint)Walls.South);
+
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("West", ref flags, (uint)Walls.West);
+
+                ImGui.EndTable();
+            }
+
+            ImGui.SeparatorText("Walls");
+
+            if(ImGui.BeginTable("WallTextures", 2))
+            {
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("North", ref selectedCell.NorthWallTexturePath);
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("East", ref selectedCell.EastWallTexturePath);
+
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("South", ref selectedCell.SouthWallTexturePath);
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("West", ref selectedCell.WestWallTexturePath);
+
+                ImGui.EndTable();
+            }
+
+            ImGui.SeparatorText("Floor / Ceiling");
+
+            if(ImGui.BeginTable("FloorTable", 2))
+            {
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("Floor", ref selectedCell.FloorTexturePath);
+                ImGui.TableNextColumn();
+                DrawTextureSlot("Ceiling", ref selectedCell.CeilingTexturePath);
+
+                ImGui.EndTable();
+            }
 
             selectedCell.Walls = (Walls)flags;
         }
@@ -316,10 +383,61 @@ public class Editor : World
 
     private void DrawAssets()
     {
-        ImGui.Begin("Assets");
+        float padding = 8.0f;
+        float cellSize = 24f;
 
+        float panelWidth = ImGui.GetContentRegionAvail().X;
+        int columnCount = Math.Max(1, (int)(panelWidth / (cellSize + padding)));
+
+        ImGui.Begin("Browser");
+
+        if(ImGui.BeginTable("Assets", columnCount))
+        {
+            foreach (var texture in AssetManager.GetAssets<Texture2D>())
+            {
+
+                ImGui.TableNextColumn();
+
+                ImGui.PushID(texture.Key);
+
+                rlImGui.ImageButtonSize("##preview", texture.Value, new Vector2(96));
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    ImGui.SetDragDropPayload("texture_path", IntPtr.Zero, 0);
+
+                    _draggedTexturePath = texture.Key;
+
+                    ImGui.Text(texture.Key);
+                    ImGui.EndDragDropSource();
+                }
+
+                ImGui.Text(Path.GetFileNameWithoutExtension(texture.Key));
+                ImGui.TextDisabled(AssetManager.GetAssetType(texture.Value));
+
+                ImGui.PopID();
+            }
+
+            ImGui.EndTable();
+        }
 
         ImGui.End();
+    }
+
+    private void DrawTextureSlot(string name, ref string texturePath)
+    {
+        ImGui.Text(name);
+
+        rlImGui.ImageSize(AssetManager.Load<Texture2D>(texturePath), new Vector2(80));
+
+        if(ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+        {
+            ImGui.AcceptDragDropPayload("texture_path");
+
+            texturePath = _draggedTexturePath;
+
+            ImGui.EndDragDropTarget();
+        }
     }
 
     private void NewLevel()

@@ -12,9 +12,19 @@ namespace Game;
 
 public class Cell
 {
-    public Texture2D WallsTexture { get; private set; }
-    public Texture2D FloorTexture { get; private set; }
-    public Texture2D CeilingTexture { get; private set; }
+    public string NorthWallTexturePath;
+    public string EastWallTexturePath;
+    public string SouthWallTexturePath;
+    public string WestWallTexturePath;
+    public string FloorTexturePath;
+    public string CeilingTexturePath;
+
+    public Texture2D NorthWallTexture => AssetManager.Load<Texture2D>(NorthWallTexturePath);
+    public Texture2D EastWallTexture => AssetManager.Load<Texture2D>(EastWallTexturePath);
+    public Texture2D SouthWallTexture => AssetManager.Load<Texture2D>(SouthWallTexturePath);
+    public Texture2D WestWallTexture => AssetManager.Load<Texture2D>(WestWallTexturePath);
+    public Texture2D FloorTexture => AssetManager.Load<Texture2D>(FloorTexturePath);
+    public Texture2D CeilingTexture => AssetManager.Load<Texture2D>(CeilingTexturePath);
 
     public Vector3 Position { get; set; }
     public Walls Walls { get; set; } = Walls.None;
@@ -26,7 +36,7 @@ public class Cell
     private Matrix4x4 _transform;
     private  Model _verticalModel;
 
-    public Cell(Texture2D wallsTexture, Texture2D floorTexture, Texture2D ceilingTexture)
+    public Cell()
     {
         _horizontalPlane = Raylib.GenMeshPlane(1.0f, 1.0f, 1, 1);
         _verticalPlane = Raylib.GenMeshPlane(1.0f, 1.5f, 1, 1);
@@ -36,16 +46,8 @@ public class Cell
         _verticalModel.Transform = _transform;
 
         _horizontalModel = Raylib.LoadModelFromMesh(_horizontalPlane);
-
-        WallsTexture = wallsTexture;
-        FloorTexture = floorTexture;
-        CeilingTexture = ceilingTexture;
-
-        unsafe
-        {
-            _verticalModel.Materials[0].Maps[(int)MaterialMapIndex.Diffuse].Texture = WallsTexture;
-        }
     }
+
 
     public BoundingBox[] GetWallColliders()
     {
@@ -128,6 +130,7 @@ public class Cell
 
     private void RenderWall(float rotation)
     {
+        Texture2D texture = NorthWallTexture;
         Vector3 offset = Vector3.Zero;
         Color color = Color.White;
 
@@ -136,26 +139,35 @@ public class Cell
             case 0f:
                 offset = new Vector3(-1, 0, 0);
                 color = Color.Red;
+                texture = NorthWallTexture;
                 break;
             case 90f:
                 offset = new Vector3(0, 0, -1);
                 color = Color.Green;
                 rotation += 180f;
+                texture = EastWallTexture;
                 break;
             case 180f:
                 offset = new Vector3(1, 0, 0);
                 color = Color.Blue;
+                texture = SouthWallTexture;
                 break;
             case 270f:
                 offset = new Vector3(0, 0, 1);
                 color = Color.Yellow;
                 rotation += 180f;
+                texture = WestWallTexture;
                 break;
         }
 
         foreach(BoundingBox collider in GetWallColliders())
         {
             Raylib.DrawBoundingBox(collider, Color.White);
+        }
+
+        unsafe
+        {
+            _verticalModel.Materials[0].Maps[(int)MaterialMapIndex.Diffuse].Texture = texture;
         }
 
         Raylib.DrawModelEx(_verticalModel, Position + (offset * 0.5f) + (Vector3.UnitY * 0.75f), Vector3.UnitY, rotation, Vector3.One, Color.White);

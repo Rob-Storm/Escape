@@ -6,16 +6,38 @@ public static class AssetManager
 {
     public static Dictionary<string, object> Assets { get; private set; }
     private static Dictionary<object, string> _assetPaths;
-    private static Dictionary<Type, Delegate> _resouceLoaders;
+    private static Dictionary<Type, Delegate> _resourceLoaders;
 
     static AssetManager()
     {
         Assets = new Dictionary<string, object>();
 
         _assetPaths = new Dictionary<object, string>();
-        _resouceLoaders = new Dictionary<Type, Delegate>
+        _resourceLoaders = new Dictionary<Type, Delegate>
         {
             {  typeof(Texture2D), LoadTexture }
+        };
+    }
+
+    public static IEnumerable<KeyValuePair<string, T>> GetAssets<T>()
+    {
+        foreach (var asset in Assets)
+        {
+            if(asset.Value is T value)
+            {
+                yield return new KeyValuePair<string, T>(asset.Key, value);
+            }
+        }
+    }
+
+    public static string GetAssetType(object asset)
+    {
+        return asset switch
+        {
+            Texture2D => "Texture",
+            Sound => "Sound",
+            Music => "Music",
+            _ => asset.GetType().Name
         };
     }
 
@@ -36,7 +58,7 @@ public static class AssetManager
             return (T)cachedObject;
         }
 
-        Func<string, T> loader = (Func<string, T>)_resouceLoaders[typeof(T)];
+        Func<string, T> loader = (Func<string, T>)_resourceLoaders[typeof(T)];
         object loadedObject = loader(path);
 
         if (loadedObject != null)
