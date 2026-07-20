@@ -31,7 +31,7 @@ public class Level
     public static string SaveToFile(Level level, string fileName)
     {
         string contents = JsonSerializer.Serialize(level, options: _options);
-        string path = $@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\{fileName}.hdl";
+        string path = $@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\{fileName}";
 
         File.WriteAllText(path, contents);
 

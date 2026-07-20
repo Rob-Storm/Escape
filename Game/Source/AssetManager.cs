@@ -2,6 +2,12 @@
 
 namespace Game;
 
+/*
+ * Todo:
+ * Implement factory or method to return assets based on type with
+ * various other data such as icon, color, etc.
+ */
+
 public static class AssetManager
 {
     public static Dictionary<string, object> Assets { get; private set; }

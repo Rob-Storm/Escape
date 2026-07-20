@@ -1,9 +1,9 @@
 ﻿using ImGuiNET;
+using NativeFileDialogSharp;
 using Raylib_cs;
 using rlImGui_cs;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace Game.LevelEditor;
 
@@ -36,6 +36,8 @@ public class Editor : World
     private int selectedIndex;
 
     private string _draggedTexturePath;
+
+    private string _defaultPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "Maps");
 
     public Editor()
     {
@@ -146,6 +148,11 @@ public class Editor : World
             cell.Render();
         }
 
+        if(selectedCell != null)
+        {
+            selectedCell.RenderBounds(Color.Orange, Color.Green);
+        }
+
         Raylib.DrawGrid(10, 1);
 
         Raylib.EndMode3D();
@@ -209,7 +216,12 @@ public class Editor : World
 
             if (ImGui.MenuItem("Run")) 
             {
-                RunLevel(SaveLevel()); 
+                var output = SaveLevel();
+
+                if(output.result.IsOk)
+                {
+                    RunLevel(output.path);
+                }
             }
 
             ImGui.EndMainMenuBar();
@@ -268,6 +280,24 @@ public class Editor : World
                 {
                     ImGui.SetItemDefaultFocus();
                     selectedCell = CellList[i];
+
+                    if (ImGui.BeginPopupContextItem("Options"))
+                    {
+                        ImGui.PushID(i);
+
+                        if (ImGui.MenuItem("Delete"))
+                        {
+                            selectedCell = null;
+
+                            CellList.Remove(CellList[i]);
+                            i--;
+                        }
+
+                        ImGui.PopID();
+
+                        ImGui.EndPopup();
+
+                    }
                 }
             }
 
@@ -351,7 +381,14 @@ public class Editor : World
 
             selectedCell.Walls = (Walls)flags;
         }
+        else
+        {
+            string text = "Select a cell to view properties";
 
+            ImGui.SetCursorPos((ImGui.GetContentRegionAvail() * 0.5f) - (ImGui.CalcTextSize(text) * 0.5f));
+            ImGui.TextDisabled(text);
+        }
+        
         ImGui.End();
     }
 
@@ -487,28 +524,40 @@ public class Editor : World
         Debug.Log("New level");
     }
 
-    private string SaveLevel()
+    private (DialogResult result, string path) SaveLevel()
     {
-        Level level = Level.FromWorld(this);
-        level.PlayerStart = _playerStart;
+        var result = Dialog.FileSave("hdl", _defaultPath);
 
-        string path = Level.SaveToFile(level, _levelName);
+        string path = null;
 
-        Debug.Log("Saving level");
+        if(result.IsOk)
+        {
+            Level level = Level.FromWorld(this);
+            level.PlayerStart = _playerStart;
 
-        return path;
+            path = Level.SaveToFile(level, _levelName);
+
+            Debug.Log("Saving level");
+        }
+
+        return (result, path);
     }
 
     private void LoadEditorLevel()
     {
-        Debug.Log("Load level");
-        Level editorLevel = Level.LoadFromFile(@"C:\Users\The1Wolfcast\source\Games\Escape\Game\Assets\Maps\Level.hdl");
+        var result = Dialog.FileOpen("hdl", _defaultPath);
 
-        EntityList = editorLevel.EntityList;
-        CellList = editorLevel.CellList;
+        if(result.IsOk)
+        {
+            Debug.Log("Load level");
+            Level editorLevel = Level.LoadFromFile(result.Path);
 
-        _playerStart = editorLevel.PlayerStart;
-        _levelName = "EditorTest";
+            EntityList = editorLevel.EntityList;
+            CellList = editorLevel.CellList;
+
+            _playerStart = editorLevel.PlayerStart;
+            _levelName = Path.GetFileNameWithoutExtension(result.Path);
+        }
     }
 
     private async Task RunLevel(string path)
@@ -533,7 +582,7 @@ public class Editor : World
             string result = await outputTask;
 
             Debug.Log("End play session");
-            Debug.Log($"Process Result: {result}");
+            Debug.Log($"Exit code: {process.ExitCode}");
         }
     }
 

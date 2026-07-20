@@ -17,11 +17,15 @@ public class Engine
     {
         Raylib.SetTraceLogLevel(TraceLogLevel.None);
 
-        Raylib.InitWindow(_screenWidth, _screenHeight, "Escape");
+        Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
+
+        Raylib.InitWindow(_screenWidth, _screenHeight, isEditorMode ? "Editor" : "Escape");
         Raylib.InitAudioDevice();
 
         if (isEditorMode)
         {
+            Raylib.MaximizeWindow();
+
             rlImGui.Setup(true);
 
             ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
@@ -29,8 +33,6 @@ public class Engine
             _world = new LevelEditor.Editor();
 
             AssetManager.ScanRegistries();
-
-            //Raylib.ToggleFullscreen();
         }
         else
         {
@@ -56,16 +58,6 @@ public class Engine
         Time.Update();
 
         _world.Update();
-
-        if(Raylib.IsKeyReleased(KeyboardKey.F5))
-        {
-            ShowFPS = !ShowFPS;
-        }
-
-        if (Raylib.IsKeyReleased(KeyboardKey.F11))
-        {
-            Raylib.ToggleFullscreen();
-        }
     }
 
     private void Render()

@@ -128,6 +128,18 @@ public class Cell
         }
     }
 
+    public void RenderBounds(Color cellColor, Color boundColor)
+    {
+        // walls which may not be visible to the editor camera
+        foreach (BoundingBox collider in GetWallColliders())
+        {
+            Raylib.DrawBoundingBox(collider, boundColor);
+        }
+
+        // entire cell bounds
+        Raylib.DrawCubeWires(Position + Vector3.UnitY* 0.75f, 1, 1.5f, 1, cellColor);
+    }
+
     private void RenderWall(float rotation)
     {
         Texture2D texture = NorthWallTexture;
@@ -158,11 +170,6 @@ public class Cell
                 rotation += 180f;
                 texture = WestWallTexture;
                 break;
-        }
-
-        foreach(BoundingBox collider in GetWallColliders())
-        {
-            Raylib.DrawBoundingBox(collider, Color.White);
         }
 
         unsafe

@@ -47,8 +47,6 @@ public class Entity
 
     public virtual void Render(Camera camera)
     {
-        Color = IsColliding ? Color.Red : Color.Green;
-        Raylib.DrawBoundingBox(Collider, Color);
         _renderer.Render(camera, Transform.Position);
     }
 
