@@ -2,7 +2,7 @@
 
 public abstract class EditorPanel
 {
-    private readonly Editor _editor;
+    protected readonly Editor _editor;
 
     protected EditorPanel(Editor editor)
     {

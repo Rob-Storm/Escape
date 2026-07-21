@@ -43,6 +43,7 @@ public class Editor : World
     private string _pendingPopup = null;
 
     private Viewport _viewport;
+    private MenuBar _menuBar;
 
     public Editor()
     {
@@ -51,6 +52,7 @@ public class Editor : World
         _consoleHistory = new List<string>();
 
         _viewport = new Viewport(this, (EditorCamera)_camera);
+        _menuBar = new MenuBar(this);
 
         Debug.OnLogCommitted += (message, level, channel) =>
         {
@@ -131,7 +133,7 @@ public class Editor : World
     {
         rlImGui.Begin();
 
-        DrawMenuBar();
+        _menuBar.Draw();
 
         ImGui.DockSpaceOverViewport();
 
@@ -195,32 +197,6 @@ public class Editor : World
                     new Vector3(WORLD_WIDTH * cellSize, 0, z * cellSize) + offset, 
                     Color.Gray
                 );
-        }
-    }
-
-    private void DrawMenuBar()
-    {
-        if (ImGui.BeginMainMenuBar())
-        {
-            if (ImGui.BeginMenu("File"))
-            {
-                if (ImGui.MenuItem("New", "Ctrl+N")) { NewLevel(); }
-                if (ImGui.MenuItem("Save", "Ctrl+S")) { SaveLevel(); }
-                if (ImGui.MenuItem("Open", "Ctrl+O")) { LoadEditorLevel(); }
-                ImGui.EndMenu();
-            }
-
-            if (ImGui.MenuItem("Run"))
-            {
-                var output = SaveLevel();
-
-                if (output.result.IsOk)
-                {
-                    RunLevel(output.path);
-                }
-            }
-
-            ImGui.EndMainMenuBar();
         }
     }
 
@@ -573,7 +549,7 @@ public class Editor : World
         }
     }
 
-    private void NewLevel()
+    public void NewLevel()
     {
         EntityList.Clear();
         Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
@@ -583,7 +559,7 @@ public class Editor : World
         Debug.Log("New level");
     }
 
-    private (DialogResult result, string path) SaveLevel()
+    public (DialogResult result, string path) SaveLevel()
     {
         var result = Dialog.FileSave("hdl", Paths.MapsFolder);
 
@@ -600,7 +576,7 @@ public class Editor : World
         return (result, path);
     }
 
-    private void LoadEditorLevel()
+    public void LoadEditorLevel()
     {
         var result = Dialog.FileOpen("hdl", Paths.MapsFolder);
 
@@ -617,7 +593,7 @@ public class Editor : World
         }
     }
 
-    private async Task RunLevel(string path)
+    public async Task RunLevel(string path)
     {
         Debug.Log("Starting play session");
 
@@ -655,7 +631,7 @@ public class Editor : World
         }
     }
 
-    private Cell CreateDefaultCell(int x, int y)
+    public Cell CreateDefaultCell(int x, int y)
     {
         return new Cell(x, y)
         {
