@@ -19,9 +19,9 @@ public class Viewport : EditorPanel
     private bool _previousControlState;
     EditorCamera _camera;
 
-    public Viewport(Editor editor, EditorCamera camera) : base(editor)
-    {
-        _camera = camera;
+    public Viewport(EditorContext context) : base(context)
+    {         
+        _camera = context.Camera;
         CreateViewportRenderTarget();
     }
 

@@ -38,7 +38,6 @@ public class EditorCamera : Camera
             return;
         }
         
-
         if (Raylib.IsKeyDown(KeyboardKey.W))
         {
             Move(GetForwardVector());

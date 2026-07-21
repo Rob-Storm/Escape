@@ -1,9 +1,8 @@
 ﻿using Game.LevelEditor.Panels;
+using Game.LevelEditor.Services;
 using ImGuiNET;
-using NativeFileDialogSharp;
 using Raylib_cs;
 using rlImGui_cs;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Game.LevelEditor;
@@ -19,23 +18,12 @@ namespace Game.LevelEditor;
 
 public class Editor : World
 {
-    public Vector2 PlayerStart = Vector2.Zero;
     public string LevelName = "Level";
 
+    public Vector2 PlayerStart = Vector2.Zero;
+    public float StartRotation = 0f;
 
-    private Cell _selectedCell;
-    public Cell SelectedCell
-    {
-        get => SelectedX >= 0 && SelectedY >= 0 ? GetCell(SelectedX, SelectedY): null;
-    }
-
-    public int SelectedX, SelectedY;
-
-    public string DraggedTexturePath;
-
-    private string _defaultPath = Paths.MapsFolder;
-
-    private string _pendingPopup = null;
+    private EditorContext _context;
 
     private Viewport _viewport;
     private MenuBar _menuBar;
@@ -50,13 +38,15 @@ public class Editor : World
         _camera = new EditorCamera();
         _camera.Transform.Position = new Vector3(WORLD_WIDTH / 2, 1, WORLD_HEIGHT / 2);
 
-        _viewport = new Viewport(this, (EditorCamera)_camera);
-        _menuBar = new MenuBar(this);
-        _console = new DeveloperConsole(this);
-        _assetBrowser = new AssetBrowser(this);
-        _inspector = new PropertyInspector(this);
-        _mapGrid = new MapGrid(this);
-        _levelSettings = new LevelSettings(this);
+        _context = new EditorContext(this, (EditorCamera)_camera);
+
+        _viewport = new Viewport(_context);
+        _menuBar = new MenuBar(_context);
+        _console = new DeveloperConsole(_context);
+        _assetBrowser = new AssetBrowser(_context);
+        _inspector = new PropertyInspector(_context);
+        _mapGrid = new MapGrid(_context);
+        _levelSettings = new LevelSettings(_context);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
     }
@@ -72,27 +62,27 @@ public class Editor : World
 
         _camera.Update();
 
-        /*
-        if (selectedCell != null && !ViewportControlled)
+        
+        if (_context.SelectedCell != null && !_viewport.ViewportControlled)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.W))
             {
-                selectedCell.Walls ^= Walls.North;
+                _context.SelectedCell.Walls ^= Walls.North;
             }
             if (Raylib.IsKeyPressed(KeyboardKey.S))
             {
-                selectedCell.Walls ^= Walls.South;
+                _context.SelectedCell.Walls ^= Walls.South;
             }
             if (Raylib.IsKeyPressed(KeyboardKey.A))
             {
-                selectedCell.Walls ^= Walls.West;
+                _context.SelectedCell.Walls ^= Walls.West;
             }
             if (Raylib.IsKeyPressed(KeyboardKey.D))
             {
-                selectedCell.Walls ^= Walls.East;
+                _context.SelectedCell.Walls ^= Walls.East;
             }
         }
-        */
+        
     }
 
     public override void Render()
@@ -113,9 +103,9 @@ public class Editor : World
             cellData.cell.Render();
         }
 
-        if(SelectedCell != null)
+        if(_context.SelectedCell != null)
         {
-            SelectedCell.RenderBounds(Color.Orange, Color.Green);
+            _context.SelectedCell.RenderBounds(Color.Orange, Color.Green);
         }        
 
         DrawWorldGrid();
@@ -148,27 +138,26 @@ public class Editor : World
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
-            SaveLevel();
+            //SaveLevel();
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
         {
-            NewLevel();
+            //NewLevel();
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))
         {
-            LoadEditorLevel();
+            //LoadEditorLevel();
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.R))
         {
-            RunLevel(SaveLevel().path);
+            //RunLevel(SaveLevel().path);
         }
 
         rlImGui.End();
     }
-
 
     private void DrawWorldGrid()
     {
@@ -197,88 +186,6 @@ public class Editor : World
         }
     }
 
-    public void NewLevel()
-    {
-        EntityList.Clear();
-        Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
-        LevelName = "New Level";
-        PlayerStart = Vector2.Zero;
-
-        Debug.Log("New level");
-    }
-
-    public (DialogResult result, string path) SaveLevel()
-    {
-        var result = Dialog.FileSave("hdl", Paths.MapsFolder);
-
-        string path = null;
-
-        if(result.IsOk)
-        {
-            Level level = Level.FromWorld(this);
-            level.PlayerStart = PlayerStart;
-
-            path = Level.SaveToFile(level, result.Path);
-        }
-
-        return (result, path);
-    }
-
-    public void LoadEditorLevel()
-    {
-        var result = Dialog.FileOpen("hdl", Paths.MapsFolder);
-
-        if(result.IsOk)
-        {
-            Debug.Log("Load level");
-            Level editorLevel = Level.LoadFromFile(result.Path);
-
-            EntityList = editorLevel.EntityList;
-            Cells = editorLevel.Cells;
-
-            PlayerStart = editorLevel.PlayerStart;
-            LevelName = Path.GetFileNameWithoutExtension(result.Path);
-        }
-    }
-
-    public async Task RunLevel(string path)
-    {
-        Debug.Log("Starting play session");
-
-        ProcessStartInfo info = new ProcessStartInfo(Paths.ApplicationExecutable, $"--level \"{path}\"");
-
-        info.RedirectStandardOutput = true;
-        info.UseShellExecute = false;
-        info.CreateNoWindow = false;
-
-        using(Process process = new Process())
-        {
-            process.StartInfo = info;
-            process.Start();
-
-            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-            Task<string> errorTask = process.StandardError.ReadToEndAsync();
-
-            await process.WaitForExitAsync();
-
-            string output = await outputTask;
-            string error = await errorTask;
-
-            if(!string.IsNullOrEmpty(output))
-            {
-                Debug.Log(output);
-            }
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                Debug.Log(error, LogLevel.Error);
-            }
-
-            Debug.Log("End play session");
-            Debug.Log($"Exit code: {process.ExitCode}");
-        }
-    }
-
     public Cell CreateDefaultCell(int x, int y)
     {
         return new Cell(x, y)
@@ -292,4 +199,39 @@ public class Editor : World
         };
     }
 
+}
+
+public class EditorContext
+{
+    public World World { get; }
+    public EditorCamera Camera { get; }
+
+    public Cell SelectedCell => World.GetCell(SelectedX, SelectedY);
+
+    public int SelectedX;
+    public int SelectedY;
+
+    public string LevelName;
+    public Vector2 PlayerStart;
+    public float StartRotation;
+
+    public string DraggedTexturePath;
+
+    public PlayModeService PlayModeService;
+    public AssetService AssetService;
+    public LevelFileService LevelFileService;
+
+    public EditorContext(World world, EditorCamera camera)
+    {
+        World = world;
+        Camera = camera;
+
+        LevelName = "Level";
+        PlayerStart = Vector2.Zero;
+        StartRotation = 0f;
+
+        PlayModeService = new PlayModeService();
+        LevelFileService = new LevelFileService();
+        AssetService = new AssetService();
+    }
 }

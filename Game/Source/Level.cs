@@ -1,12 +1,13 @@
 ﻿using System.Numerics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Game;
 
 public class Level
 {
+    public string Name { get; set; }
     public Vector2 PlayerStart { get; set; }
+    public float StartRotation { get; set; }
     public List<Entity> EntityList { get; set; }
 
     public Cell[,] Cells { get; set; }

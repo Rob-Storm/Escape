@@ -5,8 +5,10 @@ namespace Game.LevelEditor.Panels;
 
 public class MapGrid : EditorPanel
 {
-    public MapGrid(Editor editor) : base(editor)
+    private Editor _editor;
+    public MapGrid(EditorContext context) : base(context)
     {
+        _editor = (Editor)context.World;
     }
 
     public override void Draw()
@@ -27,6 +29,7 @@ public class MapGrid : EditorPanel
 
         uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
 
+        
         for (int y = 0; y < World.WORLD_HEIGHT; y++)
         {
             for (int x = 0; x < World.WORLD_WIDTH; x++)
@@ -48,7 +51,7 @@ public class MapGrid : EditorPanel
                     drawList.AddRectFilled(cellMin, cellMax, filledColor);
                 }
 
-                if (_editor.SelectedX == x && _editor.SelectedY == y)
+                if (_context.SelectedX == x && _context.SelectedY == y)
                 {
                     drawList.AddRectFilled(cellMin, cellMax, selectedColor);
                 }
@@ -57,8 +60,10 @@ public class MapGrid : EditorPanel
 
                 if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
                 {
-                    _editor.SelectedX = x;
-                    _editor.SelectedY = y;
+                    _context.SelectedX = x;
+                    _context.SelectedY = y;
+
+                    Debug.Log($"Selected cell at '{x},{y}'");
                 }
 
                 if (ImGui.BeginPopupContextItem($"CellOptions##{x}_{y}"))
@@ -76,16 +81,16 @@ public class MapGrid : EditorPanel
                         {
                             _editor.SetCell(x, y, null);
 
-                            if (_editor.SelectedX == x && _editor.SelectedY == y)
+                            if (_context.SelectedX == x && _context.SelectedY == y)
                             {
-                                _editor.SelectedX = -1;
-                                _editor.SelectedY = -1;
+                                _context.SelectedX = -1;
+                                _context.SelectedY = -1;
                             }
                         }
 
                         if (ImGui.MenuItem("Set Player Start"))
                         {
-                            _editor.PlayerStart = new Vector2(x, y);
+                            _context.PlayerStart = new Vector2(x, y);
                         }
                     }
 

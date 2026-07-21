@@ -4,8 +4,10 @@ namespace Game.LevelEditor.Panels;
 
 public class MenuBar : EditorPanel
 {
-    public MenuBar(Editor editor) : base(editor)
+    private Editor _editor;
+    public MenuBar(EditorContext context) : base(context)
     {
+        _editor = (Editor)context.World;
     }
 
     public override void Draw()
@@ -14,19 +16,19 @@ public class MenuBar : EditorPanel
         {
             if (ImGui.BeginMenu("File"))
             {
-                if (ImGui.MenuItem("New", "Ctrl+N")) { _editor.NewLevel(); }
-                if (ImGui.MenuItem("Save", "Ctrl+S")) { _editor.SaveLevel(); }
-                if (ImGui.MenuItem("Open", "Ctrl+O")) { _editor.LoadEditorLevel(); }
+                if (ImGui.MenuItem("New", "Ctrl+N")) { _context.LevelFileService.Save(_editor); }
+                if (ImGui.MenuItem("Save", "Ctrl+S")) { _context.LevelFileService.Save(_editor); }
+                if (ImGui.MenuItem("Open", "Ctrl+O")) { _context.LevelFileService.Load(_editor); }
                 ImGui.EndMenu();
             }
 
             if (ImGui.MenuItem("Run"))
             {
-                var output = _editor.SaveLevel();
+                var output = _context.LevelFileService.Save(_editor);
 
                 if (output.result.IsOk)
                 {
-                    _editor.RunLevel(output.path);
+                    _context.PlayModeService.RunLevel(output.result.Path);
                 }
             }
 

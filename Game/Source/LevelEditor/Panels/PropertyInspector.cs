@@ -7,7 +7,7 @@ namespace Game.LevelEditor.Panels;
 
 public class PropertyInspector : EditorPanel
 {
-    public PropertyInspector(Editor editor) : base(editor)
+    public PropertyInspector(EditorContext context) : base(context)
     {
     }
 
@@ -15,9 +15,9 @@ public class PropertyInspector : EditorPanel
     {
         ImGui.Begin("Properties");
 
-        if (_editor.SelectedCell != null)
+        if (_context.SelectedCell != null)
         {
-            uint flags = (uint)_editor.SelectedCell.Walls;
+            uint flags = (uint)_context.SelectedCell.Walls;
 
             if (ImGui.BeginTable("Walls", 2))
             {
@@ -47,18 +47,18 @@ public class PropertyInspector : EditorPanel
                 ImGui.TableNextRow();
 
                 ImGui.TableNextColumn();
-                DrawTextureSlot("North", ref _editor.SelectedCell.NorthWallTexturePath);
+                DrawTextureSlot("North", ref _context.SelectedCell.NorthWallTexturePath);
 
                 ImGui.TableNextColumn();
-                DrawTextureSlot("East", ref _editor.SelectedCell.EastWallTexturePath);
+                DrawTextureSlot("East", ref _context.SelectedCell.EastWallTexturePath);
 
                 ImGui.TableNextRow();
 
                 ImGui.TableNextColumn();
-                DrawTextureSlot("South", ref _editor.SelectedCell.SouthWallTexturePath);
+                DrawTextureSlot("South", ref _context.SelectedCell.SouthWallTexturePath);
 
                 ImGui.TableNextColumn();
-                DrawTextureSlot("West", ref _editor.SelectedCell.WestWallTexturePath);
+                DrawTextureSlot("West", ref _context.SelectedCell.WestWallTexturePath);
 
                 ImGui.EndTable();
             }
@@ -70,14 +70,14 @@ public class PropertyInspector : EditorPanel
                 ImGui.TableNextRow();
 
                 ImGui.TableNextColumn();
-                DrawTextureSlot("Floor", ref _editor.SelectedCell.FloorTexturePath);
+                DrawTextureSlot("Floor", ref _context.SelectedCell.FloorTexturePath);
                 ImGui.TableNextColumn();
-                DrawTextureSlot("Ceiling", ref _editor.SelectedCell.CeilingTexturePath);
+                DrawTextureSlot("Ceiling", ref _context.SelectedCell.CeilingTexturePath);
 
                 ImGui.EndTable();
             }
 
-            _editor.SelectedCell.Walls = (Walls)flags;
+            _context.SelectedCell.Walls = (Walls)flags;
         }
         else
         {
@@ -100,7 +100,7 @@ public class PropertyInspector : EditorPanel
         {
             ImGui.AcceptDragDropPayload("texture_path");
 
-            texturePath = _editor.DraggedTexturePath;
+            texturePath = _context.DraggedTexturePath;
 
             ImGui.EndDragDropTarget();
         }

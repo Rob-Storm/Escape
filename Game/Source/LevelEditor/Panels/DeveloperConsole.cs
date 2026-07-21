@@ -7,7 +7,7 @@ public class DeveloperConsole : EditorPanel
 {
     private List<string> _consoleHistory;
 
-    public DeveloperConsole(Editor editor) : base(editor)
+    public DeveloperConsole(EditorContext context) : base(context)
     {
         _consoleHistory = new List<string>();
 

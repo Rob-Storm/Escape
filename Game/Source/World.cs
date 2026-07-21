@@ -5,9 +5,9 @@ namespace Game;
 
 public class World
 {
-    public List<Entity> EntityList { get; protected set; }
+    public List<Entity> EntityList { get; set; }
 
-    public Cell[,] Cells { get; protected set; }
+    public Cell[,] Cells { get; set; }
 
     protected Player _player;
     protected Camera _camera;

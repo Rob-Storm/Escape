@@ -2,11 +2,11 @@
 
 public abstract class EditorPanel
 {
-    protected readonly Editor _editor;
+    protected EditorContext _context;
 
-    protected EditorPanel(Editor editor)
+    protected EditorPanel(EditorContext context)
     {
-        _editor = editor;
+        _context = context;
     }
 
     public abstract void Draw();

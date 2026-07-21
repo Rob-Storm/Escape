@@ -7,7 +7,7 @@ namespace Game.LevelEditor.Panels;
 
 public class AssetBrowser : EditorPanel
 {
-    public AssetBrowser(Editor editor) : base(editor)
+    public AssetBrowser(EditorContext context) : base(context)
     {
     }
 
@@ -35,7 +35,7 @@ public class AssetBrowser : EditorPanel
                 {
                     ImGui.SetDragDropPayload("texture_path", IntPtr.Zero, 0);
 
-                    _editor.DraggedTexturePath = texture.Key;
+                    _context.DraggedTexturePath = texture.Key;
 
                     ImGui.Text(texture.Key);
                     ImGui.EndDragDropSource();
