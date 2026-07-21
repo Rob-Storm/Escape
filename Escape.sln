@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37502.11
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escape", "Escape\Escape.csproj", "{0E9B9EA4-701C-431F-9DFC-D630852D902C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game", "Game\Game.csproj", "{D997385B-3699-410C-93D8-B022AE29E242}"
 EndProject
 Global
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0E9B9EA4-701C-431F-9DFC-D630852D902C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E9B9EA4-701C-431F-9DFC-D630852D902C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E9B9EA4-701C-431F-9DFC-D630852D902C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E9B9EA4-701C-431F-9DFC-D630852D902C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D997385B-3699-410C-93D8-B022AE29E242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D997385B-3699-410C-93D8-B022AE29E242}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D997385B-3699-410C-93D8-B022AE29E242}.Release|Any CPU.ActiveCfg = Release|Any CPU
