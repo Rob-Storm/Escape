@@ -1,5 +1,4 @@
-﻿using Game.LevelEditor;
-using Game.LevelEditor.Panels;
+﻿using Game.LevelEditor.Panels;
 using Raylib_cs;
 using System.Numerics;
 
@@ -16,7 +15,6 @@ public class EditorCamera : Camera
     public void SetEditor(Viewport viewport)
     {
         _viewport = viewport;
-
 
         _viewport.ViewportControlChanged += (controlled) =>
         {
@@ -35,7 +33,6 @@ public class EditorCamera : Camera
 
     public override void Update()
     {
-        
         if (!_viewport.ViewportControlled)
         {
             return;
@@ -76,7 +73,6 @@ public class EditorCamera : Camera
 
         Transform.Rotation = Quaternion.CreateFromYawPitchRoll(_yaw, 0, 0);
         Transform.Rotation = Quaternion.Normalize(Transform.Rotation * Quaternion.CreateFromYawPitchRoll(0, _pitch, 0));
-
     }
 
     private void Move(Vector3 direction)

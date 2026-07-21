@@ -19,17 +19,17 @@ namespace Game.LevelEditor;
 
 public class Editor : World
 {
-    private Vector2 _playerStart = Vector2.Zero;
-    private string _levelName = "Level";
+    public Vector2 PlayerStart = Vector2.Zero;
+    public string LevelName = "Level";
 
 
     private Cell _selectedCell;
     public Cell SelectedCell
     {
-        get => selectedX >= 0 && selectedY >= 0 ? GetCell(selectedX, selectedY): null;
+        get => SelectedX >= 0 && SelectedY >= 0 ? GetCell(SelectedX, SelectedY): null;
     }
 
-    private int selectedX, selectedY;
+    public int SelectedX, SelectedY;
 
     public string DraggedTexturePath;
 
@@ -42,6 +42,7 @@ public class Editor : World
     private DeveloperConsole _console;
     private AssetBrowser _assetBrowser;
     private PropertyInspector _inspector;
+    private MapGrid _mapGrid;
 
     public Editor()
     {
@@ -53,6 +54,7 @@ public class Editor : World
         _console = new DeveloperConsole(this);
         _assetBrowser = new AssetBrowser(this);
         _inspector = new PropertyInspector(this);
+        _mapGrid = new MapGrid(this);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
     }
@@ -61,9 +63,6 @@ public class Editor : World
     {
         rlImGui.Shutdown();
     }
-
-
-
 
     public override void Update()
     {
@@ -141,9 +140,8 @@ public class Editor : World
 
         _inspector.Draw();
 
-        DrawProperties();
+        _mapGrid.Draw();
 
-        DrawMapGrid();
 
         DrawLevelSettings();
 
@@ -198,177 +196,22 @@ public class Editor : World
         }
     }
 
-    private void DrawMapGrid()
-    {
-        ImGui.Begin("Map");
-
-        var drawList = ImGui.GetWindowDrawList();
-
-        Vector2 origin = ImGui.GetCursorScreenPos();
-
-        float cellSize = 32f;
-
-        uint gridColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
-
-        uint wallColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 0f, 0f, 1.0f));
-
-        uint filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.75f, 0.75f, 0.75f, 1f));
-
-        uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
-
-        for (int y = 0; y < WORLD_HEIGHT; y++)
-        {
-            for (int x = 0; x < WORLD_WIDTH; x++)
-            {
-                Cell cell = GetCell(x, y);
-
-                Vector2 cellMin = origin + new Vector2(x * cellSize, y * cellSize);
-
-                Vector2 cellMax = cellMin + new Vector2(cellSize, cellSize);
-
-                ImGui.SetCursorScreenPos(cellMin);
-
-                ImGui.InvisibleButton($"Cell##{x}_{y}", new Vector2(cellSize, cellSize));
-
-                bool hovered = ImGui.IsItemHovered();
-
-                if (cell != null)
-                {
-                    drawList.AddRectFilled(cellMin, cellMax, filledColor);
-                }
-
-                if (selectedX == x && selectedY == y)
-                {
-                    drawList.AddRectFilled(cellMin, cellMax, selectedColor);
-                }
-
-                drawList.AddRect(cellMin, cellMax, gridColor);
-
-                if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                {
-                    selectedX = x;
-                    selectedY = y;
-                }
-
-                if (ImGui.BeginPopupContextItem($"CellOptions##{x}_{y}"))
-                {
-                    if (cell == null)
-                    {
-                        if (ImGui.MenuItem("Add Cell"))
-                        {
-                            SetCell(x, y, CreateDefaultCell(x,y));
-                        }
-                    }
-                    else
-                    {
-                        if (ImGui.MenuItem("Remove Cell"))
-                        {
-                            SetCell(x, y, null);
-
-                            if (selectedX == x && selectedY == y)
-                            {
-                                selectedX = -1;
-                                selectedY = -1;
-                            }
-                        }
-
-                        if (ImGui.MenuItem("Set Player Start"))
-                        {
-                            _playerStart = new Vector2(x, y);
-                        }
-                    }
-
-                    ImGui.EndPopup();
-                }
-
-            }
-        }
-
-        for (int y = 0; y < WORLD_HEIGHT; y++)
-        {
-            for (int x = 0; x < WORLD_WIDTH; x++)
-            {
-                Cell cell = GetCell(x, y);
-
-                Vector2 cellMin = origin + new Vector2(x * cellSize, y * cellSize);
-
-
-                if (cell != null)
-                {
-                    if (cell.Walls.HasFlag(Walls.North))
-                    {
-                        DrawWallLine(Walls.North, drawList, cellMin, cellSize, wallColor);
-                    }
-                    if (cell.Walls.HasFlag(Walls.East))
-                    {
-                        DrawWallLine(Walls.East, drawList, cellMin, cellSize, wallColor);
-                    }
-                    if (cell.Walls.HasFlag(Walls.South))
-                    {
-                        DrawWallLine(Walls.South, drawList, cellMin, cellSize, wallColor);
-                    }
-                    if (cell.Walls.HasFlag(Walls.West))
-                    {
-                        DrawWallLine(Walls.West, drawList, cellMin, cellSize, wallColor);
-                    }
-                }
-            }
-        }
-
-        ImGui.End();
-    }
-
-    private void DrawWallLine(Walls wall, ImDrawListPtr drawList, Vector2 cellMin, float cellSize, uint color)
-    {
-        Vector2 start = cellMin;
-        Vector2 end = cellMin;
-
-        switch (wall)
-        {
-            case Walls.North:
-                start += new Vector2(cellSize, 0);
-                end += new Vector2(0, 0);
-                break;
-            case Walls.East:
-                start += new Vector2(cellSize, cellSize);
-                end += new Vector2(cellSize, 0);
-                break;
-            case Walls.South:
-                start += new Vector2(0, cellSize);
-                end += new Vector2(cellSize, cellSize);
-                break;
-            case Walls.West:
-                start += new Vector2(0, 0);
-                end += new Vector2(0, cellSize);
-                break;
-        }
-
-        drawList.AddLine(start, end, color, 1.5f);
-    }
-
-    private void DrawProperties()
-    {
-        
-    }
-
     private void DrawLevelSettings()
     {
         ImGui.Begin("Level Settings");
 
-        ImGui.InputText("Level Name", ref _levelName, 16);
-        ImGui.InputFloat2("Player Start", ref _playerStart);
+        ImGui.InputText("Level Name", ref LevelName, 16);
+        ImGui.InputFloat2("Player Start", ref PlayerStart);
 
         ImGui.End();
     }
-
-
 
     public void NewLevel()
     {
         EntityList.Clear();
         Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
-        _levelName = "New Level";
-        _playerStart = Vector2.Zero;
+        LevelName = "New Level";
+        PlayerStart = Vector2.Zero;
 
         Debug.Log("New level");
     }
@@ -382,7 +225,7 @@ public class Editor : World
         if(result.IsOk)
         {
             Level level = Level.FromWorld(this);
-            level.PlayerStart = _playerStart;
+            level.PlayerStart = PlayerStart;
 
             path = Level.SaveToFile(level, result.Path);
         }
@@ -402,8 +245,8 @@ public class Editor : World
             EntityList = editorLevel.EntityList;
             Cells = editorLevel.Cells;
 
-            _playerStart = editorLevel.PlayerStart;
-            _levelName = Path.GetFileNameWithoutExtension(result.Path);
+            PlayerStart = editorLevel.PlayerStart;
+            LevelName = Path.GetFileNameWithoutExtension(result.Path);
         }
     }
 
