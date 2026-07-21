@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Game.LevelEditor.Panels;
+using ImGuiNET;
 using NativeFileDialogSharp;
 using Raylib_cs;
 using rlImGui_cs;
@@ -15,22 +16,16 @@ namespace Game.LevelEditor;
  * 
  */
 
-public delegate void ViewportControlChangedSignature(bool newControl);
 
 public class Editor : World
 {
-    public event ViewportControlChangedSignature ViewportControlChanged;
-    public bool ViewportControlled { get; private set; } = false;
 
     private List<string> _consoleHistory;
 
-    private RenderTexture2D _viewportRenderTarget;
-    private Vector2 _viewportSize = new Vector2(960, 540);
 
     private Vector2 _playerStart = Vector2.Zero;
     private string _levelName = "Level";
 
-    private bool _previousControlState;
 
     private Cell _selectedCell;
 
@@ -47,19 +42,22 @@ public class Editor : World
 
     private string _pendingPopup = null;
 
+    private Viewport _viewport;
+
     public Editor()
     {
         _camera = new EditorCamera();
         _camera.Transform.Position = new Vector3(WORLD_WIDTH / 2, 1, WORLD_HEIGHT / 2);
         _consoleHistory = new List<string>();
-        CreateViewportRenderTarget();
+
+        _viewport = new Viewport(this, (EditorCamera)_camera);
 
         Debug.OnLogCommitted += (message, level, channel) =>
         {
             _consoleHistory.Add(message);
         };
 
-        ((EditorCamera)_camera).SetEditor(this);
+        ((EditorCamera)_camera).SetEditor(_viewport);
     }
 
     ~Editor()
@@ -67,39 +65,15 @@ public class Editor : World
         rlImGui.Shutdown();
     }
 
-    private void CreateViewportRenderTarget()
-    {
-        _viewportRenderTarget = Raylib.LoadRenderTexture
-            (
-                (int)_viewportSize.X,
-                (int)_viewportSize.Y
-            );
-    }
 
-    private void ResizeViewport(Vector2 newSize)
-    {
-        if(newSize.X <= 0 || newSize.Y <= 0)
-        { 
-            return;
-        }
 
-        _camera.SetAspectRatio(newSize);
-
-        if (newSize != _viewportSize)
-        {
-            _viewportSize = newSize;
-
-            Raylib.UnloadRenderTexture( _viewportRenderTarget);
-            CreateViewportRenderTarget();
-        }
-    }
 
     public override void Update()
     {
         base.Update();
 
         _camera.Update();
-
+        /*
         if (selectedCell != null && !ViewportControlled)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.W))
@@ -119,11 +93,12 @@ public class Editor : World
                 selectedCell.Walls ^= Walls.East;
             }
         }
+        */
     }
 
     public override void Render()
     {
-        Raylib.BeginTextureMode(_viewportRenderTarget);
+        Raylib.BeginTextureMode(_viewport.ViewportRenderTarget);
 
         Raylib.ClearBackground(Color.Black);
 
@@ -160,7 +135,7 @@ public class Editor : World
 
         ImGui.DockSpaceOverViewport();
 
-        DrawLevelViewport();
+        _viewport.Draw();
 
         DrawConsole();
 
@@ -235,11 +210,11 @@ public class Editor : World
                 ImGui.EndMenu();
             }
 
-            if (ImGui.MenuItem("Run")) 
+            if (ImGui.MenuItem("Run"))
             {
                 var output = SaveLevel();
 
-                if(output.result.IsOk)
+                if (output.result.IsOk)
                 {
                     RunLevel(output.path);
                 }
@@ -247,39 +222,6 @@ public class Editor : World
 
             ImGui.EndMainMenuBar();
         }
-    }
-
-    private void DrawLevelViewport()
-    {
-        ImGui.Begin("Viewport");
-
-        bool viewportHovered = ImGui.IsItemHovered();
-
-        Vector2 size = ImGui.GetContentRegionAvail();
-        ResizeViewport(size);
-
-        ViewportControlled = Raylib.IsMouseButtonDown(MouseButton.Right) && ImGui.IsWindowHovered();
-
-        if(ViewportControlled != _previousControlState)
-        {
-            ViewportControlChanged?.Invoke(ViewportControlled);
-        }
-
-        if (ViewportControlled)
-        {
-            Vector2 viewportCenter = size;
-
-            viewportCenter.X *= 0.5f;
-            viewportCenter.Y *= 0.5f;
-
-            Raylib.SetMousePosition((int)viewportCenter.X, (int)viewportCenter.Y);
-        }
-
-        rlImGui.ImageRenderTexture(_viewportRenderTarget);
-
-        ImGui.End();
-
-        _previousControlState = ViewportControlled;
     }
 
     private void DrawMapGrid()

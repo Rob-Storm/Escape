@@ -1,8 +1,9 @@
 ﻿using Game.LevelEditor;
+using Game.LevelEditor.Panels;
 using Raylib_cs;
 using System.Numerics;
 
-namespace Game;
+namespace Game.LevelEditor;
 
 public class EditorCamera : Camera
 {
@@ -10,13 +11,14 @@ public class EditorCamera : Camera
 
     private float _pitch, _yaw;
 
-    private Editor _editor;
+    private Viewport _viewport;
 
-    public void SetEditor(Editor editor)
+    public void SetEditor(Viewport viewport)
     {
-        _editor = editor;
+        _viewport = viewport;
 
-        _editor.ViewportControlChanged += (controlled) =>
+
+        _viewport.ViewportControlChanged += (controlled) =>
         {
             if(controlled)
             {
@@ -27,15 +29,18 @@ public class EditorCamera : Camera
                 Raylib.ShowCursor();
             }
         };
+        
     }
 
 
     public override void Update()
     {
-        if (!_editor.ViewportControlled)
+        
+        if (!_viewport.ViewportControlled)
         {
             return;
         }
+        
 
         if (Raylib.IsKeyDown(KeyboardKey.W))
         {
