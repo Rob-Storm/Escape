@@ -24,6 +24,12 @@ public class World
     {
         return Cells[x,y];
     }
+
+    public Cell GetCell(Vector2 location)
+    {
+        return Cells[(int)location.X, (int)location.Y];
+    }
+
     public void SetCell(int x, int y, Cell cell)
     {
         Cells[x,y] = cell;
@@ -52,7 +58,7 @@ public class World
         Cells = level.Cells;
 
         _player.Transform.Position = new Vector3(level.PlayerStart.X, 0.5f, level.PlayerStart.Y);
-        _player.Transform.Rotation = Quaternion.CreateFromYawPitchRoll(level.StartRotation, 0, 0);
+        _player.SetYaw(level.StartRotation * -Raylib.DEG2RAD);
 
         EntityList.Add(_player);
     }

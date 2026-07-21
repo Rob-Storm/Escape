@@ -17,12 +17,12 @@ public class MenuBar : EditorPanel
             if (ImGui.BeginMenu("File"))
             {
                 if (ImGui.MenuItem("New", "Ctrl+N")) { _context.LevelFileService.NewLevel(_context); }
-                if (ImGui.MenuItem("Save", "Ctrl+S")) { _context.LevelFileService.Save(_editor); }
-                if (ImGui.MenuItem("Open", "Ctrl+O")) { _context.LevelFileService.Load(_editor); }
+                if (ImGui.MenuItem("Save", "Ctrl+S")) { _context.LevelFileService.Save(_context); }
+                if (ImGui.MenuItem("Open", "Ctrl+O")) { _context.LevelFileService.Load(_context); }
 
                 if (ImGui.MenuItem("Run Map", "Ctrl+R"))
                 {
-                    var output = _context.LevelFileService.Save(_editor);
+                    var output = _context.LevelFileService.Save(_context);
 
                     if (output.result.IsOk)
                     {

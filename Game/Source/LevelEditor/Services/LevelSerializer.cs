@@ -7,7 +7,7 @@ public class LevelFileService
 {
     private readonly LevelSerializer _serializer = new LevelSerializer();
 
-    public (DialogResult result, string? path) Save(Editor editor)
+    public (DialogResult result, string? path) Save(EditorContext context)
     {
         var result = Dialog.FileSave("hdl", Paths.MapsFolder);
 
@@ -16,14 +16,14 @@ public class LevelFileService
             return (result, null);
         }
 
-        Level level = _serializer.Serialize(editor);
+        Level level = _serializer.Serialize(context);
 
         string path = Level.SaveToFile(level, result.Path);
 
         return (result, path);
     }
 
-    public bool Load(Editor editor)
+    public bool Load(EditorContext context)
     {
         var result = Dialog.FileOpen("hdl", Paths.MapsFolder);
 
@@ -34,9 +34,9 @@ public class LevelFileService
 
         Level level = Level.LoadFromFile(result.Path);
 
-        _serializer.Deserialize(editor, level);
+        _serializer.Deserialize(context, level);
 
-        editor.LevelName = Path.GetFileNameWithoutExtension(result.Path);
+        context.LevelName = Path.GetFileNameWithoutExtension(result.Path);
 
         return true;
     }
@@ -54,33 +54,33 @@ public class LevelFileService
 
     public class LevelSerializer
     {
-        public void NewLevel(Editor editor)
+        public void NewLevel(EditorContext context)
         {
-            editor.EntityList.Clear();
-            editor.Cells = new Cell[Editor.WORLD_WIDTH, Editor.WORLD_HEIGHT];
-            editor.LevelName = "New Level";
-            editor.PlayerStart = Vector2.Zero;
-            editor.StartRotation = 0f;
+            context.World.EntityList.Clear();
+            context.World.Cells = new Cell[Editor.WORLD_WIDTH, Editor.WORLD_HEIGHT];
+            context.LevelName = "New Level";
+            context.PlayerStart = Vector2.Zero;
+            context.StartRotation = 0f;
 
             Debug.Log("New level");
         }
 
-        public Level Serialize(Editor editor)
+        public Level Serialize(EditorContext context)
         {
-            Level level = Level.FromWorld(editor);
-            level.PlayerStart = editor.PlayerStart;
-            level.StartRotation = editor.StartRotation;
+            Level level = Level.FromWorld(context.World);
+            level.PlayerStart = context.PlayerStart;
+            level.StartRotation = context.StartRotation;
 
             return level;
         }
 
-        public void Deserialize(Editor editor, Level level)
+        public void Deserialize(EditorContext context, Level level)
         {
-            editor.EntityList = level.EntityList;
-            editor.Cells = level.Cells;
+            context.World.EntityList = level.EntityList;
+            context.World.Cells = level.Cells;
 
-            editor.PlayerStart = level.PlayerStart;
-            editor.LevelName = level.Name;
+            context.PlayerStart = level.PlayerStart;
+            context.LevelName = level.Name;
         }
     }
 }

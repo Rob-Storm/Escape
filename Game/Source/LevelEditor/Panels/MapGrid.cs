@@ -29,6 +29,8 @@ public class MapGrid : EditorPanel
 
         uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
 
+        uint playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
+
         
         for (int y = 0; y < World.WORLD_HEIGHT; y++)
         {
@@ -49,6 +51,12 @@ public class MapGrid : EditorPanel
                 if (cell != null)
                 {
                     drawList.AddRectFilled(cellMin, cellMax, filledColor);
+
+                    if (cell == _editor.GetCell(_context.PlayerStart))
+                    {
+                        drawList.AddRectFilled(cellMin, cellMax, playerStartColor);
+                    }
+
                 }
 
                 if (_context.SelectedX == x && _context.SelectedY == y)

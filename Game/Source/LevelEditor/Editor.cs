@@ -138,7 +138,7 @@ public class Editor : World
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
-            _context.LevelFileService.Save(this);
+            _context.LevelFileService.Save(_context);
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
@@ -148,12 +148,12 @@ public class Editor : World
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))
         {
-            _context.LevelFileService.Load(this);
+            _context.LevelFileService.Load(_context);
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.R))
         {
-            var output = _context.LevelFileService.Save(this);
+            var output = _context.LevelFileService.Save(_context);
 
             if (output.result.IsOk)
             {

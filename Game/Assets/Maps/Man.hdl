@@ -1,8 +1,10 @@
 {
+  "Name": null,
   "PlayerStart": {
     "X": 2,
     "Y": 4
   },
+  "StartRotation": 270,
   "EntityList": [],
   "Cells": [
     [

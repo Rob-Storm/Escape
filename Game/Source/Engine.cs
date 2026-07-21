@@ -37,6 +37,8 @@ public class Engine
         else
         {
             _world = new World();
+
+            _world.LoadLevel(Level.LoadFromFile(Path.Combine(Paths.MapsFolder, "Man.hdl")));
         }
 
         if (!string.IsNullOrEmpty(levelPath))
