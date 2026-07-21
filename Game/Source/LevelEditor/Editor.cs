@@ -19,23 +19,19 @@ namespace Game.LevelEditor;
 
 public class Editor : World
 {
-
-
-
     private Vector2 _playerStart = Vector2.Zero;
     private string _levelName = "Level";
 
 
     private Cell _selectedCell;
-
-    private Cell selectedCell
+    public Cell SelectedCell
     {
         get => selectedX >= 0 && selectedY >= 0 ? GetCell(selectedX, selectedY): null;
     }
 
     private int selectedX, selectedY;
 
-    private string _draggedTexturePath;
+    public string DraggedTexturePath;
 
     private string _defaultPath = Paths.MapsFolder;
 
@@ -44,6 +40,8 @@ public class Editor : World
     private Viewport _viewport;
     private MenuBar _menuBar;
     private DeveloperConsole _console;
+    private AssetBrowser _assetBrowser;
+    private PropertyInspector _inspector;
 
     public Editor()
     {
@@ -53,7 +51,8 @@ public class Editor : World
         _viewport = new Viewport(this, (EditorCamera)_camera);
         _menuBar = new MenuBar(this);
         _console = new DeveloperConsole(this);
-
+        _assetBrowser = new AssetBrowser(this);
+        _inspector = new PropertyInspector(this);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
     }
@@ -71,6 +70,7 @@ public class Editor : World
         base.Update();
 
         _camera.Update();
+
         /*
         if (selectedCell != null && !ViewportControlled)
         {
@@ -112,9 +112,9 @@ public class Editor : World
             cellData.cell.Render();
         }
 
-        if(selectedCell != null)
+        if(SelectedCell != null)
         {
-            selectedCell.RenderBounds(Color.Orange, Color.Green);
+            SelectedCell.RenderBounds(Color.Orange, Color.Green);
         }        
 
         DrawWorldGrid();
@@ -137,7 +137,9 @@ public class Editor : World
 
         _console.Draw();
 
-        DrawAssets();
+        _assetBrowser.Draw();
+
+        _inspector.Draw();
 
         DrawProperties();
 
@@ -346,81 +348,7 @@ public class Editor : World
 
     private void DrawProperties()
     {
-        ImGui.Begin("Properties");
-
-        if(selectedCell != null)
-        {
-            uint flags = (uint)selectedCell.Walls;
-
-            if (ImGui.BeginTable("Walls", 2))
-            {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("North", ref flags, (uint)Walls.North);
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("East", ref flags, (uint)Walls.East);
-
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("South", ref flags, (uint)Walls.South);
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("West", ref flags, (uint)Walls.West);
-
-                ImGui.EndTable();
-            }
-
-            ImGui.SeparatorText("Walls");
-
-            if(ImGui.BeginTable("WallTextures", 2))
-            {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("North", ref selectedCell.NorthWallTexturePath);
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("East", ref selectedCell.EastWallTexturePath);
-
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("South", ref selectedCell.SouthWallTexturePath);
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("West", ref selectedCell.WestWallTexturePath);
-
-                ImGui.EndTable();
-            }
-
-            ImGui.SeparatorText("Floor / Ceiling");
-
-            if(ImGui.BeginTable("FloorTable", 2))
-            {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("Floor", ref selectedCell.FloorTexturePath);
-                ImGui.TableNextColumn();
-                DrawTextureSlot("Ceiling", ref selectedCell.CeilingTexturePath);
-
-                ImGui.EndTable();
-            }
-
-            selectedCell.Walls = (Walls)flags;
-        }
-        else
-        {
-            string text = "Select a cell to view properties";
-
-            ImGui.SetCursorPos((ImGui.GetContentRegionAvail() * 0.5f) - (ImGui.CalcTextSize(text) * 0.5f));
-            ImGui.TextDisabled(text);
-        }
         
-        ImGui.End();
     }
 
     private void DrawLevelSettings()
@@ -433,87 +361,7 @@ public class Editor : World
         ImGui.End();
     }
 
-    private void DrawAssets()
-    {
-        float padding = 8.0f;
-        float cellSize = 24f;
 
-        float panelWidth = ImGui.GetContentRegionAvail().X;
-        int columnCount = Math.Max(1, (int)(panelWidth / (cellSize + padding)));
-
-        ImGui.Begin("Browser");
-
-        if(ImGui.BeginTable("Assets", columnCount))
-        {
-            foreach (var texture in AssetManager.GetAssets<Texture2D>())
-            {
-                ImGui.TableNextColumn();
-
-                ImGui.PushID(texture.Key);
-
-                rlImGui.ImageButtonSize("##preview", texture.Value, new Vector2(96));
-
-                if (ImGui.BeginDragDropSource())
-                {
-                    ImGui.SetDragDropPayload("texture_path", IntPtr.Zero, 0);
-
-                    _draggedTexturePath = texture.Key;
-
-                    ImGui.Text(texture.Key);
-                    ImGui.EndDragDropSource();
-                }
-
-                ImGui.Text(Path.GetFileNameWithoutExtension(texture.Key));
-                ImGui.TextDisabled(AssetManager.GetAssetType(texture.Value));
-
-                ImGui.PopID();
-            }
-
-            /*foreach (var asset in AssetManager.Assets)
-            {
-                ImGui.TableNextColumn();
-
-                ImGui.PushID(asset.Key);
-
-                rlImGui.ImageButtonSize("##thumbnail", AssetManager.Load<Texture2D>(@"Assets\Textures\Man.png"), new Vector2(96));
-
-                if (ImGui.BeginDragDropSource())
-                {
-                    ImGui.SetDragDropPayload("texture_path", IntPtr.Zero, 0);
-
-                    _draggedTexturePath = asset.Key;
-
-                    ImGui.Text(asset.Key);
-                    ImGui.EndDragDropSource();
-                }
-
-                ImGui.Text(Path.GetFileNameWithoutExtension(asset.Key));
-                ImGui.TextDisabled(AssetManager.GetAssetType(asset.Value));
-
-                ImGui.PopID();
-            }*/
-
-            ImGui.EndTable();
-        }
-
-        ImGui.End();
-    }
-
-    private void DrawTextureSlot(string name, ref string texturePath)
-    {
-        ImGui.Text(name);
-
-        rlImGui.ImageSize(AssetManager.Load<Texture2D>(texturePath), new Vector2(80));
-
-        if(ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-        {
-            ImGui.AcceptDragDropPayload("texture_path");
-
-            texturePath = _draggedTexturePath;
-
-            ImGui.EndDragDropTarget();
-        }
-    }
 
     public void NewLevel()
     {
