@@ -43,6 +43,7 @@ public class Editor : World
     private AssetBrowser _assetBrowser;
     private PropertyInspector _inspector;
     private MapGrid _mapGrid;
+    private LevelSettings _levelSettings;
 
     public Editor()
     {
@@ -55,6 +56,7 @@ public class Editor : World
         _assetBrowser = new AssetBrowser(this);
         _inspector = new PropertyInspector(this);
         _mapGrid = new MapGrid(this);
+        _levelSettings = new LevelSettings(this);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
     }
@@ -142,8 +144,7 @@ public class Editor : World
 
         _mapGrid.Draw();
 
-
-        DrawLevelSettings();
+        _levelSettings.Draw();
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
@@ -194,16 +195,6 @@ public class Editor : World
                     Color.Gray
                 );
         }
-    }
-
-    private void DrawLevelSettings()
-    {
-        ImGui.Begin("Level Settings");
-
-        ImGui.InputText("Level Name", ref LevelName, 16);
-        ImGui.InputFloat2("Player Start", ref PlayerStart);
-
-        ImGui.End();
     }
 
     public void NewLevel()
