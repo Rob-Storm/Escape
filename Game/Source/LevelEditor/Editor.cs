@@ -138,22 +138,27 @@ public class Editor : World
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
-            //SaveLevel();
+            _context.LevelFileService.Save(this);
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
         {
-            //NewLevel();
+            _context.LevelFileService.NewLevel(_context);
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))
         {
-            //LoadEditorLevel();
+            _context.LevelFileService.Load(this);
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.R))
         {
-            //RunLevel(SaveLevel().path);
+            var output = _context.LevelFileService.Save(this);
+
+            if (output.result.IsOk)
+            {
+                _context.PlayModeService.RunLevel(output.result.Path);
+            }
         }
 
         rlImGui.End();
@@ -198,6 +203,8 @@ public class Editor : World
             CeilingTexturePath = @"Assets\Textures\Ceiling.png"
         };
     }
+
+
 
 }
 

@@ -55,11 +55,11 @@ public class EditorCamera : Camera
             Move(GetRightVector());
         }
 
-        if (Raylib.IsKeyDown(KeyboardKey.Space))
+        if (Raylib.IsKeyDown(KeyboardKey.E))
         {
             Move(Directions.Up);
         }
-        if (Raylib.IsKeyDown(KeyboardKey.LeftControl))
+        if (Raylib.IsKeyDown(KeyboardKey.Q))
         {
             Move(Directions.Down);
         }

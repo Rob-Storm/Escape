@@ -41,8 +41,6 @@ public class World
                 }
             }
         }
-
-
     }
 
     public void LoadLevel(Level level)
@@ -54,6 +52,7 @@ public class World
         Cells = level.Cells;
 
         _player.Transform.Position = new Vector3(level.PlayerStart.X, 0.5f, level.PlayerStart.Y);
+        _player.Transform.Rotation = Quaternion.CreateFromYawPitchRoll(level.StartRotation, 0, 0);
 
         EntityList.Add(_player);
     }

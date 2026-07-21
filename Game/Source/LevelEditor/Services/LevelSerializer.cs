@@ -41,6 +41,17 @@ public class LevelFileService
         return true;
     }
 
+    public void NewLevel(EditorContext context)
+    {
+        //context.EntityList.Clear();
+        context.World.Cells = new Cell[World.WORLD_WIDTH, World.WORLD_HEIGHT];
+        context.LevelName = "New Level";
+        context.PlayerStart = Vector2.Zero;
+        context.StartRotation = 0f;
+
+        Debug.Log("New level");
+    }
+
     public class LevelSerializer
     {
         public void NewLevel(Editor editor)

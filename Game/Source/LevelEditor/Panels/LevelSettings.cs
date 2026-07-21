@@ -14,7 +14,8 @@ public class LevelSettings : EditorPanel
         ImGui.Begin("Level Settings");
 
         ImGui.InputText("Level Name", ref _context.LevelName, 16);
-        ImGui.InputFloat2("Player Start", ref _context.PlayerStart);
+        ImGui.InputFloat2("Start Position", ref _context.PlayerStart);
+        ImGui.DragFloat("Start Rotation", ref _context.StartRotation, 1f, 0f, 359f);
 
         ImGui.End();
     }

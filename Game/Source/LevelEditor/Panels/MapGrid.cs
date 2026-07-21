@@ -88,7 +88,7 @@ public class MapGrid : EditorPanel
                             }
                         }
 
-                        if (ImGui.MenuItem("Set Player Start"))
+                        if (ImGui.MenuItem("Set Start Position"))
                         {
                             _context.PlayerStart = new Vector2(x, y);
                         }
