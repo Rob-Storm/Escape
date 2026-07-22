@@ -118,9 +118,12 @@ public class MapGrid : EditorPanel
                     }
                 }
 
-                if (_context.SelectedX == x && _context.SelectedY == y)
+                if(_context.ToolMode == ToolMode.Select)
                 {
-                    drawList.AddRectFilled(cellMin, cellMax, selectedColor);
+                    if (_context.SelectedX == x && _context.SelectedY == y)
+                    {
+                        drawList.AddRectFilled(cellMin, cellMax, selectedColor);
+                    }
                 }
 
                 if (x == _startRoomCellX || x == _cursorRoomCellX)

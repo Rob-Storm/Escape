@@ -15,7 +15,7 @@ public class World
     public int SizeX = 25;
     public int SizeY = 25;
 
-    protected bool _showFPS = false;
+    protected bool _debugDrawMode = false;
 
     public World()
     {
@@ -75,7 +75,7 @@ public class World
 
         if (Raylib.IsKeyPressed(KeyboardKey.F5))
         {
-            _showFPS = !_showFPS;
+            _debugDrawMode = !_debugDrawMode;
         }
     }
 
@@ -97,7 +97,7 @@ public class World
 
         Raylib.EndMode3D();
 
-        if (_showFPS)
+        if (_debugDrawMode)
         {
             Raylib.DrawFPS(0, 0);
         }

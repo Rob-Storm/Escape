@@ -87,7 +87,7 @@ public class Editor : World
 
         if (Raylib.IsKeyPressed(KeyboardKey.F3))
         {
-            _showFPS = !_showFPS;
+            _debugDrawMode = !_debugDrawMode;
         }
 
     }
@@ -108,6 +108,11 @@ public class Editor : World
         foreach (var cellData in GetCells())
         {
             cellData.cell.Render();
+
+            if(_debugDrawMode)
+            {
+                cellData.cell.RenderBounds(Color.Blank, Color.SkyBlue);
+            }
         }
 
         if (_context.SelectedCell != null)
@@ -119,7 +124,7 @@ public class Editor : World
 
         Raylib.EndMode3D();
 
-        if (_showFPS)
+        if (_debugDrawMode)
         {
             Raylib.DrawFPS(0, 0);
         }
