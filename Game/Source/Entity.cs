@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Game;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName ="$type")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(Character))]
 public class Entity
 {

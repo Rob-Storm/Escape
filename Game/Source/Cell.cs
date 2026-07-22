@@ -34,7 +34,7 @@ public class Cell
 
     private Model _horizontalModel;
     private Matrix4x4 _transform;
-    private  Model _verticalModel;
+    private Model _verticalModel;
 
     public Cell() : this(0, 0) { }
 
@@ -140,7 +140,7 @@ public class Cell
         }
 
         // entire cell bounds
-        Raylib.DrawCubeWires(Position + Vector3.UnitY* 0.75f, 1, 1.5f, 1, cellColor);
+        Raylib.DrawCubeWires(Position + Vector3.UnitY * 0.75f, 1, 1.5f, 1, cellColor);
     }
 
     private void RenderWall(float rotation)

@@ -64,7 +64,7 @@ public class Editor : World
 
         _camera.Update();
 
-        
+
         if (_context.SelectedCell != null && !_viewport.ViewportControlled)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.W))
@@ -84,7 +84,7 @@ public class Editor : World
                 _context.SelectedCell.Walls ^= Walls.East;
             }
         }
-        
+
     }
 
     public override void Render()
@@ -100,15 +100,15 @@ public class Editor : World
             entity.Render(_camera);
         }
 
-        foreach(var cellData in GetCells())
+        foreach (var cellData in GetCells())
         {
             cellData.cell.Render();
         }
 
-        if(_context.SelectedCell != null)
+        if (_context.SelectedCell != null)
         {
             _context.SelectedCell.RenderBounds(Color.Orange, Color.Green);
-        }        
+        }
 
         DrawWorldGrid();
 
@@ -178,8 +178,8 @@ public class Editor : World
         {
             Raylib.DrawLine3D
                 (
-                    new Vector3(x * cellSize, 0, 0) + offset, 
-                    new Vector3(x * cellSize, 0, SizeY * cellSize) + offset, 
+                    new Vector3(x * cellSize, 0, 0) + offset,
+                    new Vector3(x * cellSize, 0, SizeY * cellSize) + offset,
                     Color.Gray
                 );
         }
@@ -188,8 +188,8 @@ public class Editor : World
         {
             Raylib.DrawLine3D
                 (
-                    new Vector3(0, 0, z * cellSize) + offset, 
-                    new Vector3(SizeX * cellSize, 0, z * cellSize) + offset, 
+                    new Vector3(0, 0, z * cellSize) + offset,
+                    new Vector3(SizeX * cellSize, 0, z * cellSize) + offset,
                     Color.Gray
                 );
         }

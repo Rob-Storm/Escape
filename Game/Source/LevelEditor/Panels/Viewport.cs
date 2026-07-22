@@ -20,7 +20,7 @@ public class Viewport : EditorPanel
     EditorCamera _camera;
 
     public Viewport(EditorContext context) : base(context)
-    {         
+    {
         _camera = context.Camera;
         CreateViewportRenderTarget();
     }

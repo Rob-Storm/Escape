@@ -44,7 +44,7 @@ public class Player : Character
             moveVector += GetRightVector();
         }
 
-        if(moveVector != Vector3.Zero)
+        if (moveVector != Vector3.Zero)
         {
             moveVector = Vector3.Normalize(moveVector);
             Move(moveVector);
@@ -56,7 +56,7 @@ public class Player : Character
         _pitch -= delta.Y * Camera.Sensitivity;
         _pitch = Math.Clamp(_pitch, -89.9f * Raylib.DEG2RAD, 89.9f * Raylib.DEG2RAD);
 
-        if(Raylib.IsCursorHidden())
+        if (Raylib.IsCursorHidden())
         {
             Transform.Rotation = Quaternion.CreateFromYawPitchRoll(_yaw, 0, 0);
             Camera.Transform.Rotation = Quaternion.Normalize(Transform.Rotation * Quaternion.CreateFromYawPitchRoll(0, _pitch, 0));

@@ -6,7 +6,7 @@ public class LevelSettings : EditorPanel
 {
     public LevelSettings(EditorContext context) : base(context)
     {
-        
+
     }
 
     public override void Draw()

@@ -18,7 +18,7 @@ public class EditorCamera : Camera
 
         _viewport.ViewportControlChanged += (controlled) =>
         {
-            if(controlled)
+            if (controlled)
             {
                 Raylib.HideCursor();
             }
@@ -27,7 +27,7 @@ public class EditorCamera : Camera
                 Raylib.ShowCursor();
             }
         };
-        
+
     }
 
 
@@ -37,7 +37,7 @@ public class EditorCamera : Camera
         {
             return;
         }
-        
+
         if (Raylib.IsKeyDown(KeyboardKey.W))
         {
             Move(GetForwardVector());

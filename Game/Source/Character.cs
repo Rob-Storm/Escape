@@ -13,7 +13,7 @@ public class Character : Entity
 
     protected void Move(Vector3 direction)
     {
-        Vector3 movement = direction * _moveSpeed * (float)Time.FrameDelta;   
+        Vector3 movement = direction * _moveSpeed * (float)Time.FrameDelta;
 
         if (CanMove(new Vector3(movement.X, 0, 0)))
         {
@@ -37,7 +37,7 @@ public class Character : Entity
             Max = (Transform.Position + direction) + halfSize
         };
 
-        foreach(var cellData in World.GetCells())
+        foreach (var cellData in World.GetCells())
         {
             if (World.IsCollidingWithCell(cellData.cell, sweepCollider))
             {

@@ -54,7 +54,7 @@ public class Level
 
     public static Level LoadFromFile(string path)
     {
-        if(!Path.Exists(path))
+        if (!Path.Exists(path))
         {
             throw new Exception($"Could not find level at path: {path}");
         }
@@ -63,7 +63,7 @@ public class Level
 
         Level? level = JsonSerializer.Deserialize<Level>(contents, _options);
 
-        if(level == null)
+        if (level == null)
         {
             throw new Exception("Could not load level");
         }

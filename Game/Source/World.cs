@@ -25,7 +25,7 @@ public class World
 
     public Cell GetCell(int x, int y)
     {
-        return Cells[x,y];
+        return Cells[x, y];
     }
 
     public Cell GetCell(Vector2 location)
@@ -35,12 +35,12 @@ public class World
 
     public void SetCell(int x, int y, Cell cell)
     {
-        Cells[x,y] = cell;
+        Cells[x, y] = cell;
     }
 
     public IEnumerable<(int x, int y, Cell cell)> GetCells()
     {
-        for(int x = 0; x < SizeX;  x++)
+        for (int x = 0; x < SizeX; x++)
         {
             for (int y = 0; y < SizeY; y++)
             {
@@ -73,7 +73,7 @@ public class World
             entity.Update();
         }
 
-        if(Raylib.IsKeyPressed(KeyboardKey.F5))
+        if (Raylib.IsKeyPressed(KeyboardKey.F5))
         {
             _showFPS = !_showFPS;
         }
@@ -90,14 +90,14 @@ public class World
             entity.Render(_camera);
         }
 
-        foreach(var cellData in GetCells())
+        foreach (var cellData in GetCells())
         {
             cellData.cell.Render();
         }
 
         Raylib.EndMode3D();
 
-        if(_showFPS)
+        if (_showFPS)
         {
             Raylib.DrawFPS(0, 0);
         }

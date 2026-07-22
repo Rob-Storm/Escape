@@ -1,6 +1,4 @@
-﻿using Raylib_cs;
-
-namespace Game;
+﻿namespace Game;
 
 public delegate void LogCommittedSignature(string message, LogLevel level, LogChannel channel);
 
@@ -41,7 +39,7 @@ public static class Debug
         Console.ForegroundColor = lineColor;
         Console.WriteLine(finalMessage);
         Console.ForegroundColor = ConsoleColor.White;
-    }   
+    }
 }
 
 public enum LogChannel

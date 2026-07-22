@@ -9,7 +9,7 @@ class Program
         string? levelPath = null;
 
         int levelIndex = Array.IndexOf(args, "--level");
-        if(levelIndex >= 0 && levelIndex + 1 < args.Length)
+        if (levelIndex >= 0 && levelIndex + 1 < args.Length)
         {
             levelPath = args[levelIndex + 1];
         }

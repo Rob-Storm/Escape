@@ -39,7 +39,7 @@ public static class AssetManager
     {
         string[] files = Directory.GetFiles(Paths.AssetsRoot, "*.*", SearchOption.AllDirectories);
 
-        foreach(string file in files)
+        foreach (string file in files)
         {
             string relativePath = Path.Combine("Assets", Path.GetRelativePath(Paths.AssetsRoot, file));
 
@@ -64,7 +64,7 @@ public static class AssetManager
     {
         foreach (var asset in Assets)
         {
-            if(asset.Value is T value)
+            if (asset.Value is T value)
             {
                 yield return new KeyValuePair<string, T>(asset.Key, value);
             }
@@ -120,7 +120,7 @@ public static class AssetManager
         {
             Debug.Log("Could not load resource", LogLevel.Warning, LogChannel.Asset);
         }
-        
+
         return (T)loadedObject;
     }
 

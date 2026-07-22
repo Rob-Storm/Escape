@@ -14,7 +14,7 @@ public class BillboardRenderer
 
     public void Render(Camera camera, Vector3 position)
     {
-        if(Texture.Id == 0)
+        if (Texture.Id == 0)
         {
             return;
         }

@@ -31,7 +31,7 @@ public class TextureConverter : JsonConverter<Texture2D>
 
             reader.Read();
 
-            if(propertyName == "Path")
+            if (propertyName == "Path")
             {
                 texture = AssetManager.Load<Texture2D>(reader.GetString());
             }
@@ -84,7 +84,7 @@ public class CellArrayConverter : JsonConverter<Cell[,]>
     {
         writer.WriteStartArray();
 
-        for(int x = 0; x < value.GetLength(0); x++)
+        for (int x = 0; x < value.GetLength(0); x++)
         {
             writer.WriteStartArray();
             for (int y = 0; y < value.GetLength(1); y++)

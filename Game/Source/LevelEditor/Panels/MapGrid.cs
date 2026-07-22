@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using System.Numerics;
-using System.Xml.Linq;
 
 namespace Game.LevelEditor.Panels;
 
@@ -38,7 +37,7 @@ public class MapGrid : EditorPanel
         ImGui.SameLine();
 
         DrawToolButton($"{IconFonts.FontAwesome6.Hammer} Room", ToolMode.Room);
-        
+
         ImGui.SameLine();
 
         DrawToolButton($"{IconFonts.FontAwesome6.Eraser} Erase", ToolMode.Delete);
@@ -60,7 +59,7 @@ public class MapGrid : EditorPanel
         {
             float wheel = ImGui.GetIO().MouseWheel;
 
-            if(wheel != 0)
+            if (wheel != 0)
             {
                 _zoom += wheel * 0.05f;
 
@@ -92,7 +91,7 @@ public class MapGrid : EditorPanel
 
         uint playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
 
-        
+
         for (int y = 0; y < _context.World.SizeY; y++)
         {
             for (int x = 0; x < _context.World.SizeX; x++)
@@ -124,9 +123,9 @@ public class MapGrid : EditorPanel
                     drawList.AddRectFilled(cellMin, cellMax, selectedColor);
                 }
 
-                if(x == _startRoomCellX || x == _cursorRoomCellX)
+                if (x == _startRoomCellX || x == _cursorRoomCellX)
                 {
-                    if(y == _startRoomCellY || y == _cursorRoomCellY)
+                    if (y == _startRoomCellY || y == _cursorRoomCellY)
                     {
                         drawList.AddRectFilled(cellMin, cellMax, roomPreviewColor);
                     }
@@ -134,17 +133,17 @@ public class MapGrid : EditorPanel
 
                 drawList.AddRect(cellMin, cellMax, gridColor);
 
-                if(ImGui.IsItemClicked())
+                if (ImGui.IsItemClicked())
                 {
                     HandleCellClick(x, y);
                 }
 
-                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseDown(ImGuiMouseButton.Left))
+                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseDown(ImGuiMouseButton.Left))
                 {
                     HandleCellPress(x, y);
                 }
 
-                if(hovered && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                if (hovered && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 {
                     HandleCellRelease(x, y);
                     Debug.Log($"Release cell {x},{y}");
@@ -224,7 +223,7 @@ public class MapGrid : EditorPanel
     {
         ImGui.BeginDisabled(_context.ToolMode == mode);
 
-        if(ImGui.Button(label))
+        if (ImGui.Button(label))
         {
             _context.ToolMode = mode;
             Debug.Log($"Set active mode: {mode}");
@@ -337,7 +336,7 @@ public class MapGrid : EditorPanel
 
                 Walls newWalls = Walls.None;
 
-                if(y == (int)start.Y)
+                if (y == (int)start.Y)
                 {
                     newWalls |= Walls.North;
                 }
