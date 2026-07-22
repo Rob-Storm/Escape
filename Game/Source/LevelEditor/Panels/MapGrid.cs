@@ -10,6 +10,15 @@ public class MapGrid : EditorPanel
     private Vector2 _pan = Vector2.Zero;
     private const float BASE_CELL_SIZE = 32f;
 
+    private int _startRoomCellX = -1;
+    private int _startRoomCellY = -1;
+
+    private int _cursorRoomCellX = -1;
+    private int _cursorRoomCellY = -1;
+
+    private int _endRoomCellX = -1;
+    private int _endRoomCellY = -1;
+
     public MapGrid(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
@@ -90,6 +99,8 @@ public class MapGrid : EditorPanel
 
         uint filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.75f, 0.75f, 0.75f, 1f));
 
+        uint roomPreviewColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0.75f, 1f));
+
         uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
 
         uint playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
@@ -126,6 +137,14 @@ public class MapGrid : EditorPanel
                     drawList.AddRectFilled(cellMin, cellMax, selectedColor);
                 }
 
+                if(x == _startRoomCellX || x == _cursorRoomCellX)
+                {
+                    if(y == _startRoomCellY || y == _cursorRoomCellY)
+                    {
+                        drawList.AddRectFilled(cellMin, cellMax, roomPreviewColor);
+                    }
+                }
+
                 drawList.AddRect(cellMin, cellMax, gridColor);
 
                 if(ImGui.IsItemClicked())
@@ -136,6 +155,12 @@ public class MapGrid : EditorPanel
                 if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseDown(ImGuiMouseButton.Left))
                 {
                     HandleCellPress(x, y);
+                }
+
+                if(hovered && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                {
+                    HandleCellRelease(x, y);
+                    Debug.Log($"Release cell {x},{y}");
                 }
 
                 if (ImGui.BeginPopupContextItem($"CellOptions##{x}_{y}"))
@@ -168,12 +193,11 @@ public class MapGrid : EditorPanel
 
                     ImGui.EndPopup();
                 }
-
             }
         }
 
 
-        // A second pass lets us guarantee the wall lines are drawn last 
+        // A second pass lets us guarantee the wall lines are drawn on top of the grid 
         for (int y = 0; y < _context.World.SizeY; y++)
         {
             for (int x = 0; x < _context.World.SizeX; x++)
@@ -217,11 +241,12 @@ public class MapGrid : EditorPanel
             case ToolMode.Select:
                 _context.SelectedX = cellX;
                 _context.SelectedY = cellY;
-                Debug.Log($"Selected cell at '{cellX},{cellY}'");
                 break;
             case ToolMode.Draw:
                 break;
             case ToolMode.Room:
+                _startRoomCellX = cellX;
+                _startRoomCellY = cellY;
                 break;
             case ToolMode.Delete:
                 break;
@@ -250,6 +275,8 @@ public class MapGrid : EditorPanel
 
                 break;
             case ToolMode.Room:
+                _cursorRoomCellX = cellX;
+                _cursorRoomCellY = cellY;
                 break;
             case ToolMode.Delete:
                 _editor.SetCell(cellX, cellY, null);
@@ -260,6 +287,78 @@ public class MapGrid : EditorPanel
                     _context.SelectedY = -1;
                 }
                 break;
+        }
+    }
+
+    private void HandleCellRelease(int cellX, int cellY)
+    {
+        switch (_context.ToolMode)
+        {
+            case ToolMode.Select:
+                break;
+            case ToolMode.Draw:
+                break;
+            case ToolMode.Room:
+                _endRoomCellX = cellX;
+                _endRoomCellY = cellY;
+
+                CreateRoom(new Vector2(_startRoomCellX, _startRoomCellY), new Vector2(_endRoomCellX, _endRoomCellY));
+
+                _startRoomCellX = -1;
+                _startRoomCellY = -1;
+
+                _cursorRoomCellX = -1;
+                _cursorRoomCellY = -1;
+
+                _endRoomCellX = -1;
+                _endRoomCellY = -1;
+                break;
+            case ToolMode.Delete:
+                break;
+        }
+    }
+
+    private void CreateRoom(Vector2 start, Vector2 end)
+    {
+        Debug.Log($"Building room. Start: {start}. End: {end}");
+
+        for (int x = (int)start.X; x < (int)end.X + 1; x++)
+        {
+            for (int y = (int)start.Y; y < (int)end.Y + 1; y++)
+            {
+                Cell newCell = new Cell(x, y);
+
+                newCell.NorthWallTexturePath = _context.ToolSettings.NorthWallTexturePath;
+                newCell.EastWallTexturePath = _context.ToolSettings.EastWallTexturePath;
+                newCell.WestWallTexturePath = _context.ToolSettings.WestWallTexturePath;
+                newCell.SouthWallTexturePath = _context.ToolSettings.SouthWallTexturePath;
+
+                newCell.FloorTexturePath = _context.ToolSettings.FloorTexturePath;
+                newCell.CeilingTexturePath = _context.ToolSettings.CeilingTexturePath;
+
+                Walls newWalls = Walls.None;
+
+                if(y == (int)start.Y)
+                {
+                    newWalls |= Walls.North;
+                }
+                if (y == (int)end.Y)
+                {
+                    newWalls |= Walls.South;
+                }
+                if (x == (int)start.X)
+                {
+                    newWalls |= Walls.West;
+                }
+                if (x == (int)end.X)
+                {
+                    newWalls |= Walls.East;
+                }
+
+                newCell.Walls = newWalls;
+
+                _editor.SetCell(x, y, newCell);
+            }
         }
     }
 

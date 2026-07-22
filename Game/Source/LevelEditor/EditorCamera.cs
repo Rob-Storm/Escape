@@ -6,7 +6,7 @@ namespace Game.LevelEditor;
 
 public class EditorCamera : Camera
 {
-    private float _moveSpeed = 1f;
+    public float MoveSpeed = 5f;
 
     private float _pitch, _yaw;
 
@@ -76,6 +76,6 @@ public class EditorCamera : Camera
 
     private void Move(Vector3 direction)
     {
-        Transform.Translate(direction * _moveSpeed * (float)Time.FrameDelta);
+        Transform.Translate(direction * MoveSpeed * (float)Time.FrameDelta);
     }
 }
