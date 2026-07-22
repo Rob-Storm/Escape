@@ -29,6 +29,10 @@ public class World
         {
             return null;
         }
+        if (x > SizeX || y > SizeY)
+        {
+            return null;
+        }
 
         return Cells[x, y];
     }

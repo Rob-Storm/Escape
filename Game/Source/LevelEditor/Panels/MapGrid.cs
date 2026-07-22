@@ -99,7 +99,42 @@ public class MapGrid : EditorPanel
 
         Vector2 mapSize = new Vector2(_context.World.SizeX, _context.World.SizeY) * cellSize;
 
-        if(!_drawGrid)
+        ImGui.SetCursorScreenPos(origin);
+
+        ImGui.InvisibleButton($"MapHitTest", mapSize);
+
+        bool hovered = ImGui.IsItemHovered();
+
+        if (hovered)
+        {
+            Vector2 mouse = ImGui.GetIO().MousePos - origin;
+            int cellX = (int)(mouse.X / cellSize);
+            int cellY = (int)(mouse.Y / cellSize);
+
+            if (ImGui.IsItemClicked())
+            {
+                HandleCellClick(cellX, cellY);
+            }
+
+            if (ImGui.IsMouseDown(ImGuiMouseButton.Left))
+            {
+                HandleCellPress(cellX, cellY);
+            }
+
+            if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+            {
+                HandleCellRelease(cellX, cellY);
+            }
+        }
+
+        ImGui.PushClipRect(origin, origin + mapSize, true);
+
+
+        if (_drawGrid)
+        {
+            DrawGrid(drawList, origin, cellSize);
+        }
+        else
         {
             drawList.AddRect(origin, origin + mapSize, _gridColor);
         }
@@ -113,12 +148,6 @@ public class MapGrid : EditorPanel
                 Vector2 cellMin = origin + new Vector2(x * cellSize, y * cellSize);
 
                 Vector2 cellMax = cellMin + new Vector2(cellSize, cellSize);
-
-                ImGui.SetCursorScreenPos(cellMin);
-
-                ImGui.InvisibleButton($"Cell##{x}_{y}", new Vector2(cellSize, cellSize));
-
-                bool hovered = ImGui.IsItemHovered();
 
                 if (cell != null)
                 {
@@ -148,58 +177,6 @@ public class MapGrid : EditorPanel
                         }
                     }
                 }
-
-                if(_drawGrid)
-                {
-                    drawList.AddRect(cellMin, cellMax, _gridColor);
-                }
-
-                if (ImGui.IsItemClicked())
-                {
-                    HandleCellClick(x, y);
-                }
-
-                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseDown(ImGuiMouseButton.Left))
-                {
-                    HandleCellPress(x, y);
-                }
-
-                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                {
-                    HandleCellRelease(x, y);
-                    Debug.Log($"Release cell {x},{y}");
-                }
-
-                if (ImGui.BeginPopupContextItem($"CellOptions##{x}_{y}"))
-                {
-                    if (cell == null)
-                    {
-                        if (ImGui.MenuItem("Add Cell"))
-                        {
-                            _editor.SetCell(x, y, _editor.CreateDefaultCell(x, y));
-                        }
-                    }
-                    else
-                    {
-                        if (ImGui.MenuItem("Remove Cell"))
-                        {
-                            _editor.SetCell(x, y, null);
-
-                            if (_context.SelectedX == x && _context.SelectedY == y)
-                            {
-                                _context.SelectedX = -1;
-                                _context.SelectedY = -1;
-                            }
-                        }
-
-                        if (ImGui.MenuItem("Set Start Position"))
-                        {
-                            _context.PlayerStart = new Vector2(x, y);
-                        }
-                    }
-
-                    ImGui.EndPopup();
-                }
             }
         }
 
@@ -212,7 +189,6 @@ public class MapGrid : EditorPanel
                 Cell cell = _editor.GetCell(x, y);
 
                 Vector2 cellMin = origin + new Vector2(x * cellSize, y * cellSize);
-
 
                 if (cell != null)
                 {
@@ -236,10 +212,30 @@ public class MapGrid : EditorPanel
             }
         }
 
+        ImGui.PopClipRect();
+
         ImGui.EndChild();
 
         ImGui.End();
     }
+
+    private void DrawGrid(ImDrawListPtr drawList, Vector2 origin, float cellSize)
+    {
+        for (int x = 0; x < _context.World.SizeX; x++)
+        {
+            float px = origin.X + x * cellSize;
+
+            drawList.AddLine(new Vector2(px, origin.Y), new Vector2(px, origin.Y + _context.World.SizeY * cellSize), _gridColor);
+        }
+
+        for (int y = 0; y < _context.World.SizeY; y++)
+        {
+            float py = origin.Y + y * cellSize;
+
+            drawList.AddLine(new Vector2(origin.X, py), new Vector2(origin.X + _context.World.SizeX * cellSize, py), _gridColor);
+        }
+    }
+
     private void DrawToolButton(string label, ToolMode mode)
     {
         ImGui.BeginDisabled(_context.ToolMode == mode);
