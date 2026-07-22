@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using System.Numerics;
+using System.Xml.Linq;
 
 namespace Game.LevelEditor.Panels;
 
@@ -22,39 +23,25 @@ public class MapGrid : EditorPanel
     public MapGrid(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
+
+
     }
 
     private void DrawTools()
     {
-        if (ImGui.Button($"{IconFonts.FontAwesome6.ArrowPointer} Select"))
-        {
-            _context.ToolMode = ToolMode.Select;
-            Debug.Log("Select");
-        }
+        DrawToolButton($"{IconFonts.FontAwesome6.ArrowPointer} Select", ToolMode.Select);
 
         ImGui.SameLine();
 
-        if (ImGui.Button($"{IconFonts.FontAwesome6.Paintbrush} Draw"))
-        {
-            _context.ToolMode = ToolMode.Draw;
-            Debug.Log("Draw");
-        }
+        DrawToolButton($"{IconFonts.FontAwesome6.Paintbrush} Draw", ToolMode.Draw);
 
         ImGui.SameLine();
 
-        if (ImGui.Button($"{IconFonts.FontAwesome6.Hammer} Quick Room"))
-        {
-            _context.ToolMode = ToolMode.Room;
-            Debug.Log("Room");
-        }
-
+        DrawToolButton($"{IconFonts.FontAwesome6.Hammer} Room", ToolMode.Room);
+        
         ImGui.SameLine();
 
-        if (ImGui.Button($"{IconFonts.FontAwesome6.Eraser} Erase"))
-        {
-            _context.ToolMode = ToolMode.Delete;
-            Debug.Log("Delete");
-        }
+        DrawToolButton($"{IconFonts.FontAwesome6.Eraser} Erase", ToolMode.Delete);
 
         ImGui.SameLine();
 
@@ -233,6 +220,18 @@ public class MapGrid : EditorPanel
 
         ImGui.End();
     }
+    private void DrawToolButton(string label, ToolMode mode)
+    {
+        ImGui.BeginDisabled(_context.ToolMode == mode);
+
+        if(ImGui.Button(label))
+        {
+            _context.ToolMode = mode;
+            Debug.Log($"Set active mode: {mode}");
+        }
+
+        ImGui.EndDisabled();
+    }
 
     private void HandleCellClick(int cellX, int cellY)
     {
@@ -389,4 +388,5 @@ public class MapGrid : EditorPanel
 
         drawList.AddLine(start, end, color, 1.5f * _zoom);
     }
+
 }
