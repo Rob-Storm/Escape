@@ -96,17 +96,19 @@ public static class AssetManager
     {
         Func<string, T> loader = (Func<string, T>)_resourceLoaders[typeof(T)];
 
-        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        if(!string.IsNullOrEmpty(path))
+        {
+            if (Assets.TryGetValue(path, out object cachedObject))
+            {
+                return (T)cachedObject;
+            }
+        }
+
+        if (!File.Exists(path))
         {
             object fallbackObject = loader(_fallbackPaths[typeof(T)]);
 
             return (T)fallbackObject;
-        }
-
-
-        if (Assets.TryGetValue(path, out object cachedObject))
-        {
-            return (T)cachedObject;
         }
 
         object loadedObject = loader(path);

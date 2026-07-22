@@ -65,9 +65,9 @@ public class EditorCamera : Camera
         }
 
         Vector2 delta = Raylib.GetMouseDelta();
-        _yaw -= delta.X * Sensitivity;
+        _yaw -= (delta.X * Sensitivity) * (float)Time.FrameDelta;
 
-        _pitch -= delta.Y * Sensitivity;
+        _pitch -= (delta.Y * Sensitivity) * (float)Time.FrameDelta;
         _pitch = Math.Clamp(_pitch, -89.9f * Raylib.DEG2RAD, 89.9f * Raylib.DEG2RAD);
 
         Transform.Rotation = Quaternion.CreateFromYawPitchRoll(_yaw, 0, 0);

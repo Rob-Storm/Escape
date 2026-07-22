@@ -60,7 +60,7 @@ public class Editor : World
 
     public override void Update()
     {
-        base.Update();
+        //base.Update();
 
         _camera.Update();
 
@@ -83,6 +83,11 @@ public class Editor : World
             {
                 _context.SelectedCell.Walls ^= Walls.East;
             }
+        }
+
+        if (Raylib.IsKeyPressed(KeyboardKey.F3))
+        {
+            _showFPS = !_showFPS;
         }
 
     }
@@ -113,6 +118,11 @@ public class Editor : World
         DrawWorldGrid();
 
         Raylib.EndMode3D();
+
+        if (_showFPS)
+        {
+            Raylib.DrawFPS(0, 0);
+        }
 
         Raylib.EndTextureMode();
 

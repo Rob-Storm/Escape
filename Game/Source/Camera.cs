@@ -7,7 +7,7 @@ public class Camera : Entity
 {
     public float FieldOfView { get; protected set; } = 80f;
 
-    public float Sensitivity { get; protected set; } = 0.002f;
+    public float Sensitivity { get; protected set; } = 1f;
 
     protected float _aspectRatio;
 

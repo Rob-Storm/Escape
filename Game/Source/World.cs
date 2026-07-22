@@ -15,7 +15,7 @@ public class World
     public int SizeX = 25;
     public int SizeY = 25;
 
-    private bool _showFPS = false;
+    protected bool _showFPS = false;
 
     public World()
     {
