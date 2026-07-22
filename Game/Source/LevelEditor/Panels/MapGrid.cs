@@ -19,6 +19,8 @@ public class MapGrid : EditorPanel
     private int _endRoomCellX = -1;
     private int _endRoomCellY = -1;
 
+    private bool _drawGrid = true;
+
     public MapGrid(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
@@ -45,6 +47,10 @@ public class MapGrid : EditorPanel
         ImGui.SameLine();
 
         ImGui.Text($"Current Tool: {_context.ToolMode.ToString()}");
+
+        ImGui.SameLine();
+
+        ImGui.Checkbox("Draw Grid", ref _drawGrid);
     }
 
     public override void Draw()
@@ -53,7 +59,7 @@ public class MapGrid : EditorPanel
 
         DrawTools();
 
-        ImGui.BeginChild("ScrollArea");
+        ImGui.BeginChild("ScaleArea", ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
 
         if (ImGui.IsWindowHovered())
         {
@@ -63,7 +69,7 @@ public class MapGrid : EditorPanel
             {
                 _zoom += wheel * 0.05f;
 
-                _zoom = Math.Clamp(_zoom, 0.5f, 2f);
+                _zoom = Math.Clamp(_zoom, 0.1f, 2.5f);
             }
         }
 
@@ -91,6 +97,12 @@ public class MapGrid : EditorPanel
 
         uint playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
 
+        Vector2 mapSize = new Vector2(_context.World.SizeX, _context.World.SizeY) * cellSize;
+
+        if(!_drawGrid)
+        {
+            drawList.AddRect(origin, origin + mapSize, gridColor);
+        }
 
         for (int y = 0; y < _context.World.SizeY; y++)
         {
@@ -137,7 +149,10 @@ public class MapGrid : EditorPanel
                     }
                 }
 
-                drawList.AddRect(cellMin, cellMax, gridColor);
+                if(_drawGrid)
+                {
+                    drawList.AddRect(cellMin, cellMax, gridColor);
+                }
 
                 if (ImGui.IsItemClicked())
                 {

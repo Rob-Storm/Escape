@@ -7,6 +7,14 @@ using System.Numerics;
 
 namespace Game.LevelEditor;
 
+/*
+ * Todo:
+ * 
+ * Entities,
+ * All asset types show in browser,
+ * Asset settings inspector,
+ */
+
 public class Editor : World
 {
     public string LevelName = "Level";
@@ -152,7 +160,7 @@ public class Editor : World
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
         {
-            _context.LevelFileService.NewLevel(_context);
+            
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))

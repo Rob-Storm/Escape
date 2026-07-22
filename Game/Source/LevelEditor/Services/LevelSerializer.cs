@@ -41,11 +41,13 @@ public class LevelFileService
         return true;
     }
 
-    public void NewLevel(EditorContext context)
+    public void NewLevel(EditorContext context, string name, int sizeX, int sizeY)
     {
         //context.EntityList.Clear();
-        context.World.Cells = new Cell[context.World.SizeX, context.World.SizeY];
-        context.LevelName = "New Level";
+        context.World.SizeX = sizeX; 
+        context.World.SizeY = sizeY;
+        context.World.Cells = new Cell[sizeX, sizeY];
+        context.LevelName = name;
         context.PlayerStart = Vector2.Zero;
         context.StartRotation = 0f;
 

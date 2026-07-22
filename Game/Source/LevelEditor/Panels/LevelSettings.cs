@@ -27,8 +27,10 @@ public class LevelSettings : EditorPanel
 
         _context.StartRotation = _directions.Values.ToArray()[_startRotationIndex];
 
+        ImGui.BeginDisabled();
         ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25);
         ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25);
+        ImGui.EndDisabled();
 
         ImGui.End();
     }
