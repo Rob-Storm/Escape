@@ -21,6 +21,18 @@ public class MapGrid : EditorPanel
 
     private bool _drawGrid = true;
 
+    private uint _gridColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+
+    private uint _wallColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 0f, 0f, 1.0f));
+
+    private uint _filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.75f, 0.75f, 0.75f, 1f));
+
+    private uint _roomPreviewColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0.75f, 1f));
+
+    private uint _selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
+
+    private uint _playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
+
     public MapGrid(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
@@ -85,23 +97,11 @@ public class MapGrid : EditorPanel
 
         float cellSize = BASE_CELL_SIZE * _zoom;
 
-        uint gridColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
-
-        uint wallColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 0f, 0f, 1.0f));
-
-        uint filledColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.75f, 0.75f, 0.75f, 1f));
-
-        uint roomPreviewColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0.75f, 1f));
-
-        uint selectedColor = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.5f, 0f, 0.75f));
-
-        uint playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
-
         Vector2 mapSize = new Vector2(_context.World.SizeX, _context.World.SizeY) * cellSize;
 
         if(!_drawGrid)
         {
-            drawList.AddRect(origin, origin + mapSize, gridColor);
+            drawList.AddRect(origin, origin + mapSize, _gridColor);
         }
 
         for (int y = 0; y < _context.World.SizeY; y++)
@@ -122,11 +122,11 @@ public class MapGrid : EditorPanel
 
                 if (cell != null)
                 {
-                    drawList.AddRectFilled(cellMin, cellMax, filledColor);
+                    drawList.AddRectFilled(cellMin, cellMax, _filledColor);
 
                     if (cell == _editor.GetCell(_context.PlayerStart))
                     {
-                        drawList.AddRectFilled(cellMin, cellMax, playerStartColor);
+                        drawList.AddRectFilled(cellMin, cellMax, _playerStartColor);
                     }
                 }
 
@@ -134,7 +134,7 @@ public class MapGrid : EditorPanel
                 {
                     if (_context.SelectedX == x && _context.SelectedY == y)
                     {
-                        drawList.AddRectFilled(cellMin, cellMax, selectedColor);
+                        drawList.AddRectFilled(cellMin, cellMax, _selectedColor);
                     }
                 }
 
@@ -144,14 +144,14 @@ public class MapGrid : EditorPanel
                     {
                         if (y == _startRoomCellY || y == _cursorRoomCellY)
                         {
-                            drawList.AddRectFilled(cellMin, cellMax, roomPreviewColor);
+                            drawList.AddRectFilled(cellMin, cellMax, _roomPreviewColor);
                         }
                     }
                 }
 
                 if(_drawGrid)
                 {
-                    drawList.AddRect(cellMin, cellMax, gridColor);
+                    drawList.AddRect(cellMin, cellMax, _gridColor);
                 }
 
                 if (ImGui.IsItemClicked())
@@ -218,19 +218,19 @@ public class MapGrid : EditorPanel
                 {
                     if (cell.Walls.HasFlag(Walls.North))
                     {
-                        DrawWallLine(Walls.North, drawList, cellMin, cellSize, wallColor);
+                        DrawWallLine(Walls.North, drawList, cellMin, cellSize, _wallColor);
                     }
                     if (cell.Walls.HasFlag(Walls.East))
                     {
-                        DrawWallLine(Walls.East, drawList, cellMin, cellSize, wallColor);
+                        DrawWallLine(Walls.East, drawList, cellMin, cellSize, _wallColor);
                     }
                     if (cell.Walls.HasFlag(Walls.South))
                     {
-                        DrawWallLine(Walls.South, drawList, cellMin, cellSize, wallColor);
+                        DrawWallLine(Walls.South, drawList, cellMin, cellSize, _wallColor);
                     }
                     if (cell.Walls.HasFlag(Walls.West))
                     {
-                        DrawWallLine(Walls.West, drawList, cellMin, cellSize, wallColor);
+                        DrawWallLine(Walls.West, drawList, cellMin, cellSize, _wallColor);
                     }
                 }
             }
