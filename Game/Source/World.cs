@@ -12,12 +12,15 @@ public class World
     protected Player _player;
     protected Camera _camera;
 
-    public const int WORLD_WIDTH = 10, WORLD_HEIGHT = 10;
+    public int SizeX = 25;
+    public int SizeY = 25;
+
+    private bool _showFPS = false;
 
     public World()
     {
         EntityList = new List<Entity>();
-        Cells = new Cell[WORLD_WIDTH, WORLD_HEIGHT];
+        Cells = new Cell[SizeX, SizeY];
     }
 
     public Cell GetCell(int x, int y)
@@ -37,9 +40,9 @@ public class World
 
     public IEnumerable<(int x, int y, Cell cell)> GetCells()
     {
-        for(int x = 0; x < WORLD_WIDTH;  x++)
+        for(int x = 0; x < SizeX;  x++)
         {
-            for (int y = 0; y < WORLD_HEIGHT; y++)
+            for (int y = 0; y < SizeY; y++)
             {
                 if (Cells[x, y] != null)
                 {
@@ -69,6 +72,11 @@ public class World
         {
             entity.Update();
         }
+
+        if(Raylib.IsKeyPressed(KeyboardKey.F5))
+        {
+            _showFPS = !_showFPS;
+        }
     }
 
     public virtual void Render()
@@ -88,6 +96,11 @@ public class World
         }
 
         Raylib.EndMode3D();
+
+        if(_showFPS)
+        {
+            Raylib.DrawFPS(0, 0);
+        }
     }
 
     public virtual void Render2D()

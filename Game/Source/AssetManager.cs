@@ -13,6 +13,7 @@ public static class AssetManager
     public static Dictionary<string, object> Assets { get; private set; }
     private static Dictionary<object, string> _assetPaths;
     private static Dictionary<Type, Delegate> _resourceLoaders;
+    private static Dictionary<Type, string> _fallbackPaths;
 
     static AssetManager()
     {
@@ -24,6 +25,13 @@ public static class AssetManager
             {  typeof(Texture2D), LoadTexture },
             {  typeof(Sound), LoadSound },
             {  typeof(Music), LoadMusic }
+        };
+
+        _fallbackPaths = new Dictionary<Type, string>
+        {
+            { typeof(Texture2D), @"Assets\Textures\Default.png" },
+            { typeof(Sound), @"Assets\Sound\Default.wav" },
+            { typeof(Music), @"Assets\Music\Default.ogg" }
         };
     }
 
@@ -86,12 +94,21 @@ public static class AssetManager
 
     public static T Load<T>(string path)
     {
+        Func<string, T> loader = (Func<string, T>)_resourceLoaders[typeof(T)];
+
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            object fallbackObject = loader(_fallbackPaths[typeof(T)]);
+
+            return (T)fallbackObject;
+        }
+
+
         if (Assets.TryGetValue(path, out object cachedObject))
         {
             return (T)cachedObject;
         }
 
-        Func<string, T> loader = (Func<string, T>)_resourceLoaders[typeof(T)];
         object loadedObject = loader(path);
 
         if (loadedObject != null)

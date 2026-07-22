@@ -26,13 +26,14 @@ public class Engine
         {
             Raylib.MaximizeWindow();
 
+            AssetManager.ScanRegistries();
+
             rlImGui.Setup(true);
 
             ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 
             _world = new LevelEditor.Editor();
 
-            AssetManager.ScanRegistries();
         }
         else
         {

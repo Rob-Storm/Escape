@@ -9,6 +9,8 @@ public class Level
     public Vector2 PlayerStart { get; set; }
     public float StartRotation { get; set; }
     public List<Entity> EntityList { get; set; }
+    public int SizeX { get; set; }
+    public int SizeY { get; set; }
 
     public Cell[,] Cells { get; set; }
 
@@ -31,7 +33,7 @@ public class Level
     public Level()
     {
         EntityList = new List<Entity>();
-        Cells = new Cell[World.WORLD_WIDTH, World.WORLD_HEIGHT];
+        Cells = new Cell[SizeX, SizeY];
     }
 
     public static string SaveToFile(Level level, string fileName)
@@ -54,7 +56,7 @@ public class Level
     {
         if(!Path.Exists(path))
         {
-            throw new Exception("Could not find level");
+            throw new Exception($"Could not find level at path: {path}");
         }
 
         string contents = File.ReadAllText(path);

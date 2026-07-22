@@ -32,11 +32,12 @@ public class Editor : World
     private PropertyInspector _inspector;
     private MapGrid _mapGrid;
     private LevelSettings _levelSettings;
+    private ToolSettings _toolSettings;
 
     public Editor()
     {
         _camera = new EditorCamera();
-        _camera.Transform.Position = new Vector3(WORLD_WIDTH / 2, 1, WORLD_HEIGHT / 2);
+        _camera.Transform.Position = new Vector3(SizeX / 2, 1, SizeY / 2);
 
         _context = new EditorContext(this, (EditorCamera)_camera);
 
@@ -47,6 +48,7 @@ public class Editor : World
         _inspector = new PropertyInspector(_context);
         _mapGrid = new MapGrid(_context);
         _levelSettings = new LevelSettings(_context);
+        _toolSettings = new ToolSettings(_context);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
     }
@@ -136,6 +138,8 @@ public class Editor : World
 
         _levelSettings.Draw();
 
+        _toolSettings.Draw();
+
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
             _context.LevelFileService.Save(_context);
@@ -170,22 +174,22 @@ public class Editor : World
 
         Vector3 offset = new Vector3(-0.5f, 0, -0.5f);
 
-        for (int x = 0; x <= WORLD_WIDTH; x++)
+        for (int x = 0; x <= SizeX; x++)
         {
             Raylib.DrawLine3D
                 (
                     new Vector3(x * cellSize, 0, 0) + offset, 
-                    new Vector3(x * cellSize, 0, WORLD_HEIGHT * cellSize) + offset, 
+                    new Vector3(x * cellSize, 0, SizeY * cellSize) + offset, 
                     Color.Gray
                 );
         }
 
-        for (int z = 0; z <= WORLD_HEIGHT; z++)
+        for (int z = 0; z <= SizeY; z++)
         {
             Raylib.DrawLine3D
                 (
                     new Vector3(0, 0, z * cellSize) + offset, 
-                    new Vector3(WORLD_WIDTH * cellSize, 0, z * cellSize) + offset, 
+                    new Vector3(SizeX * cellSize, 0, z * cellSize) + offset, 
                     Color.Gray
                 );
         }
@@ -203,9 +207,6 @@ public class Editor : World
             CeilingTexturePath = @"Assets\Textures\Ceiling.png"
         };
     }
-
-
-
 }
 
 public class EditorContext
@@ -214,6 +215,8 @@ public class EditorContext
     public EditorCamera Camera { get; }
 
     public Cell SelectedCell => World.GetCell(SelectedX, SelectedY);
+    public ToolMode ToolMode = ToolMode.Select;
+    public PaintWallSettings ToolSettings;
 
     public int SelectedX;
     public int SelectedY;
@@ -237,8 +240,19 @@ public class EditorContext
         PlayerStart = Vector2.Zero;
         StartRotation = 0f;
 
+        ToolSettings = new PaintWallSettings();
+
         PlayModeService = new PlayModeService();
         LevelFileService = new LevelFileService();
         AssetService = new AssetService();
     }
+}
+
+
+public enum ToolMode
+{
+    Select,
+    Draw,
+    Room,
+    Delete
 }

@@ -6,20 +6,83 @@ namespace Game.LevelEditor.Panels;
 public class MapGrid : EditorPanel
 {
     private Editor _editor;
+    private float _zoom = 1.0f;
+    private Vector2 _pan = Vector2.Zero;
+    private const float BASE_CELL_SIZE = 32f;
+
     public MapGrid(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
     }
 
+    private void DrawTools()
+    {
+        if (ImGui.Button($"{IconFonts.FontAwesome6.ArrowPointer} Select"))
+        {
+            _context.ToolMode = ToolMode.Select;
+            Debug.Log("Select");
+        }
+
+        ImGui.SameLine();
+
+        if (ImGui.Button($"{IconFonts.FontAwesome6.Paintbrush} Draw"))
+        {
+            _context.ToolMode = ToolMode.Draw;
+            Debug.Log("Draw");
+        }
+
+        ImGui.SameLine();
+
+        if (ImGui.Button($"{IconFonts.FontAwesome6.Hammer} Quick Room"))
+        {
+            _context.ToolMode = ToolMode.Room;
+            Debug.Log("Room");
+        }
+
+        ImGui.SameLine();
+
+        if (ImGui.Button($"{IconFonts.FontAwesome6.Eraser} Erase"))
+        {
+            _context.ToolMode = ToolMode.Delete;
+            Debug.Log("Delete");
+        }
+
+        ImGui.SameLine();
+
+        ImGui.Text($"Current Tool: {_context.ToolMode.ToString()}");
+    }
+
     public override void Draw()
     {
-        ImGui.Begin("Map");
+        ImGui.Begin("Map", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+
+        DrawTools();
+
+        ImGui.BeginChild("ScrollArea");
+
+        if (ImGui.IsWindowHovered())
+        {
+            float wheel = ImGui.GetIO().MouseWheel;
+
+            if(wheel != 0)
+            {
+                _zoom += wheel * 0.05f;
+
+                _zoom = Math.Clamp(_zoom, 0.5f, 2f);
+            }
+        }
+
+        if (ImGui.IsWindowHovered() && ImGui.IsMouseDragging(ImGuiMouseButton.Middle))
+        {
+            _pan += ImGui.GetIO().MouseDelta;
+        }
+
 
         var drawList = ImGui.GetWindowDrawList();
 
-        Vector2 origin = ImGui.GetCursorScreenPos();
+        Vector2 origin = ImGui.GetCursorScreenPos() + _pan;
 
-        float cellSize = 32f;
+        float cellSize = BASE_CELL_SIZE * _zoom;
 
         uint gridColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 
@@ -32,9 +95,9 @@ public class MapGrid : EditorPanel
         uint playerStartColor = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0.75f, 0f, 0.75f));
 
         
-        for (int y = 0; y < World.WORLD_HEIGHT; y++)
+        for (int y = 0; y < _context.World.SizeY; y++)
         {
-            for (int x = 0; x < World.WORLD_WIDTH; x++)
+            for (int x = 0; x < _context.World.SizeX; x++)
             {
                 Cell cell = _editor.GetCell(x, y);
 
@@ -56,7 +119,6 @@ public class MapGrid : EditorPanel
                     {
                         drawList.AddRectFilled(cellMin, cellMax, playerStartColor);
                     }
-
                 }
 
                 if (_context.SelectedX == x && _context.SelectedY == y)
@@ -66,12 +128,14 @@ public class MapGrid : EditorPanel
 
                 drawList.AddRect(cellMin, cellMax, gridColor);
 
-                if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                if(ImGui.IsItemClicked())
                 {
-                    _context.SelectedX = x;
-                    _context.SelectedY = y;
+                    HandleCellClick(x, y);
+                }
 
-                    Debug.Log($"Selected cell at '{x},{y}'");
+                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseDown(ImGuiMouseButton.Left))
+                {
+                    HandleCellPress(x, y);
                 }
 
                 if (ImGui.BeginPopupContextItem($"CellOptions##{x}_{y}"))
@@ -108,9 +172,11 @@ public class MapGrid : EditorPanel
             }
         }
 
-        for (int y = 0; y < World.WORLD_HEIGHT; y++)
+
+        // A second pass lets us guarantee the wall lines are drawn last 
+        for (int y = 0; y < _context.World.SizeY; y++)
         {
-            for (int x = 0; x < World.WORLD_WIDTH; x++)
+            for (int x = 0; x < _context.World.SizeX; x++)
             {
                 Cell cell = _editor.GetCell(x, y);
 
@@ -139,7 +205,62 @@ public class MapGrid : EditorPanel
             }
         }
 
+        ImGui.EndChild();
+
         ImGui.End();
+    }
+
+    private void HandleCellClick(int cellX, int cellY)
+    {
+        switch (_context.ToolMode)
+        {
+            case ToolMode.Select:
+                _context.SelectedX = cellX;
+                _context.SelectedY = cellY;
+                Debug.Log($"Selected cell at '{cellX},{cellY}'");
+                break;
+            case ToolMode.Draw:
+                break;
+            case ToolMode.Room:
+                break;
+            case ToolMode.Delete:
+                break;
+        }
+    }
+
+    private void HandleCellPress(int cellX, int cellY)
+    {
+        switch (_context.ToolMode)
+        {
+            case ToolMode.Select:
+                break;
+            case ToolMode.Draw:
+                Cell newCell = new Cell(cellX, cellY);
+                newCell.NorthWallTexturePath = _context.ToolSettings.NorthWallTexturePath;
+                newCell.EastWallTexturePath = _context.ToolSettings.EastWallTexturePath;
+                newCell.WestWallTexturePath = _context.ToolSettings.WestWallTexturePath;
+                newCell.SouthWallTexturePath = _context.ToolSettings.SouthWallTexturePath;
+
+                newCell.FloorTexturePath = _context.ToolSettings.FloorTexturePath;
+                newCell.CeilingTexturePath = _context.ToolSettings.CeilingTexturePath;
+
+                newCell.Walls = _context.ToolSettings.Walls;
+
+                _editor.SetCell(cellX, cellY, newCell);
+
+                break;
+            case ToolMode.Room:
+                break;
+            case ToolMode.Delete:
+                _editor.SetCell(cellX, cellY, null);
+
+                if (_context.SelectedX == cellX && _context.SelectedY == cellY)
+                {
+                    _context.SelectedX = -1;
+                    _context.SelectedY = -1;
+                }
+                break;
+        }
     }
 
     private void DrawWallLine(Walls wall, ImDrawListPtr drawList, Vector2 cellMin, float cellSize, uint color)
@@ -167,6 +288,6 @@ public class MapGrid : EditorPanel
                 break;
         }
 
-        drawList.AddLine(start, end, color, 1.5f);
+        drawList.AddLine(start, end, color, 1.5f * _zoom);
     }
 }
