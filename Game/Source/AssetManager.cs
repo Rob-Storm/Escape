@@ -96,7 +96,7 @@ public static class AssetManager
     {
         Func<string, T> loader = (Func<string, T>)_resourceLoaders[typeof(T)];
 
-        if(!string.IsNullOrEmpty(path))
+        if (!string.IsNullOrEmpty(path))
         {
             if (Assets.TryGetValue(path, out object cachedObject))
             {

@@ -25,6 +25,11 @@ public class World
 
     public Cell GetCell(int x, int y)
     {
+        if(x < 0 || y < 0)
+        {
+            return null;
+        }
+
         return Cells[x, y];
     }
 
@@ -73,7 +78,7 @@ public class World
             entity.Update();
         }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.F5))
+        if (Raylib.IsKeyPressed(KeyboardKey.F3))
         {
             _debugDrawMode = !_debugDrawMode;
         }

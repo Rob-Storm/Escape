@@ -118,7 +118,7 @@ public class MapGrid : EditorPanel
                     }
                 }
 
-                if(_context.ToolMode == ToolMode.Select)
+                if (_context.ToolMode == ToolMode.Select)
                 {
                     if (_context.SelectedX == x && _context.SelectedY == y)
                     {
@@ -126,11 +126,14 @@ public class MapGrid : EditorPanel
                     }
                 }
 
-                if (x == _startRoomCellX || x == _cursorRoomCellX)
+                if(_context.ToolMode == ToolMode.Room)
                 {
-                    if (y == _startRoomCellY || y == _cursorRoomCellY)
+                    if (x == _startRoomCellX || x == _cursorRoomCellX)
                     {
-                        drawList.AddRectFilled(cellMin, cellMax, roomPreviewColor);
+                        if (y == _startRoomCellY || y == _cursorRoomCellY)
+                        {
+                            drawList.AddRectFilled(cellMin, cellMax, roomPreviewColor);
+                        }
                     }
                 }
 
@@ -146,7 +149,7 @@ public class MapGrid : EditorPanel
                     HandleCellPress(x, y);
                 }
 
-                if (hovered && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 {
                     HandleCellRelease(x, y);
                     Debug.Log($"Release cell {x},{y}");
@@ -248,6 +251,7 @@ public class MapGrid : EditorPanel
             case ToolMode.Room:
                 _startRoomCellX = cellX;
                 _startRoomCellY = cellY;
+                Debug.Log($"Start {cellX} {cellY}");
                 break;
             case ToolMode.Delete:
                 break;
@@ -300,6 +304,8 @@ public class MapGrid : EditorPanel
             case ToolMode.Draw:
                 break;
             case ToolMode.Room:
+                Debug.Log($"End {cellX} {cellY}");
+
                 _endRoomCellX = cellX;
                 _endRoomCellY = cellY;
 
@@ -323,9 +329,30 @@ public class MapGrid : EditorPanel
     {
         Debug.Log($"Building room. Start: {start}. End: {end}");
 
-        for (int x = (int)start.X; x < (int)end.X + 1; x++)
+        int startX, startY, endX, endY;
+
+        startX = (int)start.X;
+        startY = (int)start.Y;
+
+        endX = (int)end.X;
+        endY = (int)end.Y;
+
+        // Check to see if the room was start right->left or bottom->top and flip
+        if (start.X > end.X)
         {
-            for (int y = (int)start.Y; y < (int)end.Y + 1; y++)
+            startX = (int)end.X;
+            endX = (int)start.X;
+        }
+        if(start.Y > end.Y)
+        {
+            startY = (int)end.Y;
+            endY = (int)start.Y;
+        }
+
+
+        for (int x = startX; x < endX + 1; x++)
+        {
+            for (int y = startY; y < endY + 1; y++)
             {
                 Cell newCell = new Cell(x, y);
 
@@ -339,19 +366,19 @@ public class MapGrid : EditorPanel
 
                 Walls newWalls = Walls.None;
 
-                if (y == (int)start.Y)
+                if (y == startY)
                 {
                     newWalls |= Walls.North;
                 }
-                if (y == (int)end.Y)
+                if (y == endY)
                 {
                     newWalls |= Walls.South;
                 }
-                if (x == (int)start.X)
+                if (x == startX)
                 {
                     newWalls |= Walls.West;
                 }
-                if (x == (int)end.X)
+                if (x == endX)
                 {
                     newWalls |= Walls.East;
                 }

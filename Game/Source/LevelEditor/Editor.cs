@@ -7,15 +7,6 @@ using System.Numerics;
 
 namespace Game.LevelEditor;
 
-/*
- * Todo:
- * 
- * 2D view,
- * Quick room creation,
- * 
- */
-
-
 public class Editor : World
 {
     public string LevelName = "Level";
@@ -55,13 +46,12 @@ public class Editor : World
 
     ~Editor()
     {
+        // May remove if I decide to use imgui for the final game ui
         rlImGui.Shutdown();
     }
 
     public override void Update()
     {
-        //base.Update();
-
         _camera.Update();
 
 
@@ -109,7 +99,7 @@ public class Editor : World
         {
             cellData.cell.Render();
 
-            if(_debugDrawMode)
+            if (_debugDrawMode)
             {
                 cellData.cell.RenderBounds(Color.Blank, Color.SkyBlue);
             }
