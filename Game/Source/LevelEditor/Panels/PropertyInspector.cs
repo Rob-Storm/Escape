@@ -81,7 +81,7 @@ public class PropertyInspector : EditorPanel
         }
         else
         {
-            string text = "Select a cell to view properties";
+            string text = "Select a cell/entity to view properties";
 
             ImGui.SetCursorPos((ImGui.GetContentRegionAvail() * 0.5f) - (ImGui.CalcTextSize(text) * 0.5f));
             ImGui.TextDisabled(text);

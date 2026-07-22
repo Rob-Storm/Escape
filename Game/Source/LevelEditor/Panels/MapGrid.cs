@@ -36,8 +36,6 @@ public class MapGrid : EditorPanel
     public MapGrid(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
-
-
     }
 
     private void DrawTools()
