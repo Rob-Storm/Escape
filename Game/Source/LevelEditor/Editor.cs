@@ -131,7 +131,6 @@ public class Editor : World
         }
 
         Raylib.EndTextureMode();
-
     }
 
     public override void Render2D()
@@ -231,6 +230,10 @@ public class EditorContext
     public EditorCamera Camera { get; }
 
     public object SelectedObject;
+    public object SelectedAsset;
+
+    public bool SelectedAnything => SelectedObject != null || SelectedAsset != null; 
+
     public Cell SelectedCell => World.GetCell(SelectedX, SelectedY);
     public ToolMode ToolMode = ToolMode.Select;
     public PaintWallSettings ToolSettings;
@@ -262,6 +265,20 @@ public class EditorContext
         PlayModeService = new PlayModeService();
         LevelFileService = new LevelFileService();
         AssetService = new AssetService();
+    }
+
+    public void SetSelectedObject(object newObject)
+    {
+        SelectedObject = newObject;
+
+        SelectedAsset = null;
+    }
+
+    public void SetSelectedAsset(object asset)
+    { 
+        SelectedAsset = asset;
+
+        SelectedObject = null;
     }
 }
 

@@ -17,6 +17,7 @@ public class PropertyInspector : EditorPanel
     {
         _typeFactory = new Dictionary<Type, OnPropertyDrawSignature>
         {
+            { typeof(bool), DrawBool},
             { typeof(string), DrawString},
             { typeof(int), DrawInt},
             { typeof(float), DrawFloat},
@@ -30,54 +31,111 @@ public class PropertyInspector : EditorPanel
     {
         ImGui.Begin("Properties");
 
-        DrawProperties(_context.SelectedObject);
+        if(!_context.SelectedAnything)
+        {
+            ImGui.TextDisabled("Select an object or asset to view properties");
+            ImGui.End();
+
+            return;
+        }
+
+        if (_context.SelectedObject != null)
+        {
+            DrawProperties(_context.SelectedObject);
+        }
+
+        if(_context.SelectedAsset != null)
+        {
+            AssetTypeInfo info = AssetManager.GetAssetTypeInfo(_context.SelectedAsset.GetType());
+
+            ImGui.PushID(info.DisplayName);
+
+            ImGui.Text(AssetManager.GetPath(_context.SelectedAsset));
+            ImGui.TextDisabled(info.Type.ToString());
+
+            info.DrawInspector(_context.SelectedAsset);
+
+            ImGui.PopID();
+        }
 
         ImGui.End();
     }
 
     private void DrawProperties(object inObject)
     {
-        if (inObject == null)
-        {
-            ImGui.TextDisabled("Select an object to view properties");
-
-            return;
-        }
-
         foreach (FieldInfo field in inObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
         {
-            if (_typeFactory.TryGetValue(field.FieldType, out var drawFunction))
+            if(Attribute.GetCustomAttribute(field, typeof(HidePropertyAttribute)) != null)
             {
-                object value = field.GetValue(inObject);
-                drawFunction(ref value, field.Name);
-                field.SetValue(inObject, value);
+                continue;
             }
-            else if(AssetManager.IsRegisteredAssetType(field.FieldType))
-            {
-                object value = field.GetValue(inObject);
-                DrawAsset(ref value, field.Name);
-                field.SetValue(inObject, value);
-            }
+
+            object value = field.GetValue(inObject);
+            DrawProperty(ref value, field.Name, field.FieldType);
+            field.SetValue(inObject, value);
         }
 
         foreach (PropertyInfo property in inObject.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
-            if (!property.CanRead || !property.CanWrite)
+            if (!property.CanRead)
+            {
                 continue;
-
-            if (_typeFactory.TryGetValue(property.PropertyType, out var drawFunction))
-            {
-                object value = property.GetValue(inObject);
-                drawFunction(ref value, property.Name);
-                property.SetValue(inObject, value);
             }
-            else if (AssetManager.IsRegisteredAssetType(property.PropertyType))
+
+            if (Attribute.GetCustomAttribute(property, typeof(HidePropertyAttribute)) != null)
             {
-                object value = property.GetValue(inObject);
-                DrawAsset(ref value, property.Name);
-                property.SetValue(inObject, value);
+                continue;
+            }
+
+            if(!property.CanWrite)
+            {
+                ImGui.BeginDisabled();
+            }
+
+            object value = property.GetValue(inObject);
+
+            DrawProperty(ref value, property.Name, property.PropertyType);
+            property.SetValue(inObject, value);
+
+            if(!property.CanWrite)
+            {
+                ImGui.EndDisabled();
             }
         }
+    }
+
+    private void DrawProperty(ref object property, string name, Type type)
+    {
+        if (type.IsEnum)
+        {
+            if (type.IsDefined(typeof(FlagsAttribute), false))
+            {
+                DrawFlags(ref property, name);
+            }
+            else
+            {
+                DrawEnum(ref property, name);
+            }
+        }
+
+        if (_typeFactory.TryGetValue(type, out var drawFunction))
+        {
+            drawFunction(ref property, name);
+
+        }
+        else if (AssetManager.IsRegisteredAssetType(type))
+        {
+            DrawAsset(ref property, name);
+        }
+    }
+
+    private void DrawBool(ref object propertyValue, string propertyName)
+    {
+        bool property = (bool)propertyValue;
+
+        ImGui.Checkbox(propertyName, ref property);
+
+        propertyValue = property;
     }
 
     private void DrawString(ref object propertyValue, string propertyName)
@@ -107,6 +165,62 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
+    private void DrawEnum(ref object propertyValue, string propertyName)
+    {
+        Type enumType = propertyValue.GetType();
+
+        string[] names = Enum.GetNames(enumType);
+        Array values = Enum.GetValues(enumType);
+
+        int currentIndex = Array.IndexOf(values, propertyValue);
+
+        if (ImGui.Combo(propertyName, ref currentIndex, names, names.Length))
+        {
+            propertyValue = values.GetValue(currentIndex);
+        }
+
+    }
+
+    private void DrawFlags(ref object propertyValue, string propertyName)
+    {
+        Type enumType = propertyValue.GetType();
+
+        ulong current = Convert.ToUInt64(propertyValue);
+
+        ImGui.Text(propertyName);
+        ImGui.Indent();
+
+        foreach(Enum value in Enum.GetValues(enumType))
+        {
+            ulong flag = Convert.ToUInt64(value);
+
+            if(flag == 0)
+            {
+                continue;
+            }
+
+            bool enabled = (current & flag) == flag;
+
+            string name = Enum.GetName(enumType, value);
+
+            if(ImGui.Checkbox(name, ref enabled))
+            {
+                if(enabled)
+                {
+                    current |= flag;
+                }
+                else
+                {
+                    current &= ~flag;
+                }
+            }
+        }
+
+        ImGui.Unindent();
+
+        propertyValue = Enum.ToObject(enumType, current);
+    }
+
     private void DrawVector2(ref object propertyValue, string propertyName)
     {
         Vector2 property = (Vector2)propertyValue;
@@ -120,6 +234,7 @@ public class PropertyInspector : EditorPanel
     {
         AssetTypeInfo info = AssetManager.GetAssetTypeInfo(propertyValue.GetType());
 
+
         ImGui.PushID(propertyName);
 
         if(info.DrawPreview(propertyValue))
@@ -129,9 +244,14 @@ public class PropertyInspector : EditorPanel
 
         if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
         {
-            ImGuiPayloadPtr  payload = ImGui.AcceptDragDropPayload("texture_path");
+            AssetTypeInfo dragInfo = AssetManager.GetAssetTypeInfo(_context.DraggedAssetPath);
 
-            propertyValue = AssetManager.Load(_context.DraggedAssetPath, info.Type);
+            ImGuiPayloadPtr  payload = ImGui.AcceptDragDropPayload("asset_path");
+
+            if(info.Type == dragInfo.Type)
+            {
+                propertyValue = AssetManager.Load(_context.DraggedAssetPath, info.Type);
+            }
 
             ImGui.EndDragDropTarget();
         }

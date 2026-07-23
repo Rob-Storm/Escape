@@ -254,6 +254,7 @@ public class MapGrid : EditorPanel
             case ToolMode.Select:
                 _context.SelectedX = cellX;
                 _context.SelectedY = cellY;
+                _context.SetSelectedObject(_context.World.GetCell(cellX, cellY));
                 break;
             case ToolMode.Draw:
                 break;

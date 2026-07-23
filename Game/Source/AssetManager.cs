@@ -31,6 +31,11 @@ public static class AssetManager
                 new Vector4(1f, 0f, 0f, 1f),
                 "asset",
                 texture => { return rlImGui.ImageButtonSize("##assetButton", (Texture2D)texture, new Vector2(96)); },
+                texture => 
+                {
+                    Texture2D textureObject = (Texture2D)texture;
+                    rlImGui.ImageSize(textureObject, new Vector2(textureObject.Width, textureObject.Height)); 
+                },
                 ".png"
             );
         
@@ -38,10 +43,17 @@ public static class AssetManager
             (
                 Raylib.LoadSound,
                 @"Assets\Textures\Default.png",
-                "Texture",
+                "Sound",
                 new Vector4(0f, 1f, 0f, 1f),
                 "asset",
                 sound => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(soundIcon), new Vector2(96)); },
+                sound => 
+                {
+                    if(ImGui.Button("Play Sound"))
+                    {
+                        Raylib.PlaySound((Sound)sound);
+                    }
+                },
                 ".wav"
             );
 
@@ -49,17 +61,31 @@ public static class AssetManager
             (
                 Raylib.LoadMusicStream,
                 @"Assets\Textures\Default.png",
-                "Texture",
+                "Music",
                 new Vector4(0f, 1f, 1f, 1f),
                 "asset",
                 music => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(musicIcon), new Vector2(96)); },
+                music => 
+                {
+                    
+                },
                 ".ogg"
             );
     }
 
     public static bool IsRegisteredAssetType(Type type) => _types.ContainsKey(type);
 
-    public static void Register<T>(Func<string, T> loader, string fallback, string displayName, Vector4 color, string dragPayload, Func<object, bool> drawPreview, params string[] extensions)
+    public static void Register<T>
+        (
+            Func<string, T> loader, 
+            string fallback, 
+            string displayName, 
+            Vector4 color, 
+            string dragPayload, 
+            Func<object, bool> drawPreview, 
+            Action<object> drawInspector, 
+            params string[] extensions
+        )
     {
         _types[typeof(T)] = new AssetTypeInfo
         {
@@ -70,6 +96,7 @@ public static class AssetManager
             Color = color,
             DragDropPayload = dragPayload,
             DrawPreview = drawPreview,
+            DrawInspector = drawInspector,
             Extensions = extensions
         };
     }
@@ -110,14 +137,27 @@ public static class AssetManager
     {
         return _types[type];
     }
-
     public static AssetTypeInfo GetAssetTypeInfo<T>()
     {
         return _types[typeof(T)];
     }
+    public static AssetTypeInfo GetAssetTypeInfo(object asset)
+    {
+        return _types[asset.GetType()];
+    }
+
+    public static AssetTypeInfo GetAssetTypeInfo(string path)
+    {
+        if(Assets.TryGetValue(path, out object value))
+        {
+            return GetAssetTypeInfo(value);
+        }
+
+        return null;
+    }
 
     public static string GetPath<T>(object asset) =>_assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
-
+    public static string GetPath(object asset) =>_assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
     public static object Load(string path, Type type)
     {
         AssetTypeInfo info = _types[type];

@@ -22,8 +22,6 @@ public class AssetBrowser : EditorPanel
         {
             foreach (var asset in AssetManager.GetAssets().Where(a => Directory.GetParent(a.Key).Name  != "Editor"))
             {
-                // Todo: add back in imgui drag source
-
                 AssetTypeInfo info = AssetManager.GetAssetTypeInfo(asset.Value.GetType());
 
                 ImGui.TableNextColumn();
@@ -32,7 +30,17 @@ public class AssetBrowser : EditorPanel
 
                 if(info.DrawPreview(asset.Value))
                 {
-                    _context.SelectedObject = asset.Value;
+                    _context.SetSelectedAsset(asset.Value);
+                }
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    ImGui.SetDragDropPayload("asset_path", IntPtr.Zero, 0);
+
+                    _context.DraggedAssetPath = asset.Key;
+
+                    ImGui.Text(asset.Key);
+                    ImGui.EndDragDropSource();
                 }
 
                 ImGui.TextColored(info.Color, Path.GetFileNameWithoutExtension(asset.Key));

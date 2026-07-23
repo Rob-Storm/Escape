@@ -12,4 +12,5 @@ public class AssetTypeInfo
     public string DragDropPayload { get; init; }
     public string[] Extensions { get; init; }
     public Func<object, bool>? DrawPreview { get; init; }
+    public Action<object>? DrawInspector { get; init; }
 }

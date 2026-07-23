@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Game.LevelEditor;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game;
@@ -6,25 +7,39 @@ namespace Game;
 /*
  * Todo:
  * 
- * Implement some way of consolidating the vertices of neighboring cells
- * to reduce memory usage
+ * Implement some way of consolidating the vertices of neighboring 
+ * cells (with the same texture) to reduce memory usage.
+ * 
+ * It's not an issue yet, but it could be for very large maps with a lot of cells
  */
 
 public class Cell
 {
+    [HideProperty]
     public string NorthWallTexturePath;
+
+    [HideProperty]
     public string EastWallTexturePath;
+
+    [HideProperty]
     public string SouthWallTexturePath;
+
+    [HideProperty]
     public string WestWallTexturePath;
+
+    [HideProperty]
     public string FloorTexturePath;
+
+    [HideProperty]
     public string CeilingTexturePath;
 
-    public Texture2D NorthWallTexture => AssetManager.Load<Texture2D>(NorthWallTexturePath);
-    public Texture2D EastWallTexture => AssetManager.Load<Texture2D>(EastWallTexturePath);
-    public Texture2D SouthWallTexture => AssetManager.Load<Texture2D>(SouthWallTexturePath);
-    public Texture2D WestWallTexture => AssetManager.Load<Texture2D>(WestWallTexturePath);
-    public Texture2D FloorTexture => AssetManager.Load<Texture2D>(FloorTexturePath);
-    public Texture2D CeilingTexture => AssetManager.Load<Texture2D>(CeilingTexturePath);
+
+    public Texture2D NorthWallTexture;// => AssetManager.Load<Texture2D>(NorthWallTexturePath);
+    public Texture2D EastWallTexture;// => AssetManager.Load<Texture2D>(EastWallTexturePath);
+    public Texture2D SouthWallTexture;// => AssetManager.Load<Texture2D>(SouthWallTexturePath);
+    public Texture2D WestWallTexture;// => AssetManager.Load<Texture2D>(WestWallTexturePath);
+    public Texture2D FloorTexture;// => AssetManager.Load<Texture2D>(FloorTexturePath);
+    public Texture2D CeilingTexture;// => AssetManager.Load<Texture2D>(CeilingTexturePath);
 
     public Vector3 Position { get; set; }
     public Walls Walls { get; set; } = Walls.None;
