@@ -1,64 +1,99 @@
-﻿using Raylib_cs;
+﻿using ImGuiNET;
+using Raylib_cs;
+using rlImGui_cs;
+using System.Numerics;
 
 namespace Game;
-
-/*
- * Todo:
- * Implement factory or method to return assets based on type with
- * various other data such as icon, color, etc.
- */
 
 public static class AssetManager
 {
     public static Dictionary<string, object> Assets { get; private set; }
     private static Dictionary<object, string> _assetPaths;
+    private static Dictionary<Type, AssetTypeInfo> _types;
+
     private static Dictionary<Type, Delegate> _resourceLoaders;
     private static Dictionary<Type, string> _fallbackPaths;
 
     static AssetManager()
     {
         Assets = new Dictionary<string, object>();
-
         _assetPaths = new Dictionary<object, string>();
-        _resourceLoaders = new Dictionary<Type, Delegate>
-        {
-            {  typeof(Texture2D), LoadTexture },
-            {  typeof(Sound), LoadSound },
-            {  typeof(Music), LoadMusic }
-        };
+        _types = new Dictionary<Type, AssetTypeInfo>();
 
-        _fallbackPaths = new Dictionary<Type, string>
+        string soundIcon = @"Assets\Editor\SoundIcon.png";
+        string musicIcon = @"Assets\Editor\MusicIcon.png";
+
+        Register<Texture2D>
+            (
+                Raylib.LoadTexture, 
+                @"Assets\Textures\Default.png",
+                "Texture",
+                new Vector4(1f, 0f, 0f, 1f),
+                "asset",
+                texture => { return rlImGui.ImageButtonSize("##assetButton", (Texture2D)texture, new Vector2(96)); },
+                ".png"
+            );
+        
+        Register<Sound>
+            (
+                Raylib.LoadSound,
+                @"Assets\Textures\Default.png",
+                "Texture",
+                new Vector4(0f, 1f, 0f, 1f),
+                "asset",
+                sound => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(soundIcon), new Vector2(96)); },
+                ".wav"
+            );
+
+        Register<Music>
+            (
+                Raylib.LoadMusicStream,
+                @"Assets\Textures\Default.png",
+                "Texture",
+                new Vector4(0f, 1f, 1f, 1f),
+                "asset",
+                music => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(musicIcon), new Vector2(96)); },
+                ".ogg"
+            );
+    }
+
+    public static bool IsRegisteredAssetType(Type type) => _types.ContainsKey(type);
+
+    public static void Register<T>(Func<string, T> loader, string fallback, string displayName, Vector4 color, string dragPayload, Func<object, bool> drawPreview, params string[] extensions)
+    {
+        _types[typeof(T)] = new AssetTypeInfo
         {
-            { typeof(Texture2D), @"Assets\Textures\Default.png" },
-            { typeof(Sound), @"Assets\Sound\Default.wav" },
-            { typeof(Music), @"Assets\Music\Default.ogg" }
+            Type = typeof(T),
+            Loader = path => loader(path)!,
+            FallbackPath = fallback,
+            DisplayName = displayName,
+            Color = color,
+            DragDropPayload = dragPayload,
+            DrawPreview = drawPreview,
+            Extensions = extensions
         };
     }
 
     public static void ScanRegistries()
     {
-        string[] files = Directory.GetFiles(Paths.AssetsRoot, "*.*", SearchOption.AllDirectories);
-
-        foreach (string file in files)
+        foreach (string file in Directory.GetFiles(Paths.AssetsRoot, "*.*", SearchOption.AllDirectories))
         {
-            string relativePath = Path.Combine("Assets", Path.GetRelativePath(Paths.AssetsRoot, file));
+            string extension = Path.GetExtension(file);
 
-            switch (Path.GetExtension(file).ToLowerInvariant())
+            AssetTypeInfo? type = _types.Values.FirstOrDefault(t => t.Extensions.Contains(extension, StringComparer.OrdinalIgnoreCase));
+
+            if(type == null)
             {
-                case ".png":
-                    Load<Texture2D>(relativePath);
-                    break;
-                case ".wav":
-                    Load<Sound>(relativePath);
-                    break;
-                case ".ogg":
-                    Load<Music>(relativePath);
-                    break;
-                default:
-                    continue;
+                continue;
             }
+
+            string relative = Path.Combine("Assets", Path.GetRelativePath(Paths.AssetsRoot, file));
+
+            Load(relative, type.Type);
         }
     }
+
+    public static IEnumerable<KeyValuePair<string, object>> GetAssets() => Assets;
 
     public static IEnumerable<KeyValuePair<string, T>> GetAssets<T>()
     {
@@ -71,74 +106,43 @@ public static class AssetManager
         }
     }
 
-    public static string GetAssetType(object asset)
+    public static AssetTypeInfo GetAssetTypeInfo(Type type)
     {
-        return asset switch
-        {
-            Texture2D => "Texture",
-            Sound => "Sound",
-            Music => "Music",
-            _ => asset.GetType().Name
-        };
+        return _types[type];
     }
 
-    public static string GetPath<T>(object asset)
+    public static AssetTypeInfo GetAssetTypeInfo<T>()
     {
-        if (_assetPaths.TryGetValue(asset, out string path))
+        return _types[typeof(T)];
+    }
+
+    public static string GetPath<T>(object asset) =>_assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
+
+    public static object Load(string path, Type type)
+    {
+        AssetTypeInfo info = _types[type];
+
+        if (Assets.TryGetValue(path, out object? cached))
         {
-            return path;
+            return cached;
         }
 
-        return "BAD PATH!";
+        if(!File.Exists(path))
+        {
+            path = info.FallbackPath;
+        }
+
+        object asset = info.Loader(path);
+
+        Assets[path] = asset;
+        _assetPaths[asset] = path;
+
+        return asset;
     }
 
     public static T Load<T>(string path)
     {
-        Func<string, T> loader = (Func<string, T>)_resourceLoaders[typeof(T)];
-
-        if (!string.IsNullOrEmpty(path))
-        {
-            if (Assets.TryGetValue(path, out object cachedObject))
-            {
-                return (T)cachedObject;
-            }
-        }
-
-        if (!File.Exists(path))
-        {
-            object fallbackObject = loader(_fallbackPaths[typeof(T)]);
-
-            return (T)fallbackObject;
-        }
-
-        object loadedObject = loader(path);
-
-        if (loadedObject != null)
-        {
-            Assets.Add(path, loadedObject);
-            _assetPaths.Add(loadedObject, path);
-        }
-        else
-        {
-            Debug.Log("Could not load resource", LogLevel.Warning, LogChannel.Asset);
-        }
-
-        return (T)loadedObject;
-    }
-
-    private static Texture2D LoadTexture(string path)
-    {
-        return Raylib.LoadTexture(path);
-    }
-
-    private static Sound LoadSound(string path)
-    {
-        return Raylib.LoadSound(path);
-    }
-
-    private static Music LoadMusic(string path)
-    {
-        return Raylib.LoadMusicStream(path);
+        return (T)Load(path, typeof(T));
     }
 }
 

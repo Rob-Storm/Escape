@@ -94,7 +94,7 @@ public class ToolSettings : EditorPanel
         {
             ImGui.AcceptDragDropPayload("texture_path");
 
-            texturePath = _context.DraggedTexturePath;
+            texturePath = _context.DraggedAssetPath;
 
             ImGui.EndDragDropTarget();
         }

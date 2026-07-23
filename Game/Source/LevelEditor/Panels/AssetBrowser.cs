@@ -1,7 +1,4 @@
 ﻿using ImGuiNET;
-using Raylib_cs;
-using rlImGui_cs;
-using System.Numerics;
 
 namespace Game.LevelEditor.Panels;
 
@@ -23,26 +20,23 @@ public class AssetBrowser : EditorPanel
 
         if (ImGui.BeginTable("Assets", columnCount))
         {
-            foreach (var texture in AssetManager.GetAssets<Texture2D>())
+            foreach (var asset in AssetManager.GetAssets().Where(a => Directory.GetParent(a.Key).Name  != "Editor"))
             {
+                // Todo: add back in imgui drag source
+
+                AssetTypeInfo info = AssetManager.GetAssetTypeInfo(asset.Value.GetType());
+
                 ImGui.TableNextColumn();
 
-                ImGui.PushID(texture.Key);
+                ImGui.PushID(asset.Key);
 
-                rlImGui.ImageButtonSize("##preview", texture.Value, new Vector2(96));
-
-                if (ImGui.BeginDragDropSource())
+                if(info.DrawPreview(asset.Value))
                 {
-                    ImGui.SetDragDropPayload("texture_path", IntPtr.Zero, 0);
-
-                    _context.DraggedTexturePath = texture.Key;
-
-                    ImGui.Text(texture.Key);
-                    ImGui.EndDragDropSource();
+                    _context.SelectedObject = asset.Value;
                 }
 
-                ImGui.Text(Path.GetFileNameWithoutExtension(texture.Key));
-                ImGui.TextDisabled(AssetManager.GetAssetType(texture.Value));
+                ImGui.TextColored(info.Color, Path.GetFileNameWithoutExtension(asset.Key));
+                ImGui.TextDisabled(info.Type.Name);
 
                 ImGui.PopID();
             }

@@ -15,6 +15,7 @@ namespace Game.LevelEditor;
  * Asset settings inspector,
  */
 
+
 public class Editor : World
 {
     public string LevelName = "Level";
@@ -50,6 +51,8 @@ public class Editor : World
         _toolSettings = new ToolSettings(_context);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
+
+        _context.SelectedObject = null;
     }
 
     ~Editor()
@@ -227,6 +230,7 @@ public class EditorContext
     public World World { get; }
     public EditorCamera Camera { get; }
 
+    public object SelectedObject;
     public Cell SelectedCell => World.GetCell(SelectedX, SelectedY);
     public ToolMode ToolMode = ToolMode.Select;
     public PaintWallSettings ToolSettings;
@@ -238,7 +242,7 @@ public class EditorContext
     public Vector2 PlayerStart;
     public float StartRotation;
 
-    public string DraggedTexturePath;
+    public string DraggedAssetPath;
 
     public PlayModeService PlayModeService;
     public AssetService AssetService;

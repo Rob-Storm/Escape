@@ -2,107 +2,144 @@
 using Raylib_cs;
 using rlImGui_cs;
 using System.Numerics;
+using System.Reflection;
 
 namespace Game.LevelEditor.Panels;
 
+
 public class PropertyInspector : EditorPanel
 {
+    private delegate void OnPropertyDrawSignature(ref object propertyValue, string propertyName);
+
+    private Dictionary<Type, OnPropertyDrawSignature> _typeFactory;
+
     public PropertyInspector(EditorContext context) : base(context)
     {
+        _typeFactory = new Dictionary<Type, OnPropertyDrawSignature>
+        {
+            { typeof(string), DrawString},
+            { typeof(int), DrawInt},
+            { typeof(float), DrawFloat},
+            { typeof(Vector2), DrawVector2},
+            { typeof(AssetTypeInfo), DrawAsset}
+        };
+
     }
 
     public override void Draw()
     {
         ImGui.Begin("Properties");
 
-        if (_context.SelectedCell != null)
-        {
-            uint flags = (uint)_context.SelectedCell.Walls;
-
-            if (ImGui.BeginTable("Walls", 2))
-            {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("North", ref flags, (uint)Walls.North);
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("East", ref flags, (uint)Walls.East);
-
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("South", ref flags, (uint)Walls.South);
-
-                ImGui.TableNextColumn();
-                ImGui.CheckboxFlags("West", ref flags, (uint)Walls.West);
-
-                ImGui.EndTable();
-            }
-
-            ImGui.SeparatorText("Walls");
-
-            if (ImGui.BeginTable("WallTextures", 2))
-            {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("North", ref _context.SelectedCell.NorthWallTexturePath);
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("East", ref _context.SelectedCell.EastWallTexturePath);
-
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("South", ref _context.SelectedCell.SouthWallTexturePath);
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("West", ref _context.SelectedCell.WestWallTexturePath);
-
-                ImGui.EndTable();
-            }
-
-            ImGui.SeparatorText("Floor / Ceiling");
-
-            if (ImGui.BeginTable("FloorTable", 2))
-            {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                DrawTextureSlot("Floor", ref _context.SelectedCell.FloorTexturePath);
-                ImGui.TableNextColumn();
-                DrawTextureSlot("Ceiling", ref _context.SelectedCell.CeilingTexturePath);
-
-                ImGui.EndTable();
-            }
-
-            _context.SelectedCell.Walls = (Walls)flags;
-        }
-        else
-        {
-            string text = "Select a cell/entity to view properties";
-
-            ImGui.SetCursorPos((ImGui.GetContentRegionAvail() * 0.5f) - (ImGui.CalcTextSize(text) * 0.5f));
-            ImGui.TextDisabled(text);
-        }
+        DrawProperties(_context.SelectedObject);
 
         ImGui.End();
     }
 
-    private void DrawTextureSlot(string name, ref string texturePath)
+    private void DrawProperties(object inObject)
     {
-        ImGui.Text(name);
+        if (inObject == null)
+        {
+            ImGui.TextDisabled("Select an object to view properties");
 
-        rlImGui.ImageSize(AssetManager.Load<Texture2D>(texturePath), new Vector2(80));
+            return;
+        }
+
+        foreach (FieldInfo field in inObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
+        {
+            if (_typeFactory.TryGetValue(field.FieldType, out var drawFunction))
+            {
+                object value = field.GetValue(inObject);
+                drawFunction(ref value, field.Name);
+                field.SetValue(inObject, value);
+            }
+            else if(AssetManager.IsRegisteredAssetType(field.FieldType))
+            {
+                object value = field.GetValue(inObject);
+                DrawAsset(ref value, field.Name);
+                field.SetValue(inObject, value);
+            }
+        }
+
+        foreach (PropertyInfo property in inObject.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        {
+            if (!property.CanRead || !property.CanWrite)
+                continue;
+
+            if (_typeFactory.TryGetValue(property.PropertyType, out var drawFunction))
+            {
+                object value = property.GetValue(inObject);
+                drawFunction(ref value, property.Name);
+                property.SetValue(inObject, value);
+            }
+            else if (AssetManager.IsRegisteredAssetType(property.PropertyType))
+            {
+                object value = property.GetValue(inObject);
+                DrawAsset(ref value, property.Name);
+                property.SetValue(inObject, value);
+            }
+        }
+    }
+
+    private void DrawString(ref object propertyValue, string propertyName)
+    {
+        string property = (string)propertyValue;
+
+        ImGui.InputText(propertyName, ref property, 32);
+
+        propertyValue = property;
+    }
+
+    private void DrawInt(ref object propertyValue, string propertyName)
+    {
+        int property = (int)propertyValue;
+
+        ImGui.InputInt(propertyName, ref property, 1);
+
+        propertyValue = property;
+    }
+
+    private void DrawFloat(ref object propertyValue, string propertyName)
+    {
+        float property = (float)propertyValue;
+
+        ImGui.InputFloat(propertyName, ref property, 1);
+
+        propertyValue = property;
+    }
+
+    private void DrawVector2(ref object propertyValue, string propertyName)
+    {
+        Vector2 property = (Vector2)propertyValue;
+
+        ImGui.InputFloat2(propertyName, ref property);
+
+        propertyValue = property;
+    }
+
+    private void DrawAsset(ref object propertyValue, string propertyName)
+    {
+        AssetTypeInfo info = AssetManager.GetAssetTypeInfo(propertyValue.GetType());
+
+        ImGui.PushID(propertyName);
+
+        if(info.DrawPreview(propertyValue))
+        {
+            // do stuff
+        }
 
         if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
         {
-            ImGui.AcceptDragDropPayload("texture_path");
+            ImGuiPayloadPtr  payload = ImGui.AcceptDragDropPayload("texture_path");
 
-            texturePath = _context.DraggedTexturePath;
+            propertyValue = AssetManager.Load(_context.DraggedAssetPath, info.Type);
 
             ImGui.EndDragDropTarget();
         }
+
+        ImGui.PopID();
+
+        ImGui.SameLine();
+
+        ImGui.Text(propertyName);
     }
 }
