@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game.LevelEditor.Panels;
@@ -276,13 +277,13 @@ public class MapGrid : EditorPanel
                 break;
             case ToolMode.Draw:
                 Cell newCell = new Cell(cellX, cellY);
-                newCell.NorthWallTexturePath = _context.ToolSettings.NorthWallTexturePath;
-                newCell.EastWallTexturePath = _context.ToolSettings.EastWallTexturePath;
-                newCell.WestWallTexturePath = _context.ToolSettings.WestWallTexturePath;
-                newCell.SouthWallTexturePath = _context.ToolSettings.SouthWallTexturePath;
+                newCell.NorthWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.NorthWallTexturePath);
+                newCell.EastWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.EastWallTexturePath);
+                newCell.WestWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.SouthWallTexturePath);
+                newCell.SouthWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.WestWallTexturePath);
 
-                newCell.FloorTexturePath = _context.ToolSettings.FloorTexturePath;
-                newCell.CeilingTexturePath = _context.ToolSettings.CeilingTexturePath;
+                newCell.FloorTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.FloorTexturePath);
+                newCell.CeilingTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.CeilingTexturePath);
 
                 newCell.Walls = _context.ToolSettings.Walls;
 
@@ -366,13 +367,13 @@ public class MapGrid : EditorPanel
             {
                 Cell newCell = new Cell(x, y);
 
-                newCell.NorthWallTexturePath = _context.ToolSettings.NorthWallTexturePath;
-                newCell.EastWallTexturePath = _context.ToolSettings.EastWallTexturePath;
-                newCell.WestWallTexturePath = _context.ToolSettings.WestWallTexturePath;
-                newCell.SouthWallTexturePath = _context.ToolSettings.SouthWallTexturePath;
+                newCell.NorthWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.NorthWallTexturePath);
+                newCell.EastWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.EastWallTexturePath);
+                newCell.WestWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.SouthWallTexturePath);
+                newCell.SouthWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.WestWallTexturePath);
 
-                newCell.FloorTexturePath = _context.ToolSettings.FloorTexturePath;
-                newCell.CeilingTexturePath = _context.ToolSettings.CeilingTexturePath;
+                newCell.FloorTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.FloorTexturePath);
+                newCell.CeilingTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.CeilingTexturePath);
 
                 Walls newWalls = Walls.None;
 
