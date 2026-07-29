@@ -11,9 +11,6 @@ public static class AssetManager
     private static Dictionary<object, string> _assetPaths;
     private static Dictionary<Type, AssetTypeInfo> _types;
 
-    private static Dictionary<Type, Delegate> _resourceLoaders;
-    private static Dictionary<Type, string> _fallbackPaths;
-
     static AssetManager()
     {
         Assets = new Dictionary<string, object>();
@@ -146,9 +143,9 @@ public static class AssetManager
         return _types[asset.GetType()];
     }
 
-    public static AssetTypeInfo GetAssetTypeInfo(string path)
+    public static AssetTypeInfo? GetAssetTypeInfo(string path)
     {
-        if(Assets.TryGetValue(path, out object value))
+        if(Assets.TryGetValue(path, out object? value))
         {
             return GetAssetTypeInfo(value);
         }

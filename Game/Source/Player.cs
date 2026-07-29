@@ -13,7 +13,10 @@ public class Player : Character
     {
         Camera = new Camera();
 
-        CollisionBounds = new Vector3(0.125f, 0.5f, 0.125f);
+        if (Collider != null)
+        { 
+            Collider.CollisionBounds = new Vector3(0.125f, 0.5f, 0.125f); 
+        }
     }
 
     public void SetYaw(float yaw)

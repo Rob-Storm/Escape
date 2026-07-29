@@ -9,19 +9,11 @@ namespace Game;
 public class Entity
 {
     public Transform Transform { get; set; }
-    private BillboardRenderer _renderer;
 
     [JsonIgnore]
-    public BoundingBox Collider { get; protected set; }
+    public Collider? Collider { get; set; }
 
-    [JsonIgnore]
-    public Vector3 CollisionBounds { get; protected set; } = new Vector3(0.275f, 0.5f, 0.275f);
-
-    [JsonIgnore]
-    public bool IsColliding { get; set; } = false;
-
-    [JsonIgnore]
-    public Color Color { get; private set; } = Color.SkyBlue;
+    private BillboardRenderer? _renderer;
 
     public Entity()
     {
@@ -36,18 +28,12 @@ public class Entity
 
     public virtual void Update()
     {
-        Vector3 halfSize = CollisionBounds * Transform.Scale;
-
-        Collider = new BoundingBox
-        {
-            Min = Transform.Position - halfSize,
-            Max = Transform.Position + halfSize
-        };
+        Collider?.Update(Transform);
     }
 
     public virtual void Render(Camera camera)
     {
-        _renderer.Render(camera, Transform.Position);
+        _renderer?.Render(camera, Transform.Position);
     }
 
     public Vector3 GetForwardVector() => Vector3.Transform(Directions.Forward, GetRotationMatrix());

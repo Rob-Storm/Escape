@@ -37,6 +37,27 @@ public class World
         return Cells[x, y];
     }
 
+    public IEnumerable<Collider> GetCollidables()
+    {
+        foreach (Entity entity in EntityList)
+        {
+            yield return entity.Collider;
+        }
+
+        foreach(Cell cell in Cells)
+        {
+            if(cell == null)
+            {
+                continue;
+            }
+
+            //foreach (BoundingBox collider in cell.GetWallColliders())
+            //{
+            //    yield return new Collider();
+            //}
+        }
+    }
+
     public Cell GetCell(Vector2 location)
     {
         return Cells[(int)location.X, (int)location.Y];

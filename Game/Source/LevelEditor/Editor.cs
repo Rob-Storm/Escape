@@ -34,6 +34,7 @@ public class Editor : World
     private LevelSettings _levelSettings;
     private ToolSettings _toolSettings;
 
+
     public Editor()
     {
         _camera = new EditorCamera();
@@ -65,6 +66,7 @@ public class Editor : World
     {
         _camera.Update();
 
+        _viewport.Update();
 
         if (_context.SelectedCell != null && !_viewport.ViewportControlled)
         {
@@ -229,8 +231,8 @@ public class EditorContext
     public World World { get; }
     public EditorCamera Camera { get; }
 
-    public object SelectedObject;
-    public object SelectedAsset;
+    public object? SelectedObject;
+    public object? SelectedAsset;
 
     public bool SelectedAnything => SelectedObject != null || SelectedAsset != null; 
 
@@ -245,7 +247,7 @@ public class EditorContext
     public Vector2 PlayerStart;
     public float StartRotation;
 
-    public string DraggedAssetPath;
+    public string? DraggedAssetPath;
 
     public PlayModeService PlayModeService;
     public AssetService AssetService;

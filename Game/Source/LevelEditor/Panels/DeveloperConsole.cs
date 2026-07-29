@@ -6,6 +6,7 @@ namespace Game.LevelEditor.Panels;
 public class DeveloperConsole : EditorPanel
 {
     private List<string> _consoleHistory;
+    private bool _scrollToBottom = true;
 
     public DeveloperConsole(EditorContext context) : base(context)
     {
@@ -22,28 +23,27 @@ public class DeveloperConsole : EditorPanel
     {
         ImGui.Begin("Developer Console");
 
-        ImGui.BeginChild("Scroll", new Vector2(0, -25), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
+        if (ImGui.Button("Clear History", new Vector2(120, 0))) { _consoleHistory.Clear(); }
+
+        ImGui.SameLine();
+
+        ImGui.Checkbox("Scroll To Bottom", ref _scrollToBottom);
+
+        ImGui.BeginChild("Scroll", new Vector2(0, -5), ImGuiChildFlags.None);
+
+        ImGui.Separator();
 
         foreach (string message in _consoleHistory)
         {
             ImGui.Text(message);
         }
 
-        ImGui.EndChild();
+        if (_scrollToBottom)
+        {
+            ImGui.SetScrollHereY(1);
+        }
 
-        string test = string.Empty;
-
-        float buttonWidth = 120.0f;
-        float spacing = ImGui.GetStyle().ItemSpacing.X;
-
-        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - buttonWidth - spacing);
-
-        ImGui.InputTextWithHint("##ConsoleInput", "Enter Command", ref test, 256,
-            ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.EscapeClearsAll);
-
-        ImGui.SameLine();
-
-        if (ImGui.Button("Clear History", new Vector2(buttonWidth, 0))) { _consoleHistory.Clear(); }
+        ImGui.EndChild();        
 
         ImGui.End();
     }

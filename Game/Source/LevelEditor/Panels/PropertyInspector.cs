@@ -23,6 +23,7 @@ public class PropertyInspector : EditorPanel
             { typeof(float), DrawFloat},
             { typeof(Vector2), DrawVector2},
             { typeof(AssetTypeInfo), DrawAsset}
+            // enum and enum flags are checked and handled explicitly
         };
 
     }
