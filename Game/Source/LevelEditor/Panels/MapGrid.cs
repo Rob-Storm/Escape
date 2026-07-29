@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using Raylib_cs;
 using System.Numerics;
+using System.Reflection;
 
 namespace Game.LevelEditor.Panels;
 
@@ -42,6 +43,10 @@ public class MapGrid : EditorPanel
     private void DrawTools()
     {
         DrawToolButton($"{IconFonts.FontAwesome6.ArrowPointer} Select", ToolMode.Select);
+
+        ImGui.SameLine();
+
+        DrawToolButton($"{IconFonts.FontAwesome6.Person} Entity", ToolMode.Entity);
 
         ImGui.SameLine();
 
@@ -257,14 +262,19 @@ public class MapGrid : EditorPanel
                 _context.SelectedY = cellY;
                 _context.SetSelectedObject(_context.World.GetCell(cellX, cellY));
                 break;
-            case ToolMode.Draw:
+            case ToolMode.Entity: // todo: implement entity spawning
+                ConstructorInfo ctor = _context.EntitySpawnClass.GetConstructor(new Type[] { })!;
+                Entity instance = (Entity)ctor.Invoke(new Type[] { });
+
+                instance.Transform.Position = new Vector3(cellX, 0, cellY);
+                _context.World.EntityList.Add(instance);
+
+                _context.SelectedObject = instance;
                 break;
             case ToolMode.Room:
                 _startRoomCellX = cellX;
                 _startRoomCellY = cellY;
                 Debug.Log($"Start {cellX} {cellY}");
-                break;
-            case ToolMode.Delete:
                 break;
         }
     }

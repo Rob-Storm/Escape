@@ -12,7 +12,6 @@ namespace Game.LevelEditor;
  * 
  * Entities,
  * All asset types show in browser,
- * Asset settings inspector,
  */
 
 
@@ -178,6 +177,7 @@ public class Editor : World
 
             if (output.result.IsOk)
             {
+                // Todo: make this await/async
                 _context.PlayModeService.RunLevel(output.result.Path);
             }
         }
@@ -239,6 +239,7 @@ public class EditorContext
     public Cell SelectedCell => World.GetCell(SelectedX, SelectedY);
     public ToolMode ToolMode = ToolMode.Select;
     public PaintWallSettings ToolSettings;
+    public Type EntitySpawnClass;
 
     public int SelectedX;
     public int SelectedY;
@@ -269,6 +270,7 @@ public class EditorContext
         AssetService = new AssetService();
     }
 
+    // HACK: Make cells entities to simplify this (and SetSelectedAsset) garbage
     public void SetSelectedObject(object newObject)
     {
         SelectedObject = newObject;
@@ -288,6 +290,7 @@ public class EditorContext
 public enum ToolMode
 {
     Select,
+    Entity,
     Draw,
     Room,
     Delete

@@ -14,7 +14,7 @@ public delegate void ViewportControlChangedSignature(bool newControl);
 
 public class Viewport : EditorPanel
 {
-    public event ViewportControlChangedSignature ViewportControlChanged;
+    public event ViewportControlChangedSignature? ViewportControlChanged;
 
     public bool ViewportControlled { get; private set; } = false;
 
@@ -142,8 +142,8 @@ public class Viewport : EditorPanel
             }
         }
 
-        _context.SelectedObject = selected.Parent;
+        _context.SelectedObject = selected != null ? selected.Parent : null;
 
-        Debug.Log($"Mouse Pick: {selected.ToString()}");
+        Debug.Log($"Mouse Pick: {(selected != null ? selected.ToString() : "None" )}");
     }
 }

@@ -7,22 +7,25 @@ namespace Game.LevelEditor.Panels;
 
 public class ToolSettings : EditorPanel
 {
-    private List<Type> _entityTypeList;
-    private List<string> _typeStringList;
     private int _entityIndex;
+
+    private Dictionary<string, Type> _entityTypeName;
 
     public ToolSettings(EditorContext context) : base(context)
     {
-        _entityTypeList = new List<Type>();
-        _typeStringList = new List<string>();
+        _entityTypeName = new Dictionary<string, Type>();
 
-        IEnumerable<Type> types = typeof(Entity).Assembly.GetTypes()
-            .Where(type => type.IsSubclassOf(typeof(Entity)) &&
-            Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null);
+        IEnumerable<Type> types = typeof(Entity).Assembly.GetTypes();
+            //.Where(type => type.IsSubclassOf(typeof(Entity)) &&
+            //Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null);
 
-        _entityTypeList = types.ToList();
-
-        _typeStringList = types.Select(name => name.Name).ToList();
+        foreach(Type type in types)
+        {
+            if (type.IsSubclassOf(typeof(Entity)) && Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null)
+            {
+                _entityTypeName.Add(type.Name, type);
+            }
+        }
     }
 
     public override void Draw()
@@ -95,7 +98,9 @@ public class ToolSettings : EditorPanel
 
         ImGui.SeparatorText("Spawn Entity");
 
-        ImGui.Combo("Entity Class", ref _entityIndex, _typeStringList.ToArray(), _typeStringList.Count);
+        ImGui.Combo("Entity Class", ref _entityIndex, _entityTypeName.Keys.ToArray(), _entityTypeName.Count);
+
+        _context.EntitySpawnClass = _entityTypeName.Values.ToArray()[_entityIndex];
 
         ImGui.End();
     }
