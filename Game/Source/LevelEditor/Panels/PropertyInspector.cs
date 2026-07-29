@@ -20,8 +20,12 @@ public class PropertyInspector : EditorPanel
             { typeof(int), DrawInt},
             { typeof(float), DrawFloat},
             { typeof(Vector2), DrawVector2},
+            { typeof(Vector3), DrawVector3},
+            { typeof(Quaternion), DrawQuaternion},
             { typeof(AssetTypeInfo), DrawAsset}
+
             // enum and enum flags are checked and handled explicitly
+            // complex objects are likewise handled explicitly
         };
 
     }
@@ -106,6 +110,7 @@ public class PropertyInspector : EditorPanel
     #region Draw Methods
     private void DrawProperty(ref object property, string name, Type type)
     {
+
         if (type.IsEnum)
         {
             if (type.IsDefined(typeof(FlagsAttribute), false))
@@ -116,16 +121,39 @@ public class PropertyInspector : EditorPanel
             {
                 DrawEnum(ref property, name);
             }
+
+            return;
         }
 
         if (_typeFactory.TryGetValue(type, out var drawFunction))
         {
             drawFunction(ref property, name);
 
+            return;
         }
-        else if (AssetManager.IsRegisteredAssetType(type))
+
+        if (AssetManager.IsRegisteredAssetType(type))
         {
             DrawAsset(ref property, name);
+
+            return;
+        }
+
+        // complex object (i.e entity subclass)
+
+        if(property != null)
+        {
+           ImGui.PushID($"##{name}");
+
+           if(ImGui.TreeNode(name))
+           {
+                DrawProperties(property);
+                ImGui.TreePop();
+           }
+
+            ImGui.PopID();
+
+            return;
         }
     }
 
@@ -228,6 +256,24 @@ public class PropertyInspector : EditorPanel
         ImGui.InputFloat2(propertyName, ref property);
 
         propertyValue = property;
+    }
+
+    private void DrawVector3(ref object propertyValue, string propertyName)
+    {
+        Vector3 property = (Vector3)propertyValue;
+
+        ImGui.InputFloat3(propertyName, ref property);
+
+        propertyValue = property;
+    }
+
+    private void DrawQuaternion(ref object propertyValue, string propertyName)
+    {
+        Vector3 property = ((Quaternion)propertyValue).ToEulerAngles();
+
+        ImGui.InputFloat3(propertyName, ref property);
+
+        propertyValue = Quaternion.CreateFromYawPitchRoll(property.Y, property.X, property.Z);
     }
 
     private void DrawAsset(ref object propertyValue, string propertyName)
