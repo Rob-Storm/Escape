@@ -4,6 +4,7 @@ using System.Numerics;
 
 namespace Game.LevelEditor;
 
+[HideFromSpawnMenu]
 public class EditorCamera : Camera
 {
     public float MoveSpeed = 5f;

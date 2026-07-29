@@ -1,8 +1,10 @@
-﻿using Raylib_cs;
+﻿using Game.LevelEditor;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game;
 
+[HideFromSpawnMenu]
 public class Camera : Entity
 {
     public float FieldOfView { get; protected set; } = 80f;

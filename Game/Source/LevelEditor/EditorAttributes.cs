@@ -12,11 +12,11 @@ public class HidePropertyAttribute : Attribute
 }
 
 /// <summary>
-/// Does not add this entity class to the "Spawn entity" menu
+/// Does not add this entity type to the "Spawn entity" menu
 /// </summary>
 /// 
 [AttributeUsage(AttributeTargets.Class)]
-public class AbstractEntityAttribute : Attribute
+public class HideFromSpawnMenuAttribute : Attribute
 {
     
 }

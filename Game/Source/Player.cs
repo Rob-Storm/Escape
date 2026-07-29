@@ -1,8 +1,10 @@
-﻿using Raylib_cs;
+﻿using Game.LevelEditor;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game;
 
+[HideFromSpawnMenu]
 public class Player : Character
 {
     public Camera Camera { get; private set; }

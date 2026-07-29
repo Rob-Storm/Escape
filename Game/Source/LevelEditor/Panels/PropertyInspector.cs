@@ -54,7 +54,7 @@ public class PropertyInspector : EditorPanel
             ImGui.Text(AssetManager.GetPath(_context.SelectedAsset));
             ImGui.TextDisabled(info.Type.ToString());
 
-            info.DrawInspector(_context.SelectedAsset);
+            info.DrawInspector!(_context.SelectedAsset);
 
             ImGui.PopID();
         }
@@ -71,7 +71,7 @@ public class PropertyInspector : EditorPanel
                 continue;
             }
 
-            object value = field.GetValue(inObject);
+            object? value = field.GetValue(inObject);
             DrawProperty(ref value, field.Name, field.FieldType);
             field.SetValue(inObject, value);
         }
@@ -93,7 +93,7 @@ public class PropertyInspector : EditorPanel
                 ImGui.BeginDisabled();
             }
 
-            object value = property.GetValue(inObject);
+            object? value = property.GetValue(inObject);
 
             DrawProperty(ref value, property.Name, property.PropertyType);
             property.SetValue(inObject, value);
@@ -105,6 +105,7 @@ public class PropertyInspector : EditorPanel
         }
     }
 
+    #region Draw Methods
     private void DrawProperty(ref object property, string name, Type type)
     {
         if (type.IsEnum)
@@ -177,7 +178,7 @@ public class PropertyInspector : EditorPanel
 
         if (ImGui.Combo(propertyName, ref currentIndex, names, names.Length))
         {
-            propertyValue = values.GetValue(currentIndex);
+            propertyValue = values.GetValue(currentIndex)!;
         }
 
     }
@@ -202,7 +203,7 @@ public class PropertyInspector : EditorPanel
 
             bool enabled = (current & flag) == flag;
 
-            string name = Enum.GetName(enumType, value);
+            string name = Enum.GetName(enumType, value)!;
 
             if(ImGui.Checkbox(name, ref enabled))
             {
@@ -238,20 +239,20 @@ public class PropertyInspector : EditorPanel
 
         ImGui.PushID(propertyName);
 
-        if(info.DrawPreview(propertyValue))
+        if(info.DrawPreview!(propertyValue))
         {
             // do stuff
         }
 
         if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
         {
-            AssetTypeInfo dragInfo = AssetManager.GetAssetTypeInfo(_context.DraggedAssetPath);
+            AssetTypeInfo? dragInfo = AssetManager.GetAssetTypeInfo(_context.DraggedAssetPath!);
 
             ImGuiPayloadPtr  payload = ImGui.AcceptDragDropPayload("asset_path");
 
-            if(info.Type == dragInfo.Type)
+            if(info.Type == dragInfo!.Type)
             {
-                propertyValue = AssetManager.Load(_context.DraggedAssetPath, info.Type);
+                propertyValue = AssetManager.Load(_context.DraggedAssetPath!, info.Type);
             }
 
             ImGui.EndDragDropTarget();
@@ -263,4 +264,5 @@ public class PropertyInspector : EditorPanel
 
         ImGui.Text(propertyName);
     }
+    #endregion
 }
