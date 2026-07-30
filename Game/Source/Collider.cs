@@ -5,16 +5,16 @@ namespace Game;
 
 public class Collider
 {
-    public event Action<Collider> OnBeginOverlap;
-    public event Action<Collider> OnEndOverlap;
+    public event Action<Collider>? OnBeginOverlap;
+    public event Action<Collider>? OnEndOverlap;
 
     public Entity Parent { get; init; }
 
     public BoundingBox BoundingBox { get; protected set; }
 
-    public Vector3 CollisionBounds { get; set; }
+    public Vector3 CollisionBounds { get; set; } = Vector3.Zero;
 
-    public bool IsColliding { get; set; } = false;
+    public bool IsColliding { get; protected set; } = false;
 
     public Color Color { get; private set; } = Color.SkyBlue;
 

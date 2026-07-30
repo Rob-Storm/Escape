@@ -13,7 +13,7 @@ public class Entity
     [JsonIgnore]
     public Collider? Collider { get; set; }
 
-    private BillboardRenderer? _renderer;
+    protected RenderComponent? _renderer;
 
     public Entity()
     {
@@ -33,7 +33,7 @@ public class Entity
 
     public virtual void Render(Camera camera)
     {
-        _renderer?.Render(camera, Transform.Position);
+        _renderer?.Render(camera, Transform);
     }
 
     public Vector3 GetForwardVector() => Vector3.Transform(Directions.Forward, GetRotationMatrix());

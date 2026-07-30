@@ -12,6 +12,10 @@ public class Character : Entity
     protected float _moveSpeed = 1.5f;
     public World? World;
 
+    public Character()
+    {
+        Collider = new Collider(this);
+    }
 
     protected void Move(Vector3 direction)
     {
@@ -30,7 +34,7 @@ public class Character : Entity
 
     protected bool CanMove(Vector3 direction)
     {
-        Vector3 halfSize = Collider.CollisionBounds * Transform.Scale;
+        Vector3 halfSize = Collider!.CollisionBounds * Transform.Scale;
 
         BoundingBox sweepCollider = new BoundingBox
         {

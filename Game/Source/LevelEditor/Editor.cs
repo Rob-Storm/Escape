@@ -63,6 +63,11 @@ public class Editor : World
 
     public override void Update()
     {
+        foreach(Entity entity in EntityList)
+        {
+            entity.Update();
+        }
+
         _camera.Update();
 
         _viewport.Update();
@@ -105,6 +110,11 @@ public class Editor : World
         foreach (Entity entity in EntityList)
         {
             entity.Render(_camera);
+
+            if(_debugDrawMode && entity.Collider != null)
+            {
+                Raylib.DrawBoundingBox(entity.Collider.BoundingBox, entity.Collider.Color);
+            }
         }
 
         foreach (var cellData in GetCells())

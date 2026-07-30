@@ -3,16 +3,14 @@ using System.Numerics;
 
 namespace Game;
 
-public class BillboardRenderer
+public class BillboardRenderer : RenderComponent
 {
-    public Texture2D Texture { get; set; }
-
     ~BillboardRenderer()
     {
         Raylib.UnloadTexture(Texture);
     }
 
-    public void Render(Camera camera, Vector3 position)
+    public override void Render(Camera camera, Transform transform)
     {
         if (Texture.Id == 0)
         {
@@ -23,7 +21,7 @@ public class BillboardRenderer
         Vector2 size = Vector2.One;
         Vector2 origin = new Vector2(0.5f, 0.5f);
 
-        Raylib.DrawBillboardPro(camera, Texture, source, position, Vector3.UnitY, size, origin, 0f, Color.White);
+        Raylib.DrawBillboardPro(camera, Texture, source, transform.Position, Vector3.UnitY, size, origin, 0f, Color.White);
 
         // Todo: fix bug with billboard rotating with camera rotation instead of it's position
     }
