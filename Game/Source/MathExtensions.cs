@@ -3,9 +3,13 @@ using System.Numerics;
 
 namespace Game;
 
-
 public static class QuaternionExtensions
 {
+    /// <summary>
+    /// Converts a quaternion to euler angles, in degrees
+    /// </summary>
+    /// <param name="q">Quaternion</param>
+    /// <returns></returns>
     public static Vector3 ToEulerAngles(this Quaternion q)
     {
         q = Quaternion.Normalize(q);

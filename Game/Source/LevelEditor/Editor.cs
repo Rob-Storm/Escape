@@ -132,6 +132,11 @@ public class Editor : World
             _context.SelectedCell.RenderBounds(Color.Orange, Color.Green);
         }
 
+        if(_context.SelectedObject != null && _context.SelectedObject is Entity selectedEntity)
+        {
+            selectedEntity.DebugRender(_camera);
+        }
+
         DrawWorldGrid();
 
         Raylib.EndMode3D();

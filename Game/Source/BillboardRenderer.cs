@@ -25,4 +25,9 @@ public class BillboardRenderer : RenderComponent
 
         // Todo: fix bug with billboard rotating with camera rotation instead of it's position
     }
+
+    public override void DebugRender(Camera camera, Transform transform)
+    {
+        
+    }
 }

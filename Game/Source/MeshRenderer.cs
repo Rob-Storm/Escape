@@ -16,4 +16,9 @@ public class MeshRenderer : RenderComponent
 
         Raylib.DrawModelEx(Model, transform.Position, Directions.Up, transform.Rotation.ToEulerAngles().Y, transform.Scale, Color.White);
     }
+
+    public override void DebugRender(Camera camera, Transform transform)
+    {
+        Raylib.DrawModelWiresEx(Model, transform.Position, Directions.Up, transform.Rotation.ToEulerAngles().Y, transform.Scale, Color.Orange);
+    }
 }

@@ -6,12 +6,6 @@ using System.Numerics;
 namespace Game.LevelEditor.Panels;
 
 public delegate void ViewportControlChangedSignature(bool newControl);
-
-/*
- * Todo:
- * 3d picking in viewport
- */
-
 public class Viewport : EditorPanel
 {
     public event ViewportControlChangedSignature? ViewportControlChanged;
@@ -124,7 +118,7 @@ public class Viewport : EditorPanel
         RayCollision closest = default;
         Collider? selected = null;
 
-        mouseRay = Raylib.GetScreenToWorldRay(localMousePos, _camera);
+        mouseRay = Raylib.GetScreenToWorldRayEx(localMousePos, _camera, (int)_viewportSize.X, (int)_viewportSize.Y);
 
         foreach (Collider collider in _context.World.GetCollidables())
         {

@@ -7,4 +7,5 @@ public abstract class RenderComponent
 {
     public Texture2D Texture { get; set; }
     public abstract void Render(Camera camera, Transform transform);
+    public abstract void DebugRender(Camera camera, Transform transform);
 }

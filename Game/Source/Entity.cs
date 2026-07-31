@@ -36,6 +36,11 @@ public class Entity
         _renderer?.Render(camera, Transform);
     }
 
+    public virtual void DebugRender(Camera camera)
+    {
+        _renderer?.DebugRender(camera, Transform);
+    }
+
     public Vector3 GetForwardVector() => Vector3.Transform(Directions.Forward, GetRotationMatrix());
     public Vector3 GetBackwardVector() => Vector3.Transform(Directions.Backward, GetRotationMatrix());
     public Vector3 GetUpVector() => Vector3.Transform(Directions.Up, GetRotationMatrix());
