@@ -4,6 +4,60 @@ using System.Text.Json.Serialization;
 
 namespace Game;
 
+public class AssetConverter<T> : JsonConverter<T>
+{
+    public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType != JsonTokenType.StartObject)
+        {
+            throw new JsonException();
+        }
+
+        string? path = null;
+
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject)
+            {
+                break;
+            }
+
+            if (reader.TokenType != JsonTokenType.PropertyName)
+            {
+                throw new JsonException();
+            }
+
+            string property = reader.GetString()!;
+            reader.Read();
+
+            if (property == "Path")
+            {
+                path = reader.GetString();
+            }
+            else
+            {
+                reader.Skip();
+            }
+        }
+
+        if (path == null)
+        {
+            throw new JsonException("Missing Path.");
+        }
+
+        return AssetManager.Load<T>(path);
+    }
+
+    public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+
+        writer.WriteString("Path", AssetManager.GetPath(value!));
+
+        writer.WriteEndObject();
+    }
+}
+
 public class TextureConverter : JsonConverter<Texture2D>
 {
     public override Texture2D Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

@@ -7,24 +7,28 @@ namespace Game;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(Character), "character")]
 [JsonDerivedType(typeof(Door), "door")]
+[JsonDerivedType(typeof(DoorKey), "key")]
 public class Entity
 {
     // An identifier for the editor
-    public string Name = "Entity";
+    public string Name;
     public Transform Transform { get; set; }
 
     [JsonIgnore]
     public Collider? Collider { get; set; }
 
-    protected RenderComponent? _renderer;
 
-    public bool MarkedForDelete { get; private set; } = false;
+    public RenderComponent? Renderer { get; set; }
+
+    private bool _markedForDelete = false;
 
     public Entity()
     {
+        Name = GetType().Name;
+
         Transform = new Transform();
 
-        _renderer = new BillboardRenderer
+        Renderer = new BillboardRenderer
         {
         };
 
@@ -38,15 +42,16 @@ public class Entity
 
     public virtual void Render(Camera camera)
     {
-        _renderer?.Render(camera, Transform);
+        Renderer?.Render(camera, Transform);
     }
 
     public virtual void DebugRender(Camera camera)
     {
-        _renderer?.DebugRender(camera, Transform);
+        Renderer?.DebugRender(camera, Transform);
     }
 
-    public void Destroy() => MarkedForDelete = true;
+    public bool GetMarkedForDelete() => _markedForDelete;
+    public void Destroy() => _markedForDelete = true;
 
     public Vector3 GetForwardVector() => Vector3.Transform(Directions.Forward, GetRotationMatrix());
     public Vector3 GetBackwardVector() => Vector3.Transform(Directions.Backward, GetRotationMatrix());

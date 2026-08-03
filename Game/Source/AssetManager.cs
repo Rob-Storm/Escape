@@ -39,11 +39,14 @@ public static class AssetManager
         Register<Sound>
             (
                 Raylib.LoadSound,
-                @"Assets\Textures\Default.png",
+                @"Assets\Sounds\Default.wav",
                 "Sound",
                 new Vector4(0f, 1f, 0f, 1f),
                 "asset",
-                sound => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(soundIcon), new Vector2(96)); },
+                sound => 
+                { 
+                    return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(soundIcon), new Vector2(96)); 
+                },
                 sound => 
                 {
                     if(ImGui.Button("Play Sound"))
@@ -57,7 +60,7 @@ public static class AssetManager
         Register<Music>
             (
                 Raylib.LoadMusicStream,
-                @"Assets\Textures\Default.png",
+                @"Assets\Music\Default.ogg",
                 "Music",
                 new Vector4(0f, 1f, 1f, 1f),
                 "asset",

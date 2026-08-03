@@ -5,21 +5,26 @@ namespace Game.Objects;
 
 public class Door : Entity, IInteractable
 {
-    public bool IsLocked { get; set; } = true;
+    public int ID = 0;
+    public Sound UseSound;
+    public Sound LockSound;
+
     private Model model;
 
     public Door()
     {
         model = Raylib.LoadModelFromMesh(Raylib.GenMeshCube(1f, 1f, 1f));
+        UseSound = AssetManager.Load<Sound>(@"Assets\Sounds\DoorUse.wav");
+        LockSound = AssetManager.Load<Sound>(@"Assets\Sounds\DoorLocked.wav");
 
         Collider = new Collider(this)
         {
             CollisionBounds = Vector3.One * 0.5f
         };
 
-        _renderer = new MeshRenderer
+        Renderer = new MeshRenderer
         {
-            Texture = AssetManager.Load<Texture2D>("Assets/Textures/Default.png"),
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\Default.png"),
             Model = model
         };
     }
@@ -31,9 +36,20 @@ public class Door : Entity, IInteractable
 
     public void Interact(Entity callingEntity)
     {
-        if(callingEntity is Player)
+        Player? player = callingEntity as Player;
+
+        if(player == null)
         {
-            Destroy();
+            return;
         }
+
+        if(!player.HasKey(ID))
+        {
+            GameplayStatics.PlaySoundAtLocation(LockSound, Transform.Position, 1.25f);
+            return;
+        }
+
+        GameplayStatics.PlaySoundAtLocation(UseSound, Transform.Position, 1.25f);
+        Destroy();
     }
 }

@@ -103,7 +103,7 @@ public class World
         {
             entity.Update();
 
-            if(entity.MarkedForDelete)
+            if(entity.GetMarkedForDelete())
             {
                 _removeEntityList.Add(entity);
             }

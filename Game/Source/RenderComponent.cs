@@ -1,8 +1,11 @@
 ﻿using Raylib_cs;
-using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Game;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(MeshRenderer), "mesh")]
+[JsonDerivedType(typeof(BillboardRenderer), "billboard")]
 public abstract class RenderComponent
 {
     public Texture2D Texture { get; set; }

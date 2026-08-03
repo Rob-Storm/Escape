@@ -13,14 +13,20 @@ public class Player : Character
     private Vector3 _cameraOffset = Directions.Up * 0.375f;
 
     private float _pitch, _yaw;
+
+    private HashSet<int> _collectedKeys;
+
     public Player()
     {
         Camera = new Camera();
+        _collectedKeys = new HashSet<int>();
 
         if (Collider != null)
         { 
             Collider.CollisionBounds = new Vector3(0.125f, 0.5f, 0.125f); 
         }
+
+        GameplayStatics.Camera = Camera;
     }
 
     public void SetYaw(float yaw)
@@ -78,13 +84,14 @@ public class Player : Character
         Camera.Update();
     }
 
-    public bool LineTrace(float range, out Entity hitEntity)
+    public bool LineTrace(float range, out Entity? hitEntity)
     {
         Vector3 start, end;
         start = Camera.Transform.Position;
-        end = start + Camera.GetForwardVector() * range;
+        Ray ray = new Ray(start, Vector3.Normalize(Camera.GetForwardVector()));
 
-        Ray interactRay = new Ray(start, end);
+        float closestDistance = float.MaxValue;
+        hitEntity = null;
 
         foreach (Collider collider in World!.GetCollidables())
         {
@@ -93,30 +100,28 @@ public class Player : Character
                 continue;
             }
 
-            RayCollision hit = Raylib.GetRayCollisionBox(interactRay, collider.BoundingBox);
+            RayCollision hit = Raylib.GetRayCollisionBox(ray, collider.BoundingBox);
 
-            if (!hit.Hit)
+            if (!hit.Hit || hit.Distance > range)
             {
                 continue;
             }
 
-            hitEntity = collider.Parent;
-
-            return true;
-
-            Debug.Log(collider.Parent.Name);
+            if (hit.Distance < closestDistance)
+            {
+                closestDistance = hit.Distance;
+                hitEntity = collider.Parent;
+            }
         }
 
-        hitEntity = null;
-
-        return false;
+        return hitEntity != null;
     }
 
     public void InteractTrace()
     {        
-        if(LineTrace(0.5f, out Entity hitEntity))
+        if(LineTrace(0.65f, out Entity? hitEntity))
         {
-            IInteractable interactable = hitEntity as IInteractable;
+            IInteractable? interactable = hitEntity as IInteractable;
 
             if(interactable != null)
             {
@@ -124,4 +129,7 @@ public class Player : Character
             }
         }
     }
+
+    public void AddKey(int id) =>_collectedKeys.Add(id);
+    public bool HasKey(int id) => _collectedKeys.Contains(id);
 }

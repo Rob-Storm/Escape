@@ -1,4 +1,5 @@
 ﻿using Game.Objects;
+using Raylib_cs;
 using System.Numerics;
 using System.Text.Json;
 
@@ -27,8 +28,11 @@ public class Level
             IncludeFields = true,
         };
 
-        _options.Converters.Add(new TextureConverter());
+
         _options.Converters.Add(new CellArrayConverter());
+        _options.Converters.Add(new AssetConverter<Texture2D>());
+        _options.Converters.Add(new AssetConverter<Sound>());
+        _options.Converters.Add(new AssetConverter<Music>());
     }
 
     public Level()

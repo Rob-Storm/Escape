@@ -18,7 +18,7 @@ public class BillboardRenderer : RenderComponent
         }
 
         Rectangle source = new Rectangle(Vector2.Zero, Texture.Dimensions);
-        Vector2 size = Vector2.One;
+        Vector2 size = new Vector2(transform.Scale.X, transform.Scale.Z);
         Vector2 origin = new Vector2(0.5f, 0.5f);
 
         Raylib.DrawBillboardPro(camera, Texture, source, transform.Position, Vector3.UnitY, size, origin, 0f, Color.White);

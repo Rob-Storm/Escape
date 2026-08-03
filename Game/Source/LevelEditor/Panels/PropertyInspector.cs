@@ -293,13 +293,16 @@ public class PropertyInspector : EditorPanel
     {
         AssetTypeInfo info = AssetManager.GetAssetTypeInfo(propertyValue.GetType());
 
-
         ImGui.PushID(propertyName);
+
+        ImGui.BeginGroup();
 
         if(info.DrawPreview!(propertyValue))
         {
             // do stuff
         }
+
+        ImGui.EndGroup();
 
         if (ImGui.BeginDragDropTarget() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
         {
@@ -319,7 +322,13 @@ public class PropertyInspector : EditorPanel
 
         ImGui.SameLine();
 
+        ImGui.BeginGroup();
+
         ImGui.Text(propertyName);
+
+        ImGui.TextDisabled($"({AssetManager.GetPath(propertyValue)})");
+
+        ImGui.EndGroup();
     }
     #endregion
 }

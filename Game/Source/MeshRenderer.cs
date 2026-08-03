@@ -1,15 +1,19 @@
 ﻿using Raylib_cs;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Game;
 
 public class MeshRenderer : RenderComponent
 {
-    private Model _model;
+    private Model _model = Raylib.LoadModelFromMesh(Raylib.GenMeshCube(1, 1, 1));
+
+    [JsonIgnore]
     public Model Model { get => _model; set => _model = value; }
 
     public override void Render(Camera camera, Transform transform)
     {
+
         unsafe
         {
             Model.Materials[0].Maps[(int)MaterialMapIndex.Diffuse].Texture = Texture;
