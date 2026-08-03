@@ -56,7 +56,7 @@ public class Viewport : EditorPanel
 
     public void Update()
     {
-        if(Raylib.IsMouseButtonPressed(MouseButton.Left))
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left) && !ImGui.IsPopupOpen(null, ImGuiPopupFlags.AnyPopupId))
         {
             ClickViewport();
         }
