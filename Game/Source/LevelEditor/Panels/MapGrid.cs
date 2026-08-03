@@ -262,7 +262,7 @@ public class MapGrid : EditorPanel
                 _context.SelectedY = cellY;
                 _context.SetSelectedObject(_context.World.GetCell(cellX, cellY));
                 break;
-            case ToolMode.Entity: // todo: implement entity spawning
+            case ToolMode.Entity:
                 ConstructorInfo ctor = _context.EntitySpawnClass.GetConstructor(new Type[] { })!;
                 Entity instance = (Entity)ctor.Invoke(new Type[] { });
 

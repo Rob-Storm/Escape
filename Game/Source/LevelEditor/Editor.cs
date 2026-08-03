@@ -7,14 +7,6 @@ using System.Numerics;
 
 namespace Game.LevelEditor;
 
-/*
- * Todo:
- * 
- * Entities,
- * All asset types show in browser,
- */
-
-
 public class Editor : World
 {
     public string LevelName = "Level";
@@ -32,6 +24,7 @@ public class Editor : World
     private MapGrid _mapGrid;
     private LevelSettings _levelSettings;
     private ToolSettings _toolSettings;
+    private EntityHeirarchy _entityHeirarchy;
 
 
     public Editor()
@@ -49,6 +42,7 @@ public class Editor : World
         _mapGrid = new MapGrid(_context);
         _levelSettings = new LevelSettings(_context);
         _toolSettings = new ToolSettings(_context);
+        _entityHeirarchy = new EntityHeirarchy(_context);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
 
@@ -170,6 +164,8 @@ public class Editor : World
         _levelSettings.Draw();
 
         _toolSettings.Draw();
+
+        _entityHeirarchy.Draw();
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {

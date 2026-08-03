@@ -1,15 +1,17 @@
 ﻿using ImGuiNET;
+using Raylib_cs;
 using System.Numerics;
 using System.Reflection;
 
 namespace Game.LevelEditor.Panels;
 
-
 public class PropertyInspector : EditorPanel
 {
-    private delegate void OnPropertyDrawSignature(ref object propertyValue, string propertyName);
+    private delegate void OnPropertyDrawSignature(object owner, ref object propertyValue, string propertyName);
 
     private Dictionary<Type, OnPropertyDrawSignature> _typeFactory;
+
+    private readonly Dictionary<(object Owner, string PropertyName), Vector3> _cachedEuler = new Dictionary<(object Owner, string PropertyName), Vector3>();
 
     public PropertyInspector(EditorContext context) : base(context)
     {
@@ -74,7 +76,7 @@ public class PropertyInspector : EditorPanel
             }
 
             object? value = field.GetValue(inObject);
-            DrawProperty(ref value, field.Name, field.FieldType);
+            DrawProperty(inObject, ref value, field.Name, field.FieldType);
             field.SetValue(inObject, value);
         }
 
@@ -97,7 +99,7 @@ public class PropertyInspector : EditorPanel
 
             object? value = property.GetValue(inObject);
 
-            DrawProperty(ref value, property.Name, property.PropertyType);
+            DrawProperty(inObject, ref value, property.Name, property.PropertyType);
             property.SetValue(inObject, value);
 
             if(!property.CanWrite)
@@ -108,18 +110,18 @@ public class PropertyInspector : EditorPanel
     }
 
     #region Draw Methods
-    private void DrawProperty(ref object property, string name, Type type)
+    private void DrawProperty(object owner, ref object property, string name, Type type)
     {
 
         if (type.IsEnum)
         {
             if (type.IsDefined(typeof(FlagsAttribute), false))
             {
-                DrawFlags(ref property, name);
+                DrawFlags(owner, ref property, name);
             }
             else
             {
-                DrawEnum(ref property, name);
+                DrawEnum(owner, ref property, name);
             }
 
             return;
@@ -127,14 +129,14 @@ public class PropertyInspector : EditorPanel
 
         if (_typeFactory.TryGetValue(type, out var drawFunction))
         {
-            drawFunction(ref property, name);
+            drawFunction(owner, ref property, name);
 
             return;
         }
 
         if (AssetManager.IsRegisteredAssetType(type))
         {
-            DrawAsset(ref property, name);
+            DrawAsset(owner, ref property, name);
 
             return;
         }
@@ -157,7 +159,7 @@ public class PropertyInspector : EditorPanel
         }
     }
 
-    private void DrawBool(ref object propertyValue, string propertyName)
+    private void DrawBool(object owner, ref object propertyValue, string propertyName)
     {
         bool property = (bool)propertyValue;
 
@@ -166,7 +168,7 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
-    private void DrawString(ref object propertyValue, string propertyName)
+    private void DrawString(object owner, ref object propertyValue, string propertyName)
     {
         string property = (string)propertyValue;
 
@@ -175,7 +177,7 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
-    private void DrawInt(ref object propertyValue, string propertyName)
+    private void DrawInt(object owner, ref object propertyValue, string propertyName)
     {
         int property = (int)propertyValue;
 
@@ -184,7 +186,7 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
-    private void DrawFloat(ref object propertyValue, string propertyName)
+    private void DrawFloat(object owner, ref object propertyValue, string propertyName)
     {
         float property = (float)propertyValue;
 
@@ -193,7 +195,7 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
-    private void DrawEnum(ref object propertyValue, string propertyName)
+    private void DrawEnum(object owner, ref object propertyValue, string propertyName)
     {
         Type enumType = propertyValue.GetType();
 
@@ -209,7 +211,7 @@ public class PropertyInspector : EditorPanel
 
     }
 
-    private void DrawFlags(ref object propertyValue, string propertyName)
+    private void DrawFlags(object owner, ref object propertyValue, string propertyName)
     {
         Type enumType = propertyValue.GetType();
 
@@ -249,7 +251,7 @@ public class PropertyInspector : EditorPanel
         propertyValue = Enum.ToObject(enumType, current);
     }
 
-    private void DrawVector2(ref object propertyValue, string propertyName)
+    private void DrawVector2(object owner, ref object propertyValue, string propertyName)
     {
         Vector2 property = (Vector2)propertyValue;
 
@@ -258,7 +260,7 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
-    private void DrawVector3(ref object propertyValue, string propertyName)
+    private void DrawVector3(object owner, ref object propertyValue, string propertyName)
     {
         Vector3 property = (Vector3)propertyValue;
 
@@ -267,16 +269,27 @@ public class PropertyInspector : EditorPanel
         propertyValue = property;
     }
 
-    private void DrawQuaternion(ref object propertyValue, string propertyName)
+    private void DrawQuaternion(object owner, ref object propertyValue, string propertyName)
     {
-        Vector3 property = ((Quaternion)propertyValue).ToEulerAngles();
+        Quaternion rotation = (Quaternion)propertyValue;
 
-        ImGui.InputFloat3(propertyName, ref property);
+        var key = (owner, propertyName);
 
-        propertyValue = Quaternion.CreateFromYawPitchRoll(property.Y, property.X, property.Z);
+        if (!_cachedEuler.TryGetValue(key, out Vector3 euler))
+        {
+            euler = rotation.ToEulerAngles();
+            _cachedEuler[key] = euler;
+        }
+
+        if (ImGui.InputFloat3(propertyName, ref euler))
+        {
+            _cachedEuler[key] = euler;
+
+            propertyValue = Quaternion.Normalize(Quaternion.CreateFromYawPitchRoll(euler.X * Raylib.DEG2RAD, euler.Y * Raylib.DEG2RAD, euler.Z * Raylib.DEG2RAD));
+        }
     }
 
-    private void DrawAsset(ref object propertyValue, string propertyName)
+    private void DrawAsset(object owner, ref object propertyValue, string propertyName)
     {
         AssetTypeInfo info = AssetManager.GetAssetTypeInfo(propertyValue.GetType());
 

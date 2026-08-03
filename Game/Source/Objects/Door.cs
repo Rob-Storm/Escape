@@ -5,12 +5,12 @@ namespace Game.Objects;
 
 public class Door : Entity
 {
-    public bool IsLocked { get; set; } = false;
+    public bool IsLocked { get; set; } = true;
+    private Model model;
 
     public Door()
     {
-        Model model = Raylib.LoadModelFromMesh(Raylib.GenMeshPlane(1.0f, 1.0f, 1, 1));
-        model.Transform = Matrix4x4.CreateRotationX(Raylib.DEG2RAD * -90f);
+        model = Raylib.LoadModelFromMesh(Raylib.GenMeshCube(1f, 1f, 1f));
 
         Collider = new Collider(this)
         {
@@ -22,5 +22,10 @@ public class Door : Entity
             Texture = AssetManager.Load<Texture2D>("Assets/Textures/Default.png"),
             Model = model
         };
+    }
+
+    public override void Update()
+    {
+        base.Update();
     }
 }

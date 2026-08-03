@@ -80,6 +80,11 @@ public class Viewport : EditorPanel
         if (ViewportControlled != _previousControlState)
         {
             ViewportControlChanged?.Invoke(ViewportControlled);
+
+            if(ViewportControlled)
+            {
+                ImGui.SetKeyboardFocusHere(-1);
+            }
         }
 
         if (ViewportControlled)

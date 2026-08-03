@@ -28,7 +28,7 @@ public class Transform
     public void Rotate(Vector3 rotation)
     {
         Rotation *= Quaternion.CreateFromYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
-        Quaternion.Normalize(Rotation);
+        Rotation = Quaternion.Normalize(Rotation);
     }
 }
 

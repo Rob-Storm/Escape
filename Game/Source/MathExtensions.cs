@@ -14,13 +14,31 @@ public static class QuaternionExtensions
     {
         q = Quaternion.Normalize(q);
 
-        float pitch, yaw, roll;
+        // Pitch (X axis)
+        float sinPitch = 2f * (q.W * q.X - q.Y * q.Z);
 
-        roll = MathF.Atan2(2 * (q.W * q.X + q.Y * q.Z), 1 - 2 * (MathF.Pow(q.X, 2) + MathF.Pow(q.Y, 2)));
+        float pitch;
 
-        pitch = MathF.Asin(2 * (q.W * q.Y - q.Z * q.X));
+        if (MathF.Abs(sinPitch) >= 1f)
+        {
+            pitch = MathF.CopySign(MathF.PI / 2f, sinPitch);
+        }
+        else
+        {
+            pitch = MathF.Asin(sinPitch);
+        }
 
-        yaw = MathF.Atan2(2 * (q.W * q.Z + q.X * q.Y), 1 - 2 * (MathF.Pow(q.Y, 2) + MathF.Pow(q.Z, 2)));
+        // Yaw (Y axis)
+        float siny = 2f * (q.W * q.Y + q.Z * q.X);
+        float cosy = 1f - 2f * (q.X * q.X + q.Y * q.Y);
+
+        float yaw = MathF.Atan2(siny, cosy);
+
+        // Roll (Z axis)
+        float sinr = 2f * (q.W * q.Z + q.X * q.Y);
+        float cosr = 1f - 2f * (q.X * q.X + q.Z * q.Z);
+
+        float roll = MathF.Atan2(sinr, cosr);
 
         return new Vector3(yaw * Raylib.RAD2DEG, pitch * Raylib.RAD2DEG, roll * Raylib.RAD2DEG);
     }

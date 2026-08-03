@@ -1,13 +1,17 @@
-﻿using Raylib_cs;
+﻿using Game.Objects;
+using Raylib_cs;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Game;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
-[JsonDerivedType(typeof(Character))]
+[JsonDerivedType(typeof(Character), "character")]
+[JsonDerivedType(typeof(Door), "door")]
 public class Entity
 {
+    // An identifier for the editor
+    public string Name = "Entity";
     public Transform Transform { get; set; }
 
     [JsonIgnore]

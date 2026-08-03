@@ -8,6 +8,7 @@ public class LevelSettings : EditorPanel
     private Dictionary<string, float> _directions;
     public LevelSettings(EditorContext context) : base(context)
     {
+        // may refactor to an enum
         _directions = new Dictionary<string, float>
         {
             { "North", 0f },
