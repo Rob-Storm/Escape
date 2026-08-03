@@ -2,7 +2,7 @@
 using Raylib_cs;
 using System.Numerics;
 
-namespace Game;
+namespace Game.Objects;
 
 [HideFromSpawnMenu]
 public class Character : Entity
@@ -38,13 +38,26 @@ public class Character : Entity
 
         BoundingBox sweepCollider = new BoundingBox
         {
-            Min = (Transform.Position + direction) - halfSize,
-            Max = (Transform.Position + direction) + halfSize
+            Min = Transform.Position + direction - halfSize,
+            Max = Transform.Position + direction + halfSize
         };
 
         foreach (var cellData in World!.GetCells())
         {
             if (World.IsCollidingWithCell(cellData.cell, sweepCollider))
+            {
+                return false;
+            }
+        }
+
+        foreach (Entity entity in World!.EntityList)
+        {
+            if(entity == this)
+            {
+                continue;
+            }
+
+            if (World.IsCollidingWithEntity(entity, sweepCollider))
             {
                 return false;
             }

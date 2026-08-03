@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Game.Objects;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game;
@@ -6,6 +7,8 @@ namespace Game;
 public class World
 {
     public List<Entity> EntityList { get; set; }
+    protected List<Entity> _removeEntityList {  get; set; }
+    protected List<Entity> _addEntityList {  get; set; }
 
     public Cell[,] Cells { get; set; }
 
@@ -20,6 +23,9 @@ public class World
     public World()
     {
         EntityList = new List<Entity>();
+        _removeEntityList = new List<Entity>();
+        _addEntityList = new List<Entity>();
+
         Cells = new Cell[SizeX, SizeY];
     }
 
@@ -50,11 +56,6 @@ public class World
             {
                 continue;
             }
-
-            //foreach (BoundingBox collider in cell.GetWallColliders())
-            //{
-            //    yield return new Collider();
-            //}
         }
     }
 
@@ -101,7 +102,22 @@ public class World
         foreach (Entity entity in EntityList)
         {
             entity.Update();
+
+            if(entity.MarkedForDelete)
+            {
+                _removeEntityList.Add(entity);
+            }
         }
+
+        EntityList.AddRange(_addEntityList);
+        _addEntityList.Clear();
+
+        foreach (Entity entity in _removeEntityList)
+        {
+            EntityList.Remove(entity);
+        }
+
+        _removeEntityList.Clear();
 
         if (Raylib.IsKeyPressed(KeyboardKey.F3))
         {
@@ -149,5 +165,23 @@ public class World
         }
 
         return false;
+    }
+
+    public bool IsCollidingWithEntity(Entity entity, BoundingBox collider)
+    {
+        return Raylib.CheckCollisionBoxes(entity.Collider.BoundingBox, collider);
+    }
+
+    public void CheckEntityCollisions()
+    {
+        foreach(Entity entity in EntityList)
+        {
+            foreach(Entity instigator in EntityList)
+            {
+                bool colliding = Raylib.CheckCollisionBoxes(entity.Collider.BoundingBox, instigator.Collider.BoundingBox);
+
+                entity.Collider.SetIsColliding(colliding, instigator.Collider);
+            }
+        }
     }
 }

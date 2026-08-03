@@ -1,5 +1,4 @@
 ﻿using Game.Objects;
-using Raylib_cs;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -18,6 +17,8 @@ public class Entity
     public Collider? Collider { get; set; }
 
     protected RenderComponent? _renderer;
+
+    public bool MarkedForDelete { get; private set; } = false;
 
     public Entity()
     {
@@ -44,6 +45,8 @@ public class Entity
     {
         _renderer?.DebugRender(camera, Transform);
     }
+
+    public void Destroy() => MarkedForDelete = true;
 
     public Vector3 GetForwardVector() => Vector3.Transform(Directions.Forward, GetRotationMatrix());
     public Vector3 GetBackwardVector() => Vector3.Transform(Directions.Backward, GetRotationMatrix());

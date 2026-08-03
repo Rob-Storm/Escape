@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Game.Objects;
 
-public class Door : Entity
+public class Door : Entity, IInteractable
 {
     public bool IsLocked { get; set; } = true;
     private Model model;
@@ -27,5 +27,13 @@ public class Door : Entity
     public override void Update()
     {
         base.Update();
+    }
+
+    public void Interact(Entity callingEntity)
+    {
+        if(callingEntity is Player)
+        {
+            Destroy();
+        }
     }
 }

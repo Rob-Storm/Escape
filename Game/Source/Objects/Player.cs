@@ -1,8 +1,10 @@
 ﻿using Game.LevelEditor;
+using Game.Objects;
 using Raylib_cs;
 using System.Numerics;
 
-namespace Game;
+
+namespace Game.Objects;
 
 [HideFromSpawnMenu]
 public class Player : Character
@@ -49,6 +51,11 @@ public class Player : Character
             moveVector += GetRightVector();
         }
 
+        if(Raylib.IsKeyPressed(KeyboardKey.E))
+        {
+            InteractTrace();
+        }
+
         if (moveVector != Vector3.Zero)
         {
             moveVector = Vector3.Normalize(moveVector);
@@ -56,9 +63,9 @@ public class Player : Character
         }
 
         Vector2 delta = Raylib.GetMouseDelta();
-        _yaw -= (delta.X * Camera.Sensitivity) * (float)Time.FrameDelta;
+        _yaw -= delta.X * Camera.Sensitivity * (float)Time.FrameDelta;
 
-        _pitch -= (delta.Y * Camera.Sensitivity) * (float)Time.FrameDelta;
+        _pitch -= delta.Y * Camera.Sensitivity * (float)Time.FrameDelta;
         _pitch = Math.Clamp(_pitch, -89.9f * Raylib.DEG2RAD, 89.9f * Raylib.DEG2RAD);
 
         if (Raylib.IsCursorHidden())
@@ -71,4 +78,50 @@ public class Player : Character
         Camera.Update();
     }
 
+    public bool LineTrace(float range, out Entity hitEntity)
+    {
+        Vector3 start, end;
+        start = Camera.Transform.Position;
+        end = start + Camera.GetForwardVector() * range;
+
+        Ray interactRay = new Ray(start, end);
+
+        foreach (Collider collider in World!.GetCollidables())
+        {
+            if (collider == Collider)
+            {
+                continue;
+            }
+
+            RayCollision hit = Raylib.GetRayCollisionBox(interactRay, collider.BoundingBox);
+
+            if (!hit.Hit)
+            {
+                continue;
+            }
+
+            hitEntity = collider.Parent;
+
+            return true;
+
+            Debug.Log(collider.Parent.Name);
+        }
+
+        hitEntity = null;
+
+        return false;
+    }
+
+    public void InteractTrace()
+    {        
+        if(LineTrace(0.5f, out Entity hitEntity))
+        {
+            IInteractable interactable = hitEntity as IInteractable;
+
+            if(interactable != null)
+            {
+                interactable.Interact(this);
+            }
+        }
+    }
 }

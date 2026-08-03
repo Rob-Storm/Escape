@@ -33,4 +33,21 @@ public class Collider
             Max = transform.Position + halfSize
         };
     }
+
+    public void SetIsColliding(bool colliding, Collider collider)
+    {
+        if(!IsColliding && colliding)
+        {
+            OnBeginOverlap?.Invoke(collider);
+            Debug.Log("Begin overlap");
+        }
+
+        if(IsColliding && !colliding)
+        {
+            OnEndOverlap?.Invoke(collider);
+            Debug.Log("End Overlap");
+        }
+
+        IsColliding = colliding;
+    }
 }
