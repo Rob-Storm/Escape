@@ -9,14 +9,28 @@ public class MenuBar : EditorPanel
     private int _levelSizeY = 25;
 
     private Editor _editor;
+
+    private int _startRotationIndex = 0;
+    private Dictionary<string, float> _directions;
+
     public MenuBar(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
+
+        // may refactor to an enum
+        _directions = new Dictionary<string, float>
+        {
+            { "North", 0f },
+            { "East", 90f },
+            { "South", 180f },
+            { "West", 270f }
+        };
     }
 
     public override void Draw()
     {
         bool openNewPopup = false;
+        bool openLevelSettingsPopup = false;
 
         if (ImGui.BeginMainMenuBar())
         {
@@ -43,6 +57,16 @@ public class MenuBar : EditorPanel
                 ImGui.EndMenu();
             }
 
+            if (ImGui.BeginMenu("Edit"))
+            {
+                if (ImGui.MenuItem("Level Settings"))
+                {
+                    openLevelSettingsPopup = true;
+                }
+
+                ImGui.EndMenu();
+            }
+
             ImGui.EndMainMenuBar();
         }
 
@@ -51,12 +75,18 @@ public class MenuBar : EditorPanel
             ImGui.OpenPopup("Create New Level");
         }
 
-        ShowPopup();
+        if(openLevelSettingsPopup)
+        {
+            ImGui.OpenPopup("Level Settings");
+        }
+
+        ShowNewLevelPopup();
+        ShowLevelSettingsPopup();
     }
 
-    private void ShowPopup()
+    private void ShowNewLevelPopup()
     {
-        if (ImGui.BeginPopupModal("Create New Level", ImGuiWindowFlags.AlwaysAutoResize))
+        if (ImGui.BeginPopupModal("Create New Level", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
         {
             ImGui.InputText("Level Name", ref _levelName, 16);
             ImGui.InputInt("Level Size X", ref _levelSizeX, step: 1);
@@ -80,5 +110,29 @@ public class MenuBar : EditorPanel
 
         _levelSizeX = Math.Clamp(_levelSizeX, 1, 150);
         _levelSizeY = Math.Clamp(_levelSizeY, 1, 150);
+    }
+
+    private void ShowLevelSettingsPopup()
+    {
+        if(ImGui.BeginPopupModal("Level Settings", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            ImGui.InputText("Level Name", ref _context.LevelName, 16);
+            ImGui.InputFloat2("Start Position", ref _context.PlayerStart);
+            ImGui.Combo("Start Rotation", ref _startRotationIndex, _directions.Keys.ToArray(), 4);
+
+            _context.StartRotation = _directions.Values.ToArray()[_startRotationIndex];
+
+            ImGui.BeginDisabled();
+            ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25);
+            ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25);
+            ImGui.EndDisabled();
+
+            if (ImGui.Button("Close"))
+            {
+                ImGui.CloseCurrentPopup();
+            }
+
+            ImGui.EndPopup();
+        }
     }
 }

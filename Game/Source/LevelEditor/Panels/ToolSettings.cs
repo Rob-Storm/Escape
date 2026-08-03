@@ -32,75 +32,83 @@ public class ToolSettings : EditorPanel
     {
         ImGui.Begin("Tool Settings");
 
-        uint flags = (uint)_context.ToolSettings.Walls;
-
-        ImGui.SeparatorText("Create Walls");
-
-        if (ImGui.BeginTable("Create Wall", 2))
+        if(ImGui.TreeNode("Paint/Room"))
         {
-            ImGui.TableNextRow();
 
-            ImGui.TableNextColumn();
-            ImGui.CheckboxFlags("North", ref flags, (uint)Walls.North);
+            uint flags = (uint)_context.ToolSettings.Walls;
 
-            ImGui.TableNextColumn();
-            ImGui.CheckboxFlags("East", ref flags, (uint)Walls.East);
+            ImGui.SeparatorText("Create Walls");
 
-            ImGui.TableNextRow();
+            if (ImGui.BeginTable("Create Wall", 2))
+            {
+                ImGui.TableNextRow();
 
-            ImGui.TableNextColumn();
-            ImGui.CheckboxFlags("South", ref flags, (uint)Walls.South);
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("North", ref flags, (uint)Walls.North);
 
-            ImGui.TableNextColumn();
-            ImGui.CheckboxFlags("West", ref flags, (uint)Walls.West);
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("East", ref flags, (uint)Walls.East);
 
-            _context.ToolSettings.Walls = (Walls)flags;
+                ImGui.TableNextRow();
 
-            ImGui.EndTable();
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("South", ref flags, (uint)Walls.South);
+
+                ImGui.TableNextColumn();
+                ImGui.CheckboxFlags("West", ref flags, (uint)Walls.West);
+
+                _context.ToolSettings.Walls = (Walls)flags;
+
+                ImGui.EndTable();
+            }
+
+            ImGui.SeparatorText("Walls");
+
+            if (ImGui.BeginTable("WallTextures", 2))
+            {
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("North", ref _context.ToolSettings.NorthWallTexturePath);
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("East", ref _context.ToolSettings.EastWallTexturePath);
+
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("South", ref _context.ToolSettings.SouthWallTexturePath);
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("West", ref _context.ToolSettings.WestWallTexturePath);
+
+                ImGui.EndTable();
+            }
+
+            ImGui.SeparatorText("Floor / Ceiling");
+
+            if (ImGui.BeginTable("FloorTable", 2))
+            {
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                DrawTextureSlot("Floor", ref _context.ToolSettings.FloorTexturePath);
+                ImGui.TableNextColumn();
+                DrawTextureSlot("Ceiling", ref _context.ToolSettings.CeilingTexturePath);
+
+                ImGui.EndTable();
+            }
+
+            ImGui.TreePop();
         }
 
-        ImGui.SeparatorText("Walls");
-
-        if (ImGui.BeginTable("WallTextures", 2))
+        if(ImGui.TreeNode("Entity"))
         {
-            ImGui.TableNextRow();
+            ImGui.Combo("Entity Class", ref _entityIndex, _entityTypeName.Keys.ToArray(), _entityTypeName.Count);
+            _context.EntitySpawnClass = _entityTypeName.Values.ToArray()[_entityIndex];
 
-            ImGui.TableNextColumn();
-            DrawTextureSlot("North", ref _context.ToolSettings.NorthWallTexturePath);
-
-            ImGui.TableNextColumn();
-            DrawTextureSlot("East", ref _context.ToolSettings.EastWallTexturePath);
-
-            ImGui.TableNextRow();
-
-            ImGui.TableNextColumn();
-            DrawTextureSlot("South", ref _context.ToolSettings.SouthWallTexturePath);
-
-            ImGui.TableNextColumn();
-            DrawTextureSlot("West", ref _context.ToolSettings.WestWallTexturePath);
-
-            ImGui.EndTable();
+            ImGui.TreePop();
         }
-
-        ImGui.SeparatorText("Floor / Ceiling");
-
-        if (ImGui.BeginTable("FloorTable", 2))
-        {
-            ImGui.TableNextRow();
-
-            ImGui.TableNextColumn();
-            DrawTextureSlot("Floor", ref _context.ToolSettings.FloorTexturePath);
-            ImGui.TableNextColumn();
-            DrawTextureSlot("Ceiling", ref _context.ToolSettings.CeilingTexturePath);
-
-            ImGui.EndTable();
-        }
-
-        ImGui.SeparatorText("Spawn Entity");
-
-        ImGui.Combo("Entity Class", ref _entityIndex, _entityTypeName.Keys.ToArray(), _entityTypeName.Count);
-
-        _context.EntitySpawnClass = _entityTypeName.Values.ToArray()[_entityIndex];
 
         ImGui.End();
     }

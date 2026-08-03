@@ -22,7 +22,6 @@ public class Editor : World
     private AssetBrowser _assetBrowser;
     private PropertyInspector _inspector;
     private MapGrid _mapGrid;
-    private LevelSettings _levelSettings;
     private ToolSettings _toolSettings;
     private EntityHeirarchy _entityHeirarchy;
 
@@ -40,7 +39,6 @@ public class Editor : World
         _assetBrowser = new AssetBrowser(_context);
         _inspector = new PropertyInspector(_context);
         _mapGrid = new MapGrid(_context);
-        _levelSettings = new LevelSettings(_context);
         _toolSettings = new ToolSettings(_context);
         _entityHeirarchy = new EntityHeirarchy(_context);
 
@@ -160,8 +158,6 @@ public class Editor : World
         _inspector.Draw();
 
         _mapGrid.Draw();
-
-        _levelSettings.Draw();
 
         _toolSettings.Draw();
 
