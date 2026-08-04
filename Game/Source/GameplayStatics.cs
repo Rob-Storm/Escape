@@ -6,7 +6,6 @@ namespace Game;
 public static class GameplayStatics
 {
     public static Camera Camera;
-
     public static void PlaySoundAtLocation(Sound sound, Vector3 location, float maxDist)
     {
         Vector3 direction = Vector3.Subtract(location, Camera.Transform.Position);

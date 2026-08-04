@@ -152,3 +152,12 @@ public struct PaintWallSettings
         Walls = Walls.None;
     }
 }
+
+public enum ToolMode
+{
+    Select,
+    Entity,
+    Draw,
+    Room,
+    Delete
+}

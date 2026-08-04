@@ -1,4 +1,6 @@
 ﻿using ImGuiNET;
+using System.Numerics;
+using System.Reflection;
 
 namespace Game.LevelEditor.Panels;
 
@@ -10,28 +12,15 @@ public class MenuBar : EditorPanel
 
     private Editor _editor;
 
-    private int _startRotationIndex = 0;
-    private Dictionary<string, float> _directions;
-
     public MenuBar(EditorContext context) : base(context)
     {
         _editor = (Editor)context.World;
-
-        // may refactor to an enum
-        _directions = new Dictionary<string, float>
-        {
-            { "North", 0f },
-            { "East", 90f },
-            { "South", 180f },
-            { "West", 270f }
-        };
     }
 
     public override void Draw()
     {
         bool openNewPopup = false;
         bool openLevelSettingsPopup = false;
-        bool openEditorPreferencesPopup = false;
 
         if (ImGui.BeginMainMenuBar())
         {
@@ -58,17 +47,42 @@ public class MenuBar : EditorPanel
                 ImGui.EndMenu();
             }
 
-            if (ImGui.BeginMenu("Edit"))
+            if(ImGui.BeginMenu("Edit"))
             {
-                if (ImGui.MenuItem("Level Settings"))
+                if (ImGui.BeginMenu("Spawn Entity"))
                 {
-                    openLevelSettingsPopup = true;
+                    // HACK: copy-pasted from MapGrid.cs and ToolSettings.cs
+                    IEnumerable<Type> types = typeof(Entity).Assembly.GetTypes();
+
+                    foreach (Type type in types)
+                    {
+                        if (type.IsSubclassOf(typeof(Entity)) && Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null)
+                        {
+
+                            if (ImGui.MenuItem(type.Name))
+                            {
+                                ConstructorInfo ctor = type.GetConstructor(new Type[] { })!;
+                                Entity instance = (Entity)ctor.Invoke(new Type[] { });
+
+                                instance.Transform.Position = new Vector3(0, 0, 0);
+                                _context.World.EntityList.Add(instance);
+
+                                _context.SelectedObject = instance;
+                            }
+                        }
+                    }
+
+                    ImGui.EndMenu();
                 }
 
-                if (ImGui.MenuItem("Editor Preferences"))
-                {
-                    openEditorPreferencesPopup = true;
-                }
+                ImGui.EndMenu();
+            }
+
+            if (ImGui.BeginMenu("View"))
+            {
+                ImGui.Checkbox("Level Settings", ref _context.Layout.ShowLevelSettings);
+
+                ImGui.Checkbox("Editor Preferences", ref _context.Layout.ShowEditorPreferences);
 
                 ImGui.EndMenu();
             }
@@ -81,19 +95,8 @@ public class MenuBar : EditorPanel
             ImGui.OpenPopup("Create New Level");
         }
 
-        if (openLevelSettingsPopup)
-        {
-            ImGui.OpenPopup("Level Settings");
-        }
-
-        if (openEditorPreferencesPopup)
-        {
-            ImGui.OpenPopup("Editor Preferences");
-        }
 
         ShowNewLevelPopup();
-        ShowLevelSettingsPopup();
-        ShowEditorPreferencesPopup();
     }
 
     private void ShowNewLevelPopup()
@@ -124,47 +127,4 @@ public class MenuBar : EditorPanel
         _levelSizeY = Math.Clamp(_levelSizeY, 1, 150);
     }
 
-    private void ShowLevelSettingsPopup()
-    {
-        if (ImGui.BeginPopupModal("Level Settings", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
-        {
-            ImGui.InputText("Level Name", ref _context.LevelName, 16);
-            ImGui.InputFloat2("Start Position", ref _context.PlayerStart);
-            ImGui.Combo("Start Rotation", ref _startRotationIndex, _directions.Keys.ToArray(), 4);
-
-            _context.StartRotation = _directions.Values.ToArray()[_startRotationIndex];
-
-            ImGui.BeginDisabled();
-            ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25);
-            ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25);
-            ImGui.EndDisabled();
-
-            if (ImGui.Button("Close"))
-            {
-                ImGui.CloseCurrentPopup();
-            }
-
-            ImGui.EndPopup();
-        }
-    }
-
-    private void ShowEditorPreferencesPopup()
-    {
-        if (ImGui.BeginPopupModal("Editor Preferences", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
-        {
-            float mouseSens = _context.Camera.Sensitivity;
-
-            ImGui.InputFloat("Camera Speed", ref _context.Camera.MoveSpeed);
-            ImGui.DragFloat("Mouse Sensitivity", ref mouseSens, 0.5f, 1f, 10.0f);
-
-            _context.Camera.Sensitivity = mouseSens;
-
-            if (ImGui.Button("Close"))
-            {
-                ImGui.CloseCurrentPopup();
-            }
-
-            ImGui.EndPopup();
-        }
-    }
 }

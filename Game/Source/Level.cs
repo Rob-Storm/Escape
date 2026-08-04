@@ -9,11 +9,12 @@ public class Level
 {
     public string Name { get; set; }
     public Vector2 PlayerStart { get; set; }
+    public Texture2D SkyboxTexure { get; set; }
+    public Music BackgroundMusic { get; set; }
     public float StartRotation { get; set; }
     public List<Entity> EntityList { get; set; }
     public int SizeX { get; set; }
     public int SizeY { get; set; }
-
     public Cell[,] Cells { get; set; }
 
 

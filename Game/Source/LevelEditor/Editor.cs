@@ -25,6 +25,9 @@ public class Editor : World
     private ToolSettings _toolSettings;
     private EntityHeirarchy _entityHeirarchy;
 
+    private EditorPreferences _editorPreferences;
+    private LevelSettings _levelSettings;
+
 
     public Editor()
     {
@@ -41,6 +44,9 @@ public class Editor : World
         _mapGrid = new MapGrid(_context);
         _toolSettings = new ToolSettings(_context);
         _entityHeirarchy = new EntityHeirarchy(_context);
+
+        _editorPreferences = new EditorPreferences(_context);
+        _levelSettings = new LevelSettings(_context);
 
         ((EditorCamera)_camera).SetEditor(_viewport);
 
@@ -163,6 +169,16 @@ public class Editor : World
 
         _entityHeirarchy.Draw();
 
+        if(_context.Layout.ShowEditorPreferences)
+        {
+            _editorPreferences.Draw();
+        }
+
+        if(_context.Layout.ShowLevelSettings)
+        {
+            _levelSettings.Draw();
+        }
+
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
         {
             _context.LevelFileService.Save(_context);
@@ -233,12 +249,13 @@ public class Editor : World
     }
 }
 
-
-public enum ToolMode
+public struct EditorLayout
 {
-    Select,
-    Entity,
-    Draw,
-    Room,
-    Delete
+    public bool ShowEditorPreferences = false;
+    public bool ShowLevelSettings = false;
+
+    public EditorLayout()
+    {
+        
+    }
 }

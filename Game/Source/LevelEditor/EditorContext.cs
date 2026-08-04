@@ -1,6 +1,7 @@
 ﻿using Game.LevelEditor.Panels;
 using Game.LevelEditor.Services;
 using Game.Objects;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game.LevelEditor;
@@ -24,6 +25,8 @@ public class EditorContext
     public int SelectedY;
 
     public string LevelName;
+    public Texture2D Skybox;
+    public Music BackgroundMusic;
     public Vector2 PlayerStart;
     public float StartRotation;
 
@@ -33,6 +36,8 @@ public class EditorContext
     public AssetService AssetService;
     public LevelFileService LevelFileService;
 
+    public EditorLayout Layout = new EditorLayout();
+
     public EditorContext(World world, EditorCamera camera)
     {
         World = world;
@@ -40,6 +45,8 @@ public class EditorContext
 
         LevelName = "Level";
         PlayerStart = Vector2.Zero;
+        Skybox = AssetManager.Load<Texture2D>(@"Assets\Texture\Default.png");
+        BackgroundMusic = AssetManager.Load<Music>(@"Assets\Music\Default.ogg");
         StartRotation = 0f;
 
         ToolSettings = new PaintWallSettings();
