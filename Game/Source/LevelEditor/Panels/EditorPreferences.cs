@@ -1,4 +1,7 @@
-﻿namespace Game.LevelEditor.Panels;
+﻿using ImGuiNET;
+using Raylib_cs;
+
+namespace Game.LevelEditor.Panels;
 
 /*
  * Todo: Impelement
@@ -14,6 +17,6 @@ public class EditorPreferences : EditorPanel
     }
     public override void Draw()
     {
-        throw new NotImplementedException();
+
     }
 }

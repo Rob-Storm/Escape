@@ -31,6 +31,7 @@ public class MenuBar : EditorPanel
     {
         bool openNewPopup = false;
         bool openLevelSettingsPopup = false;
+        bool openEditorPreferencesPopup = false;
 
         if (ImGui.BeginMainMenuBar())
         {
@@ -64,6 +65,11 @@ public class MenuBar : EditorPanel
                     openLevelSettingsPopup = true;
                 }
 
+                if (ImGui.MenuItem("Editor Preferences"))
+                {
+                    openEditorPreferencesPopup = true;
+                }
+
                 ImGui.EndMenu();
             }
 
@@ -80,8 +86,14 @@ public class MenuBar : EditorPanel
             ImGui.OpenPopup("Level Settings");
         }
 
+        if (openEditorPreferencesPopup)
+        {
+            ImGui.OpenPopup("Editor Preferences");
+        }
+
         ShowNewLevelPopup();
         ShowLevelSettingsPopup();
+        ShowEditorPreferencesPopup();
     }
 
     private void ShowNewLevelPopup()
@@ -126,6 +138,26 @@ public class MenuBar : EditorPanel
             ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25);
             ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25);
             ImGui.EndDisabled();
+
+            if (ImGui.Button("Close"))
+            {
+                ImGui.CloseCurrentPopup();
+            }
+
+            ImGui.EndPopup();
+        }
+    }
+
+    private void ShowEditorPreferencesPopup()
+    {
+        if (ImGui.BeginPopupModal("Editor Preferences", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            float mouseSens = _context.Camera.Sensitivity;
+
+            ImGui.InputFloat("Camera Speed", ref _context.Camera.MoveSpeed);
+            ImGui.DragFloat("Mouse Sensitivity", ref mouseSens, 0.5f, 1f, 10.0f);
+
+            _context.Camera.Sensitivity = mouseSens;
 
             if (ImGui.Button("Close"))
             {
