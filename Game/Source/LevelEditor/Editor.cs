@@ -55,7 +55,7 @@ public class Editor : World
 
     public override void Update()
     {
-        foreach(Entity entity in EntityList)
+        foreach (Entity entity in EntityList)
         {
             entity.Update();
         }
@@ -124,7 +124,7 @@ public class Editor : World
             _context.SelectedCell.RenderBounds(Color.Orange, Color.Green);
         }
 
-        if(_context.SelectedObject != null && _context.SelectedObject is Entity selectedEntity)
+        if (_context.SelectedObject != null && _context.SelectedObject is Entity selectedEntity)
         {
             selectedEntity.DebugRender(_camera);
         }
@@ -170,7 +170,7 @@ public class Editor : World
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
         {
-            
+
         }
 
         if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))

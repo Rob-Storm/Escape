@@ -36,7 +36,7 @@ public class PropertyInspector : EditorPanel
     {
         ImGui.Begin("Properties");
 
-        if(!_context.SelectedAnything)
+        if (!_context.SelectedAnything)
         {
             ImGui.TextDisabled("Select an object or asset to view properties");
             ImGui.End();
@@ -49,7 +49,7 @@ public class PropertyInspector : EditorPanel
             DrawProperties(_context.SelectedObject);
         }
 
-        if(_context.SelectedAsset != null)
+        if (_context.SelectedAsset != null)
         {
             AssetTypeInfo info = AssetManager.GetAssetTypeInfo(_context.SelectedAsset.GetType());
 
@@ -70,7 +70,7 @@ public class PropertyInspector : EditorPanel
     {
         foreach (FieldInfo field in inObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
         {
-            if(Attribute.GetCustomAttribute(field, typeof(HidePropertyAttribute)) != null)
+            if (Attribute.GetCustomAttribute(field, typeof(HidePropertyAttribute)) != null)
             {
                 continue;
             }
@@ -92,7 +92,7 @@ public class PropertyInspector : EditorPanel
                 continue;
             }
 
-            if(!property.CanWrite)
+            if (!property.CanWrite)
             {
                 ImGui.BeginDisabled();
             }
@@ -102,7 +102,7 @@ public class PropertyInspector : EditorPanel
             DrawProperty(inObject, ref value, property.Name, property.PropertyType);
             property.SetValue(inObject, value);
 
-            if(!property.CanWrite)
+            if (!property.CanWrite)
             {
                 ImGui.EndDisabled();
             }
@@ -143,15 +143,15 @@ public class PropertyInspector : EditorPanel
 
         // complex object (i.e entity subclass)
 
-        if(property != null)
+        if (property != null)
         {
-           ImGui.PushID($"##{name}");
+            ImGui.PushID($"##{name}");
 
-           if(ImGui.TreeNode(name))
-           {
+            if (ImGui.TreeNode(name))
+            {
                 DrawProperties(property);
                 ImGui.TreePop();
-           }
+            }
 
             ImGui.PopID();
 
@@ -220,11 +220,11 @@ public class PropertyInspector : EditorPanel
         ImGui.Text(propertyName);
         ImGui.Indent();
 
-        foreach(Enum value in Enum.GetValues(enumType))
+        foreach (Enum value in Enum.GetValues(enumType))
         {
             ulong flag = Convert.ToUInt64(value);
 
-            if(flag == 0)
+            if (flag == 0)
             {
                 continue;
             }
@@ -233,9 +233,9 @@ public class PropertyInspector : EditorPanel
 
             string name = Enum.GetName(enumType, value)!;
 
-            if(ImGui.Checkbox(name, ref enabled))
+            if (ImGui.Checkbox(name, ref enabled))
             {
-                if(enabled)
+                if (enabled)
                 {
                     current |= flag;
                 }
@@ -297,7 +297,7 @@ public class PropertyInspector : EditorPanel
 
         ImGui.BeginGroup();
 
-        if(info.DrawPreview!(propertyValue))
+        if (info.DrawPreview!(propertyValue))
         {
             // do stuff
         }
@@ -308,9 +308,9 @@ public class PropertyInspector : EditorPanel
         {
             AssetTypeInfo? dragInfo = AssetManager.GetAssetTypeInfo(_context.DraggedAssetPath!);
 
-            ImGuiPayloadPtr  payload = ImGui.AcceptDragDropPayload("asset_path");
+            ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("asset_path");
 
-            if(info.Type == dragInfo!.Type)
+            if (info.Type == dragInfo!.Type)
             {
                 propertyValue = AssetManager.Load(_context.DraggedAssetPath!, info.Type);
             }

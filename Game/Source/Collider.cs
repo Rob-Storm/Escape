@@ -36,13 +36,13 @@ public class Collider
 
     public void SetIsColliding(bool colliding, Collider collider)
     {
-        if(!IsColliding && colliding)
+        if (!IsColliding && colliding)
         {
             OnBeginOverlap?.Invoke(collider);
             Debug.Log("Begin overlap");
         }
 
-        if(IsColliding && !colliding)
+        if (IsColliding && !colliding)
         {
             OnEndOverlap?.Invoke(collider);
             Debug.Log("End Overlap");

@@ -37,9 +37,9 @@ public class MenuBar : EditorPanel
         {
             if (ImGui.BeginMenu("File"))
             {
-                if (ImGui.MenuItem("New", "Ctrl+N")) 
+                if (ImGui.MenuItem("New", "Ctrl+N"))
                 {
-                    openNewPopup = true;    
+                    openNewPopup = true;
                 }
 
                 if (ImGui.MenuItem("Save", "Ctrl+S")) { _context.LevelFileService.Save(_context); }
@@ -76,12 +76,12 @@ public class MenuBar : EditorPanel
             ImGui.EndMainMenuBar();
         }
 
-        if(openNewPopup)
+        if (openNewPopup)
         {
             ImGui.OpenPopup("Create New Level");
         }
 
-        if(openLevelSettingsPopup)
+        if (openLevelSettingsPopup)
         {
             ImGui.OpenPopup("Level Settings");
         }
@@ -106,7 +106,7 @@ public class MenuBar : EditorPanel
 
             if (ImGui.Button("Create"))
             {
-                _context.LevelFileService.NewLevel(_context, _levelName, _levelSizeX, _levelSizeY); 
+                _context.LevelFileService.NewLevel(_context, _levelName, _levelSizeX, _levelSizeY);
                 ImGui.CloseCurrentPopup();
             }
 
@@ -126,7 +126,7 @@ public class MenuBar : EditorPanel
 
     private void ShowLevelSettingsPopup()
     {
-        if(ImGui.BeginPopupModal("Level Settings", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
+        if (ImGui.BeginPopupModal("Level Settings", ImGuiWindowFlags.Popup | ImGuiWindowFlags.AlwaysAutoResize))
         {
             ImGui.InputText("Level Name", ref _context.LevelName, 16);
             ImGui.InputFloat2("Start Position", ref _context.PlayerStart);

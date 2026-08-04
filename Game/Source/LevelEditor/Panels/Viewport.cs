@@ -81,7 +81,7 @@ public class Viewport : EditorPanel
         {
             ViewportControlChanged?.Invoke(ViewportControlled);
 
-            if(ViewportControlled)
+            if (ViewportControlled)
             {
                 ImGui.SetKeyboardFocusHere(-1);
             }
@@ -115,7 +115,7 @@ public class Viewport : EditorPanel
         Vector2 mousePos = Raylib.GetMousePosition();
         Vector2 localMousePos = new Vector2(mousePos.X - _viewportLocation.X, mousePos.Y - _viewportLocation.Y);
 
-        if(localMousePos.X < 0 || localMousePos.Y < 0 || localMousePos.X >= _viewportSize.X || localMousePos.Y >= _viewportSize.Y)
+        if (localMousePos.X < 0 || localMousePos.Y < 0 || localMousePos.X >= _viewportSize.X || localMousePos.Y >= _viewportSize.Y)
         {
             return;
         }
@@ -129,12 +129,12 @@ public class Viewport : EditorPanel
         {
             RayCollision hit = Raylib.GetRayCollisionBox(mouseRay, collider.BoundingBox);
 
-            if(!hit.Hit)
-            { 
-                continue; 
+            if (!hit.Hit)
+            {
+                continue;
             }
 
-            if(selected == null || hit.Distance < closest.Distance)
+            if (selected == null || hit.Distance < closest.Distance)
             {
                 closest = hit;
                 selected = collider;
@@ -143,6 +143,6 @@ public class Viewport : EditorPanel
 
         _context.SelectedObject = selected != null ? selected.Parent : null;
 
-        Debug.Log($"Mouse Pick: {(selected != null ? selected.ToString() : "None" )}");
+        Debug.Log($"Mouse Pick: {(selected != null ? selected.ToString() : "None")}");
     }
 }

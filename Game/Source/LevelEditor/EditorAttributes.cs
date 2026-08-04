@@ -8,7 +8,7 @@
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 public class HidePropertyAttribute : Attribute
 {
-    
+
 }
 
 /// <summary>
@@ -18,5 +18,5 @@ public class HidePropertyAttribute : Attribute
 [AttributeUsage(AttributeTargets.Class)]
 public class HideFromSpawnMenuAttribute : Attribute
 {
-    
+
 }

@@ -38,12 +38,12 @@ public class Door : Entity, IInteractable
     {
         Player? player = callingEntity as Player;
 
-        if(player == null)
+        if (player == null)
         {
             return;
         }
 
-        if(!player.HasKey(ID))
+        if (!player.HasKey(ID))
         {
             GameplayStatics.PlaySoundAtLocation(LockSound, Transform.Position, 1.25f);
             return;

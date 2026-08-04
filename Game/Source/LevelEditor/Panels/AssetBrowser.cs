@@ -20,7 +20,7 @@ public class AssetBrowser : EditorPanel
 
         if (ImGui.BeginTable("Assets", columnCount))
         {
-            foreach (var asset in AssetManager.GetAssets().Where(a => Directory.GetParent(a.Key).Name  != "Editor"))
+            foreach (var asset in AssetManager.GetAssets().Where(a => Directory.GetParent(a.Key).Name != "Editor"))
             {
                 AssetTypeInfo info = AssetManager.GetAssetTypeInfo(asset.Value.GetType());
 
@@ -28,7 +28,7 @@ public class AssetBrowser : EditorPanel
 
                 ImGui.PushID(asset.Key);
 
-                if(info.DrawPreview(asset.Value))
+                if (info.DrawPreview(asset.Value))
                 {
                     _context.SetSelectedAsset(asset.Value);
                 }

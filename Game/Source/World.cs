@@ -7,8 +7,8 @@ namespace Game;
 public class World
 {
     public List<Entity> EntityList { get; set; }
-    protected List<Entity> _removeEntityList {  get; set; }
-    protected List<Entity> _addEntityList {  get; set; }
+    protected List<Entity> _removeEntityList { get; set; }
+    protected List<Entity> _addEntityList { get; set; }
 
     public Cell[,] Cells { get; set; }
 
@@ -31,7 +31,7 @@ public class World
 
     public Cell GetCell(int x, int y)
     {
-        if(x < 0 || y < 0)
+        if (x < 0 || y < 0)
         {
             return null;
         }
@@ -50,9 +50,9 @@ public class World
             yield return entity.Collider;
         }
 
-        foreach(Cell cell in Cells)
+        foreach (Cell cell in Cells)
         {
-            if(cell == null)
+            if (cell == null)
             {
                 continue;
             }
@@ -103,7 +103,7 @@ public class World
         {
             entity.Update();
 
-            if(entity.GetMarkedForDelete())
+            if (entity.GetMarkedForDelete())
             {
                 _removeEntityList.Add(entity);
             }
@@ -174,9 +174,9 @@ public class World
 
     public void CheckEntityCollisions()
     {
-        foreach(Entity entity in EntityList)
+        foreach (Entity entity in EntityList)
         {
-            foreach(Entity instigator in EntityList)
+            foreach (Entity instigator in EntityList)
             {
                 bool colliding = Raylib.CheckCollisionBoxes(entity.Collider.BoundingBox, instigator.Collider.BoundingBox);
 

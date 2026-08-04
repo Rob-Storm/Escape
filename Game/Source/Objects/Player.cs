@@ -21,8 +21,8 @@ public class Player : Character
         _collectedKeys = new HashSet<int>();
 
         if (Collider != null)
-        { 
-            Collider.CollisionBounds = new Vector3(0.125f, 0.5f, 0.125f); 
+        {
+            Collider.CollisionBounds = new Vector3(0.125f, 0.5f, 0.125f);
         }
 
         GameplayStatics.Camera = Camera;
@@ -56,7 +56,7 @@ public class Player : Character
             moveVector += GetRightVector();
         }
 
-        if(Raylib.IsKeyPressed(KeyboardKey.E))
+        if (Raylib.IsKeyPressed(KeyboardKey.E))
         {
             InteractTrace();
         }
@@ -117,18 +117,18 @@ public class Player : Character
     }
 
     public void InteractTrace()
-    {        
-        if(LineTrace(0.65f, out Entity? hitEntity))
+    {
+        if (LineTrace(0.65f, out Entity? hitEntity))
         {
             IInteractable? interactable = hitEntity as IInteractable;
 
-            if(interactable != null)
+            if (interactable != null)
             {
                 interactable.Interact(this);
             }
         }
     }
 
-    public void AddKey(int id) =>_collectedKeys.Add(id);
+    public void AddKey(int id) => _collectedKeys.Add(id);
     public bool HasKey(int id) => _collectedKeys.Contains(id);
 }

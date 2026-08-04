@@ -171,7 +171,7 @@ public class MapGrid : EditorPanel
                     }
                 }
 
-                if(_context.ToolMode == ToolMode.Room)
+                if (_context.ToolMode == ToolMode.Room)
                 {
                     if (x == _startRoomCellX || x == _cursorRoomCellX)
                     {
@@ -364,7 +364,7 @@ public class MapGrid : EditorPanel
             startX = (int)end.X;
             endX = (int)start.X;
         }
-        if(start.Y > end.Y)
+        if (start.Y > end.Y)
         {
             startY = (int)end.Y;
             endY = (int)start.Y;

@@ -43,7 +43,7 @@ public class DeveloperConsole : EditorPanel
             ImGui.SetScrollHereY(1);
         }
 
-        ImGui.EndChild();        
+        ImGui.EndChild();
 
         ImGui.End();
     }

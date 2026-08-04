@@ -61,7 +61,7 @@ public class EntityHeirarchy : EditorPanel
                     if (type.IsSubclassOf(typeof(Entity)) && Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null)
                     {
 
-                        if(ImGui.MenuItem(type.Name))
+                        if (ImGui.MenuItem(type.Name))
                         {
                             ConstructorInfo ctor = type.GetConstructor(new Type[] { })!;
                             Entity instance = (Entity)ctor.Invoke(new Type[] { });

@@ -22,20 +22,20 @@ public static class AssetManager
 
         Register<Texture2D>
             (
-                Raylib.LoadTexture, 
+                Raylib.LoadTexture,
                 @"Assets\Textures\Default.png",
                 "Texture",
                 new Vector4(1f, 0f, 0f, 1f),
                 "asset",
                 texture => { return rlImGui.ImageButtonSize("##assetButton", (Texture2D)texture, new Vector2(96)); },
-                texture => 
+                texture =>
                 {
                     Texture2D textureObject = (Texture2D)texture;
-                    rlImGui.ImageSize(textureObject, new Vector2(textureObject.Width, textureObject.Height)); 
+                    rlImGui.ImageSize(textureObject, new Vector2(textureObject.Width, textureObject.Height));
                 },
                 ".png"
             );
-        
+
         Register<Sound>
             (
                 Raylib.LoadSound,
@@ -43,13 +43,13 @@ public static class AssetManager
                 "Sound",
                 new Vector4(0f, 1f, 0f, 1f),
                 "asset",
-                sound => 
-                { 
-                    return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(soundIcon), new Vector2(96)); 
-                },
-                sound => 
+                sound =>
                 {
-                    if(ImGui.Button("Play Sound"))
+                    return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(soundIcon), new Vector2(96));
+                },
+                sound =>
+                {
+                    if (ImGui.Button("Play Sound"))
                     {
                         Raylib.PlaySound((Sound)sound);
                     }
@@ -65,9 +65,9 @@ public static class AssetManager
                 new Vector4(0f, 1f, 1f, 1f),
                 "asset",
                 music => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(musicIcon), new Vector2(96)); },
-                music => 
+                music =>
                 {
-                    
+
                 },
                 ".ogg"
             );
@@ -77,13 +77,13 @@ public static class AssetManager
 
     public static void Register<T>
         (
-            Func<string, T> loader, 
-            string fallback, 
-            string displayName, 
-            Vector4 color, 
-            string dragPayload, 
-            Func<object, bool> drawPreview, 
-            Action<object> drawInspector, 
+            Func<string, T> loader,
+            string fallback,
+            string displayName,
+            Vector4 color,
+            string dragPayload,
+            Func<object, bool> drawPreview,
+            Action<object> drawInspector,
             params string[] extensions
         )
     {
@@ -109,7 +109,7 @@ public static class AssetManager
 
             AssetTypeInfo? type = _types.Values.FirstOrDefault(t => t.Extensions.Contains(extension, StringComparer.OrdinalIgnoreCase));
 
-            if(type == null)
+            if (type == null)
             {
                 continue;
             }
@@ -148,7 +148,7 @@ public static class AssetManager
 
     public static AssetTypeInfo? GetAssetTypeInfo(string path)
     {
-        if(Assets.TryGetValue(path, out object? value))
+        if (Assets.TryGetValue(path, out object? value))
         {
             return GetAssetTypeInfo(value);
         }
@@ -156,8 +156,8 @@ public static class AssetManager
         return null;
     }
 
-    public static string GetPath<T>(object asset) =>_assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
-    public static string GetPath(object asset) =>_assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
+    public static string GetPath<T>(object asset) => _assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
+    public static string GetPath(object asset) => _assetPaths.TryGetValue(asset, out var path) ? path : string.Empty;
     public static object Load(string path, Type type)
     {
         AssetTypeInfo info = _types[type];
@@ -167,7 +167,7 @@ public static class AssetManager
             return cached;
         }
 
-        if(!File.Exists(path))
+        if (!File.Exists(path))
         {
             path = info.FallbackPath;
         }

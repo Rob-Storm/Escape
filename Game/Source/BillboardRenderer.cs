@@ -28,6 +28,6 @@ public class BillboardRenderer : RenderComponent
 
     public override void DebugRender(Camera camera, Transform transform)
     {
-        
+
     }
 }

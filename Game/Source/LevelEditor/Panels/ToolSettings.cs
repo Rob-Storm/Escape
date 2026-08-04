@@ -16,10 +16,10 @@ public class ToolSettings : EditorPanel
         _entityTypeName = new Dictionary<string, Type>();
 
         IEnumerable<Type> types = typeof(Entity).Assembly.GetTypes();
-            //.Where(type => type.IsSubclassOf(typeof(Entity)) &&
-            //Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null);
+        //.Where(type => type.IsSubclassOf(typeof(Entity)) &&
+        //Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null);
 
-        foreach(Type type in types)
+        foreach (Type type in types)
         {
             if (type.IsSubclassOf(typeof(Entity)) && Attribute.GetCustomAttribute(type, typeof(HideFromSpawnMenuAttribute)) == null)
             {
@@ -32,7 +32,7 @@ public class ToolSettings : EditorPanel
     {
         ImGui.Begin("Tool Settings");
 
-        if(ImGui.TreeNode("Paint/Room"))
+        if (ImGui.TreeNode("Paint/Room"))
         {
 
             uint flags = (uint)_context.ToolSettings.Walls;
@@ -102,7 +102,7 @@ public class ToolSettings : EditorPanel
             ImGui.TreePop();
         }
 
-        if(ImGui.TreeNode("Entity"))
+        if (ImGui.TreeNode("Entity"))
         {
             ImGui.Combo("Entity Class", ref _entityIndex, _entityTypeName.Keys.ToArray(), _entityTypeName.Count);
             _context.EntitySpawnClass = _entityTypeName.Values.ToArray()[_entityIndex];

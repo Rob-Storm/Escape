@@ -17,7 +17,7 @@ public class LevelSettings : EditorPanel
 
         ImGui.InputText("Level Name", ref _context.LevelName, 16);
         ImGui.InputFloat2("Start Position", ref _context.PlayerStart);
-        ImGui.Combo("Start Rotation", ref _startRotationIndex, _directions.Keys.ToArray(),  4);
+        ImGui.Combo("Start Rotation", ref _startRotationIndex, _directions.Keys.ToArray(), 4);
 
         _context.StartRotation = _directions.Values.ToArray()[_startRotationIndex];
 

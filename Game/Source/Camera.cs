@@ -42,7 +42,7 @@ public class Camera : Entity
 
             Raylib.PlaySound(_sound);
         }
-    }    
+    }
 
     public void SetAspectRatio(float width, float height) => _aspectRatio = width / height;
     public void SetAspectRatio(Vector2 size) => SetAspectRatio(size.X, size.Y);

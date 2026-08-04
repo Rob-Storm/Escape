@@ -44,7 +44,7 @@ public class LevelFileService
     public void NewLevel(EditorContext context, string name, int sizeX, int sizeY)
     {
         //context.EntityList.Clear();
-        context.World.SizeX = sizeX; 
+        context.World.SizeX = sizeX;
         context.World.SizeY = sizeY;
         context.World.Cells = new Cell[sizeX, sizeY];
         context.LevelName = name;

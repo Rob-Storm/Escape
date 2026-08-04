@@ -1,7 +1,4 @@
-﻿using ImGuiNET;
-using Raylib_cs;
-
-namespace Game.LevelEditor.Panels;
+﻿namespace Game.LevelEditor.Panels;
 
 /*
  * Todo: Impelement
