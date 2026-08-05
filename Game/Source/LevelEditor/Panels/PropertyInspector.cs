@@ -70,18 +70,32 @@ public class PropertyInspector : EditorPanel
     {
         foreach (FieldInfo field in inObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
         {
+            bool hasTooltip = Attribute.GetCustomAttribute(field, typeof(ToolTipAttribute)) != null;
+            string toolTip = string.Empty;
+
             if (Attribute.GetCustomAttribute(field, typeof(HidePropertyAttribute)) != null)
             {
                 continue;
             }
 
+
             object? value = field.GetValue(inObject);
             DrawProperty(inObject, ref value, field.Name, field.FieldType);
             field.SetValue(inObject, value);
+
+            if (hasTooltip)
+            {
+                toolTip = ((ToolTipAttribute)Attribute.GetCustomAttribute(field, typeof(ToolTipAttribute))).Tip;
+                ImGui.SetItemTooltip(toolTip);
+            }
         }
 
         foreach (PropertyInfo property in inObject.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
+            bool hasTooltip = Attribute.GetCustomAttribute(property, typeof(ToolTipAttribute)) != null;
+            string toolTip = string.Empty;
+
+
             if (!property.CanRead)
             {
                 continue;
@@ -92,6 +106,7 @@ public class PropertyInspector : EditorPanel
                 continue;
             }
 
+
             if (!property.CanWrite)
             {
                 ImGui.BeginDisabled();
@@ -101,6 +116,12 @@ public class PropertyInspector : EditorPanel
 
             DrawProperty(inObject, ref value, property.Name, property.PropertyType);
             property.SetValue(inObject, value);
+
+            if (hasTooltip)
+            {
+                toolTip = ((ToolTipAttribute)Attribute.GetCustomAttribute(property, typeof(ToolTipAttribute))).Tip;
+                ImGui.SetItemTooltip(toolTip);
+            }
 
             if (!property.CanWrite)
             {

@@ -20,3 +20,15 @@ public class HideFromSpawnMenuAttribute : Attribute
 {
 
 }
+
+/// <summary>
+/// Displays a tooltip in the editor when hovering over the property or class
+/// </summary>
+public class ToolTipAttribute : Attribute
+{
+    public string Tip { get; private set; }
+    public ToolTipAttribute(string tip)
+    {
+        Tip = tip;
+    }
+}

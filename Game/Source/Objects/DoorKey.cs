@@ -1,10 +1,12 @@
-﻿using Raylib_cs;
+﻿using Game.LevelEditor;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game.Objects;
 
 public class DoorKey : Entity, IInteractable
 {
+    [ToolTip("The ID of the door this key unlocks")]
     public int DoorID = 0;
     public Sound CollectSound;
 

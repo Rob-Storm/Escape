@@ -73,7 +73,8 @@ public static class AssetManager
                 music => { return rlImGui.ImageButtonSize("##assetButton", Load<Texture2D>(musicIcon), new Vector2(96)); },
                 music =>
                 {
-
+                    // Todo: add music preview
+                    // play, pause, stop, maybe?
                 },
                 ".ogg"
             );
