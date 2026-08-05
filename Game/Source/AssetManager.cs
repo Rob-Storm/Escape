@@ -5,6 +5,12 @@ using System.Numerics;
 
 namespace Game;
 
+/*
+ * Todo:
+ * Use Paths.cs for relative paths to make literal paths shorter
+ * à la MonoGame/XNA
+ */
+
 public static class AssetManager
 {
     public static Dictionary<string, object> Assets { get; private set; }
