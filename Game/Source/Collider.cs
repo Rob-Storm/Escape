@@ -14,13 +14,23 @@ public class Collider
 
     public Vector3 CollisionBounds { get; set; } = Vector3.Zero;
 
+    // Non-solid colliders will still trigger overlap events, but will not block movement.
+
+    // Possible refactor to use collision channels like Unreal Engine, but that is for
+    // a next iteration of the engine
+    public bool Solid { get; set; } = true;
+
     public bool IsColliding { get; protected set; } = false;
 
     public Color Color { get; private set; } = Color.SkyBlue;
 
+    private HashSet<Collider> _overlappingColliders;
+
+
     public Collider(Entity parent)
     {
         Parent = parent;
+        _overlappingColliders = new HashSet<Collider>();
     }
 
     public void Update(Transform transform)
@@ -36,18 +46,27 @@ public class Collider
 
     public void SetIsColliding(bool colliding, Collider collider)
     {
-        if (!IsColliding && colliding)
+
+        if (!IsColliding && colliding && !_overlappingColliders.Contains(collider))
         {
             OnBeginOverlap?.Invoke(collider);
-            Debug.Log("Begin overlap");
+
+            _overlappingColliders.Add(collider);
+
+            Debug.Log($"{Parent.Name} Begin overlap {collider.Parent}");
         }
 
-        if (IsColliding && !colliding)
+        if (IsColliding && !colliding && _overlappingColliders.Contains(collider))
         {
             OnEndOverlap?.Invoke(collider);
-            Debug.Log("End Overlap");
+
+            _overlappingColliders.Remove(collider);
+
+            Debug.Log($"{Parent.Name} End Overlap {collider.Parent}");
         }
 
         IsColliding = colliding;
     }
 }
+
+

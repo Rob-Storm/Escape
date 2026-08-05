@@ -29,7 +29,7 @@ public class World
         Cells = new Cell[SizeX, SizeY];
     }
 
-    public Cell GetCell(int x, int y)
+    public Cell? GetCell(int x, int y)
     {
         if (x < 0 || y < 0)
         {
@@ -47,7 +47,7 @@ public class World
     {
         foreach (Entity entity in EntityList)
         {
-            yield return entity.Collider;
+            yield return entity.Collider!;
         }
 
         foreach (Cell cell in Cells)
@@ -109,6 +109,8 @@ public class World
             }
         }
 
+        CheckEntityCollisions();
+
         EntityList.AddRange(_addEntityList);
         _addEntityList.Clear();
 
@@ -169,7 +171,7 @@ public class World
 
     public bool IsCollidingWithEntity(Entity entity, BoundingBox collider)
     {
-        return Raylib.CheckCollisionBoxes(entity.Collider.BoundingBox, collider);
+        return Raylib.CheckCollisionBoxes(entity.Collider!.BoundingBox, collider);
     }
 
     public void CheckEntityCollisions()
@@ -178,9 +180,14 @@ public class World
         {
             foreach (Entity instigator in EntityList)
             {
-                bool colliding = Raylib.CheckCollisionBoxes(entity.Collider.BoundingBox, instigator.Collider.BoundingBox);
+                if(entity == instigator)
+                {
+                    continue;
+                }
 
-                entity.Collider.SetIsColliding(colliding, instigator.Collider);
+                bool overlapping = Raylib.CheckCollisionBoxes(entity.Collider!.BoundingBox, instigator.Collider!.BoundingBox);
+
+                entity.Collider.SetIsColliding(overlapping, instigator.Collider);
             }
         }
     }

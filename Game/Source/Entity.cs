@@ -4,10 +4,14 @@ using System.Text.Json.Serialization;
 
 namespace Game;
 
+// Todo: find a way of automatically registering derived types for polymorphic serialization.
+// This does not scale well
+
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(Character), "character")]
 [JsonDerivedType(typeof(Door), "door")]
 [JsonDerivedType(typeof(DoorKey), "key")]
+[JsonDerivedType(typeof(AmmoPickup), "ammo_pickup")]
 public class Entity
 {
     // An identifier for the editor

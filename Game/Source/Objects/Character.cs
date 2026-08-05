@@ -52,7 +52,7 @@ public class Character : Entity
 
         foreach (Entity entity in World!.EntityList)
         {
-            if (entity == this)
+            if (entity == this || !entity.Collider!.Solid)
             {
                 continue;
             }

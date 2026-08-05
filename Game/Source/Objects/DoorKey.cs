@@ -21,8 +21,28 @@ public class DoorKey : Entity, IInteractable
 
         Collider = new Collider(this)
         {
-            CollisionBounds = Vector3.One * 0.25f
+            CollisionBounds = Vector3.One * 0.25f,
+            Solid = false
         };
+
+        Collider.OnBeginOverlap += Collider_OnBeginOverlap;
+    }
+
+    private void Collider_OnBeginOverlap(Collider other)
+    {
+        Player? player = other.Parent as Player;
+
+        if(player == null)
+        {
+            return;
+        }
+
+        player.AddKey(DoorID);
+        GameplayStatics.PlaySoundAtLocation(CollectSound, Transform.Position, 0.5f);
+
+        Debug.Log($"Collected key: {DoorID}");
+
+        Destroy();
     }
 
     public void Interact(Entity callingEntity)

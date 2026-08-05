@@ -14,11 +14,13 @@ public class Player : Character
     private float _pitch, _yaw;
 
     private HashSet<int> _collectedKeys;
+    private Dictionary<AmmoType, int> _ammoInventory;
 
     public Player()
     {
         Camera = new Camera();
         _collectedKeys = new HashSet<int>();
+        _ammoInventory = new Dictionary<AmmoType, int>();
 
         if (Collider != null)
         {
@@ -151,4 +153,28 @@ public class Player : Character
 
     public void AddKey(int id) => _collectedKeys.Add(id);
     public bool HasKey(int id) => _collectedKeys.Contains(id);
+
+    public void AddAmmo(AmmoType type, int amount)
+    {
+        if (_ammoInventory.ContainsKey(type))
+        {
+            _ammoInventory[type] += amount;
+        }
+        else
+        {
+            _ammoInventory[type] = amount;
+        }
+    }
+    public void RemoveAmmo(AmmoType type, int amount)
+    {
+        if (_ammoInventory.ContainsKey(type))
+        {
+            _ammoInventory[type] -= amount;
+
+            if (_ammoInventory[type] < 0)
+            {
+                _ammoInventory[type] = 0;
+            }
+        }
+    }
 }
