@@ -2,7 +2,7 @@
   "profiles": {
     "Game": {
       "commandName": "Project",
-      "commandLineArgs": "--level \"C:\\Users\\The1Wolfcast\\source\\Games\\Escape\\Game\\bin\\Debug\\net9.0\\Assets\\Maps\\test.hdl\""
+      "commandLineArgs": "--level \"C:\\Users\\the1w\\source\\clone\\Escape\\Game\\bin\\Debug\\net9.0\\Assets\\Maps\\test.hdl\""
     },
     "Editor": {
       "commandName": "Project",

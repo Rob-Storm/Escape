@@ -61,6 +61,13 @@ public class Player : Character
             InteractTrace();
         }
 
+        if(Raylib.IsKeyPressed(KeyboardKey.Space))
+        {
+            GameplayStatics.PlaySoundAtLocation(AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"), Camera.Transform.Position, 10f);
+            ShootTrace();
+            Debug.Log("Shoot Trace");
+        }
+
         if (moveVector != Vector3.Zero)
         {
             moveVector = Vector3.Normalize(moveVector);
@@ -85,7 +92,7 @@ public class Player : Character
 
     public bool LineTrace(float range, out Entity? hitEntity)
     {
-        Vector3 start, end;
+        Vector3 start;
         start = Camera.Transform.Position;
         Ray ray = new Ray(start, Vector3.Normalize(Camera.GetForwardVector()));
 
@@ -125,6 +132,19 @@ public class Player : Character
             if (interactable != null)
             {
                 interactable.Interact(this);
+            }
+        }
+    }
+
+    public void ShootTrace()
+    {
+        if(LineTrace(0.65f, out Entity? hitEntity))
+        {
+            IDamageable? damageable = hitEntity as IDamageable;
+
+            if (damageable != null)
+            {
+                damageable.Damage(1);
             }
         }
     }

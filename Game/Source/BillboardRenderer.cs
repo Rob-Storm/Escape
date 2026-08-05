@@ -5,10 +5,6 @@ namespace Game;
 
 public class BillboardRenderer : RenderComponent
 {
-    ~BillboardRenderer()
-    {
-        Raylib.UnloadTexture(Texture);
-    }
 
     public override void Render(Camera camera, Transform transform)
     {
