@@ -174,6 +174,10 @@ public class World
         return Raylib.CheckCollisionBoxes(entity.Collider!.BoundingBox, collider);
     }
 
+
+    // HACK: This should really be changed to something more efficient.
+    // This is O(n^2) and will not scale well with a large number of entities.
+    // May try an octree for this engine iteration or use BSP after this game is shipped
     public void CheckEntityCollisions()
     {
         foreach (Entity entity in EntityList)

@@ -1,8 +1,10 @@
 ﻿using Game.LevelEditor;
+using Raylib_cs;
+using System.Numerics;
 
 namespace Game.Objects;
 
-public class AmmoPickup : Entity, IInteractable
+public class AmmoPickup : Entity
 {
     [ToolTip("The ammo type provided by this pickup")]
     public AmmoType AmmoType = AmmoType.Pistol;
@@ -10,15 +12,37 @@ public class AmmoPickup : Entity, IInteractable
     [ToolTip("The amount of ammo provided by this pickup")]
     public int AmmoAmount = 0;
 
-    public void Interact(Entity callingEntity)
-    {
-        Player? player = callingEntity as Player;
+    public Sound PickupSound = AssetManager.Load<Sound>("Assets/Sounds/AmmoPickup.wav");
 
-        if(player != null)
+    public AmmoPickup()
+    {
+        Renderer = new BillboardRenderer
         {
-            player.AddAmmo(AmmoType.Pistol, 10);
-            Destroy();
-        }   
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\PistolBullets.png")
+        };
+
+        Collider = new Collider(this)
+        {
+            CollisionBounds = Vector3.One * 0.5f,
+            Solid = false
+        };
+
+        Collider.OnBeginOverlap += Collider_OnBeginOverlap;
+    }
+
+    private void Collider_OnBeginOverlap(Collider other)
+    {
+        Player? player = other.Parent as Player;
+
+        if(player == null)
+        {
+            return;
+        }
+
+        player.AddAmmo(AmmoType, AmmoAmount);
+        GameplayStatics.PlaySoundAtLocation(PickupSound, Transform.Position, 1f);
+        Destroy();
+
     }
 }
 

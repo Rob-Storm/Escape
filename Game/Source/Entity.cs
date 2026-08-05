@@ -1,4 +1,5 @@
-﻿using Game.Objects;
+﻿using Game.LevelEditor;
+using Game.Objects;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -18,6 +19,7 @@ public class Entity
     public string Name;
     public Transform Transform { get; set; }
 
+    [HideProperty]
     [JsonIgnore]
     public Collider? Collider { get; set; }
 

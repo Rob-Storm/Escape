@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace Game.Objects;
 
-public class DoorKey : Entity, IInteractable
+public class DoorKey : Entity
 {
     [ToolTip("The ID of the door this key unlocks")]
     public int DoorID = 0;
@@ -33,23 +33,6 @@ public class DoorKey : Entity, IInteractable
         Player? player = other.Parent as Player;
 
         if(player == null)
-        {
-            return;
-        }
-
-        player.AddKey(DoorID);
-        GameplayStatics.PlaySoundAtLocation(CollectSound, Transform.Position, 0.5f);
-
-        Debug.Log($"Collected key: {DoorID}");
-
-        Destroy();
-    }
-
-    public void Interact(Entity callingEntity)
-    {
-        Player? player = callingEntity as Player;
-
-        if (player == null)
         {
             return;
         }
