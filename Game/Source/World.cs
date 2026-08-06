@@ -1,4 +1,5 @@
-﻿using Game.Objects;
+﻿using Game.GUI;
+using Game.Objects;
 using Raylib_cs;
 using System.Numerics;
 
@@ -19,6 +20,8 @@ public class World
     public int SizeY = 25;
 
     protected bool _debugDrawMode = false;
+
+    private GameUI _userInterface;
 
     public World()
     {
@@ -91,6 +94,8 @@ public class World
         EntityList = level.EntityList;
         Cells = level.Cells;
 
+        _userInterface = new GameUI(_player);
+
         _player.Transform.Position = new Vector3(level.PlayerStart.X, 0.5f, level.PlayerStart.Y);
         _player.SetYaw(level.StartRotation * -Raylib.DEG2RAD);
 
@@ -153,7 +158,10 @@ public class World
 
     public virtual void Render2D()
     {
-
+        if(_userInterface != null)
+        {
+            _userInterface.Render();
+        }
     }
 
     public bool IsCollidingWithCell(Cell cell, BoundingBox collider)

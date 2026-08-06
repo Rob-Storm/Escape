@@ -5,8 +5,13 @@ using System.Numerics;
 namespace Game.Objects;
 
 [HideFromSpawnMenu]
-public class Character : Entity
+public class Character : Entity, IDamageable
 {
+    public event Action<int>? OnDamaged;
+    public event Action? OnKill;
+
+    public int Health { get; protected set; }
+
     public Engine? Engine { get; set; }
 
     protected float _moveSpeed = 1.5f;
@@ -64,5 +69,22 @@ public class Character : Entity
         }
 
         return true;
+    }
+
+    public void Kill()
+    {
+        OnKill?.Invoke();
+    }
+
+    public void Damage(int amount)
+    {
+        Health -= amount;
+
+        if(Health <= 0)
+        {
+            Kill();
+        }
+
+        OnDamaged?.Invoke(Health);
     }
 }

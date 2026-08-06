@@ -50,6 +50,7 @@ public enum LogChannel
     Config,
     UserInterface,
     Timer,
+    Editor,
     Raylib
 };
 

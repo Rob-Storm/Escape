@@ -1,4 +1,5 @@
-﻿using Game.LevelEditor;
+﻿using Game.GUI;
+using Game.LevelEditor;
 using Raylib_cs;
 using System.Numerics;
 
@@ -8,6 +9,8 @@ namespace Game.Objects;
 [HideFromSpawnMenu]
 public class Player : Character
 {
+    public event Action<Dictionary<AmmoType, int>>? OnAmmoChanged;
+
     public Camera Camera { get; private set; }
     private Vector3 _cameraOffset = Directions.Up * 0.375f;
 
@@ -18,9 +21,12 @@ public class Player : Character
 
     public Player()
     {
+        Name = "Player";
         Camera = new Camera();
         _collectedKeys = new HashSet<int>();
         _ammoInventory = new Dictionary<AmmoType, int>();
+
+        Health = 100;
 
         if (Collider != null)
         {
@@ -164,6 +170,8 @@ public class Player : Character
         {
             _ammoInventory[type] = amount;
         }
+
+        OnAmmoChanged?.Invoke(_ammoInventory);
     }
     public void RemoveAmmo(AmmoType type, int amount)
     {
@@ -176,5 +184,7 @@ public class Player : Character
                 _ammoInventory[type] = 0;
             }
         }
+
+        OnAmmoChanged?.Invoke(_ammoInventory);
     }
 }
