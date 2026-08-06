@@ -16,7 +16,8 @@ public class DoorKey : Entity
 
         Renderer = new BillboardRenderer
         {
-            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\KeyGeneric.png")
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\KeyGeneric.png"),
+            //Bounce = true
         };
 
         Collider = new Collider(this)

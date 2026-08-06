@@ -13,6 +13,8 @@ public class Engine
 
     private World _world;
 
+    public static bool IsEditor { get; private set; } = false;
+
     public void Init(bool isEditorMode = false, string? levelPath = null)
     {
         Raylib.SetTraceLogLevel(TraceLogLevel.None);
@@ -24,6 +26,8 @@ public class Engine
 
         if (isEditorMode)
         {
+            IsEditor = true;
+
             Raylib.MaximizeWindow();
 
             AssetManager.ScanRegistries();

@@ -3,7 +3,6 @@ using Game.LevelEditor;
 using Raylib_cs;
 using System.Numerics;
 
-
 namespace Game.Objects;
 
 [HideFromSpawnMenu]

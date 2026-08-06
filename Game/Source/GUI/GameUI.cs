@@ -27,8 +27,11 @@ public class GameUI
 
         foreach(var item in ammoInventory)
         {
-            _ammoText += $"{item.Key.ToString()}: {item.Value.ToString()}";
+            _ammoText += $"{item.Key.ToString()}: {item.Value.ToString()}\n";
         }
+
+        // Remove \n from last item
+        _ammoText = _ammoText.Remove(_ammoText.Length - 1, 1);
     }
 
     public void Render()

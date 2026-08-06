@@ -5,6 +5,10 @@ using System.Reflection;
 
 namespace Game.LevelEditor.Panels;
 
+/*
+ * Todo:
+ * Maybe some way to revert properties back to the class default?
+ */
 public class PropertyInspector : EditorPanel
 {
     private delegate void OnPropertyDrawSignature(object owner, ref object propertyValue, string propertyName);

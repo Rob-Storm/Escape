@@ -12,13 +12,14 @@ public class AmmoPickup : Entity
     [ToolTip("The amount of ammo provided by this pickup")]
     public int AmmoAmount = 0;
 
-    public Sound PickupSound = AssetManager.Load<Sound>("Assets/Sounds/AmmoPickup.wav");
+    public Sound PickupSound = AssetManager.Load<Sound>(@"Assets\Sounds\AmmoPickup.wav");
 
     public AmmoPickup()
     {
         Renderer = new BillboardRenderer
         {
-            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\PistolBullets.png")
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\PistolBullets.png"),
+            Bounce = true
         };
 
         Collider = new Collider(this)
@@ -48,5 +49,6 @@ public class AmmoPickup : Entity
 
 public enum AmmoType
 {
-    Pistol
+    Pistol,
+    Shotgun
 };
