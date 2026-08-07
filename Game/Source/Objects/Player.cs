@@ -23,7 +23,11 @@ public class Player : Character
         Name = "Player";
         Camera = new Camera();
         _collectedKeys = new HashSet<int>();
-        _ammoInventory = new Dictionary<AmmoType, int>();
+        _ammoInventory = new Dictionary<AmmoType, int>
+        {
+            { AmmoType.Pistol, 0 },
+            { AmmoType.Shotgun, 0 }
+        };
 
         Health = 100;
 
@@ -158,7 +162,7 @@ public class Player : Character
 
     public void AddKey(int id) => _collectedKeys.Add(id);
     public bool HasKey(int id) => _collectedKeys.Contains(id);
-
+    public Dictionary<AmmoType, int> GetAmmoInventory() => _ammoInventory;
     public void AddAmmo(AmmoType type, int amount)
     {
         if (_ammoInventory.ContainsKey(type))
@@ -186,4 +190,10 @@ public class Player : Character
 
         OnAmmoChanged?.Invoke(_ammoInventory);
     }
+
+    public void TryShoot()
+    {
+
+    }
+
 }

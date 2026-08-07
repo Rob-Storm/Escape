@@ -14,6 +14,7 @@ public class GameUI
         player.OnDamaged += Player_OnDamaged;
 
         _healthText = player.Health.ToString();
+        Player_OnAmmoChanged(player.GetAmmoInventory());
     }
 
     private void Player_OnDamaged(int health)
