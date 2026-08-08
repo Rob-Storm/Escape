@@ -28,11 +28,14 @@ public class Player : Character
         Name = "Player";
         Camera = new Camera();
         _collectedKeys = new HashSet<int>();
-        _ammoInventory = new Dictionary<AmmoType, int>
+        _ammoInventory = new Dictionary<AmmoType, int>();
+
+        var values = Enum.GetValues(typeof(AmmoType));
+
+        foreach ( var value in values )
         {
-            { AmmoType.Pistol, 0 },
-            { AmmoType.Shotgun, 0 }
-        };
+            _ammoInventory.Add((AmmoType)value, 0);
+        }
 
         Health = 100;
 

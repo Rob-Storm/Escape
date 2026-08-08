@@ -18,7 +18,7 @@ public class AmmoPickup : Entity
     {
         Renderer = new BillboardRenderer
         {
-            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\PistolBullets.png"),
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\PistolAmmo.png"),
             Bounce = true
         };
 
@@ -50,5 +50,9 @@ public class AmmoPickup : Entity
 public enum AmmoType
 {
     Pistol,
-    Shotgun
+    Revolver,
+    Shotgun,
+    Rifle,
+    AutoRifle,
+    Grenade
 };

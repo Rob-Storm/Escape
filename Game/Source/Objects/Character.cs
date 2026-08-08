@@ -9,7 +9,7 @@ public class Character : Entity, IDamageable
     public event Action<int>? OnDamaged;
     public event Action? OnKill;
 
-    public int Health { get; protected set; }
+    public int Health { get; set; } = 10;
 
     public float MoveSpeed { get; set; } = 1.5f;
 
