@@ -16,7 +16,7 @@ public struct WeaponData
 
     public WeaponData()
     {
-        
+
     }
 
     #region Weapon preset definitions

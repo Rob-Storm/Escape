@@ -158,7 +158,7 @@ public class World
 
     public virtual void Render2D()
     {
-        if(_userInterface != null)
+        if (_userInterface != null)
         {
             _userInterface.Render();
         }
@@ -192,7 +192,7 @@ public class World
         {
             foreach (Entity instigator in EntityList)
             {
-                if(entity == instigator)
+                if (entity == instigator)
                 {
                     continue;
                 }

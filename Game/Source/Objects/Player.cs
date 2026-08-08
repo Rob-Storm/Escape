@@ -1,5 +1,5 @@
-﻿using Game.GUI;
-using Game.LevelEditor;
+﻿using Game.LevelEditor;
+using Game.Utility;
 using Raylib_cs;
 using System.Numerics;
 
@@ -9,7 +9,7 @@ namespace Game.Objects;
 public class Player : Character
 {
     public event Action<Dictionary<AmmoType, int>>? OnAmmoChanged;
-    public event Action<WeaponData>? OnWeaponChanged;
+    public event Action<WeaponData?>? OnWeaponChanged;
 
     public Camera Camera { get; private set; }
     private Vector3 _cameraOffset = Directions.Up * 0.375f;
@@ -19,7 +19,9 @@ public class Player : Character
     private HashSet<int> _collectedKeys;
     private Dictionary<AmmoType, int> _ammoInventory;
 
-    private WeaponData _currentWeapon = WeaponData.Pistol();
+    private List<WeaponData> _weaponInventory;
+
+    private WeaponData? _currentWeapon = null;
 
     private bool _shootCooldownFinished = true;
 
@@ -29,12 +31,11 @@ public class Player : Character
         Camera = new Camera();
         _collectedKeys = new HashSet<int>();
         _ammoInventory = new Dictionary<AmmoType, int>();
+        _weaponInventory = new List<WeaponData>();
 
-        var values = Enum.GetValues(typeof(AmmoType));
-
-        foreach ( var value in values )
+        foreach (AmmoType ammoType in EnumUtil.GetValues<AmmoType>())
         {
-            _ammoInventory.Add((AmmoType)value, 0);
+            _ammoInventory.Add(ammoType, 0);
         }
 
         Health = 100;
@@ -80,15 +81,29 @@ public class Player : Character
             InteractTrace();
         }
 
-        if(Raylib.IsMouseButtonDown(MouseButton.Left))
+        if (Raylib.IsMouseButtonDown(MouseButton.Left))
         {
             TryShoot();
         }
 
+        if (Raylib.GetMouseWheelMoveV() != Vector2.Zero)
+        {
+            float deltaY = Raylib.GetMouseWheelMoveV().Y;
+
+            if (deltaY > 0)
+            {
+                ChangeWeapon(false);
+            }
+            else if (deltaY < 0)
+            {
+                ChangeWeapon(true);
+            }
+        }
+
         if (moveVector != Vector3.Zero)
         {
-            moveVector = Vector3.Normalize(moveVector);
-            Move(moveVector);
+                moveVector = Vector3.Normalize(moveVector);
+                Move(moveVector);
         }
 
         Vector2 delta = Raylib.GetMouseDelta();
@@ -107,6 +122,7 @@ public class Player : Character
         Camera.Update();
     }
 
+    // HACK: Line traces should be done by the engine or world!
     public bool LineTrace(float range, out Entity? hitEntity)
     {
         Vector3 start;
@@ -155,19 +171,27 @@ public class Player : Character
 
     public void ShootTrace()
     {
-        if(LineTrace(_currentWeapon.Range, out Entity? hitEntity))
+        if(_currentWeapon == null)
+        {
+            return;
+        }
+
+        WeaponData currentWeapon = _currentWeapon!.Value;
+
+        if (LineTrace(currentWeapon.Range, out Entity? hitEntity))
         {
             IDamageable? damageable = hitEntity as IDamageable;
 
             if (damageable != null)
             {
-                damageable.Damage(_currentWeapon.Damage);
+                damageable.Damage(currentWeapon.Damage);
             }
         }
     }
 
     public void AddKey(int id) => _collectedKeys.Add(id);
     public bool HasKey(int id) => _collectedKeys.Contains(id);
+
     public Dictionary<AmmoType, int> GetAmmoInventory() => _ammoInventory;
     public void AddAmmo(AmmoType type, int amount)
     {
@@ -199,21 +223,28 @@ public class Player : Character
 
     private void TryShoot()
     {
-        if(!_shootCooldownFinished)
+        if(_currentWeapon ==  null)
         {
             return;
         }
 
-        AmmoType? ammo = _currentWeapon.AmmoType;
+        if (!_shootCooldownFinished)
+        {
+            return;
+        }
+
+        WeaponData currentWeapon = _currentWeapon.Value!;
+
+        AmmoType? ammo = currentWeapon.AmmoType;
 
         // Melee or other infinite-ammo weapon
-        if(ammo == null)
+        if (ammo == null)
         {
             ShootTrace();
-            GameplayStatics.PlaySound2D(_currentWeapon.FireSound);
+            GameplayStatics.PlaySound2D(currentWeapon.FireSound);
             _shootCooldownFinished = false;
 
-            TimerManager.SetTimer(_currentWeapon.FireRate, () => { _shootCooldownFinished = true; });
+            TimerManager.SetTimer(currentWeapon.FireRate, () => { _shootCooldownFinished = true; });
             return;
         }
 
@@ -231,13 +262,81 @@ public class Player : Character
         ShootTrace();
 
         // Normal shoot logic
-        GameplayStatics.PlaySound2D(_currentWeapon.FireSound);
+        GameplayStatics.PlaySound2D(currentWeapon.FireSound);
 
-        RemoveAmmo(_currentWeapon.AmmoType!.Value, 1);
+        RemoveAmmo(currentWeapon.AmmoType!.Value, 1);
 
         _shootCooldownFinished = false;
 
-        TimerManager.SetTimer(_currentWeapon.FireRate, () => { _shootCooldownFinished = true; });
+        TimerManager.SetTimer(currentWeapon.FireRate, () => { _shootCooldownFinished = true; });
     }
 
+    public void AddWeapon(WeaponData weapon)
+    {
+        if(_weaponInventory.Contains(weapon))
+        {
+            return;
+        }
+
+        _weaponInventory.Add(weapon);
+    }
+
+    public void RemoveWeapon(WeaponData weapon)
+    {
+        if(!_weaponInventory.Contains(weapon))
+        {
+            return;
+        }
+
+        _weaponInventory.Remove(weapon);
+    }
+
+    private void ChangeWeapon(bool previous)
+    {
+        if(_weaponInventory.Count <= 0 )
+        {
+            return;
+        }
+
+        int currentWeaponIndex = _currentWeapon != null ? _weaponInventory.IndexOf(_currentWeapon!.Value) : 0;
+
+        if (previous)
+        {
+            PreviousWeapon(currentWeaponIndex);
+        }
+        else
+        {
+            NextWeapon(currentWeaponIndex);
+        }
+
+        OnWeaponChanged?.Invoke(_currentWeapon.Value);
+    }
+
+    private void PreviousWeapon(int weaponIndex)
+    {
+        if(weaponIndex == 0)
+        {
+            weaponIndex = _weaponInventory.Count - 1;
+        }
+        else
+        {
+            weaponIndex--;
+        }
+
+        _currentWeapon = _weaponInventory[weaponIndex];
+    }
+
+    private void NextWeapon(int weaponIndex)
+    {
+        if (weaponIndex == _weaponInventory.Count - 1)
+        {
+            weaponIndex = 0;
+        }
+        else
+        {
+            weaponIndex++;
+        }
+
+        _currentWeapon = _weaponInventory[weaponIndex];
+    }
 }

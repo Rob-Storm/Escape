@@ -88,7 +88,7 @@ public class Character : Entity, IDamageable
     {
         Health -= amount;
 
-        if(Health <= 0)
+        if (Health <= 0)
         {
             Kill();
         }

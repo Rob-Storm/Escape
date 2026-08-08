@@ -18,12 +18,12 @@ public class GameUI
         _healthText = player.Health.ToString();
         Player_OnAmmoChanged(player.GetAmmoInventory());
 
-        _weaponText = "Pistol";
+        _weaponText = "None";
     }
 
-    private void Player_OnWeaponChanged(WeaponData weapon)
+    private void Player_OnWeaponChanged(WeaponData? weapon)
     {
-        _weaponText = weapon.Name;
+        _weaponText = weapon != null ? weapon!.Value.Name : "None";
     }
 
     private void Player_OnDamaged(int health)
@@ -35,7 +35,7 @@ public class GameUI
     {
         _ammoText = string.Empty;
 
-        foreach(var item in ammoInventory)
+        foreach (var item in ammoInventory)
         {
             _ammoText += $"{item.Key.ToString()}: {item.Value.ToString()}\n";
         }

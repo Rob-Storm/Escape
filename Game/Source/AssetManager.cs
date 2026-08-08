@@ -33,10 +33,20 @@ public static class AssetManager
                 "Texture",
                 new Vector4(1f, 0f, 0f, 1f),
                 "asset",
-                texture => { return rlImGui.ImageButtonSize("##assetButton", (Texture2D)texture, new Vector2(96)); },
                 texture =>
                 {
                     Texture2D textureObject = (Texture2D)texture;
+
+                    float scale = 96f / MathF.Max(textureObject.Width, textureObject.Height);
+
+                    Vector2 size = new(textureObject.Width * scale, textureObject.Height * scale);
+
+                    return rlImGui.ImageButtonSize("##assetButton", textureObject, size);
+                },
+                texture =>
+                {
+                    Texture2D textureObject = (Texture2D)texture;
+
                     rlImGui.ImageSize(textureObject, new Vector2(textureObject.Width, textureObject.Height));
                 },
                 ".png"

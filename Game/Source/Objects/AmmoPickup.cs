@@ -19,6 +19,8 @@ public class AmmoPickup : Entity
         Renderer = new BillboardRenderer
         {
             Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\PistolAmmo.png"),
+            AutoSize = true,
+            Scale = 1f,
             Bounce = true
         };
 
@@ -35,7 +37,7 @@ public class AmmoPickup : Entity
     {
         Player? player = other.Parent as Player;
 
-        if(player == null)
+        if (player == null)
         {
             return;
         }

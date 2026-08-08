@@ -169,12 +169,12 @@ public class Editor : World
 
         _entityHeirarchy.Draw();
 
-        if(_context.Layout.ShowEditorPreferences)
+        if (_context.Layout.ShowEditorPreferences)
         {
             _editorPreferences.Draw();
         }
 
-        if(_context.Layout.ShowLevelSettings)
+        if (_context.Layout.ShowLevelSettings)
         {
             _levelSettings.Draw();
         }
@@ -256,6 +256,6 @@ public struct EditorLayout
 
     public EditorLayout()
     {
-        
+
     }
 }

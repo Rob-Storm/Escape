@@ -47,7 +47,7 @@ public class MenuBar : EditorPanel
                 ImGui.EndMenu();
             }
 
-            if(ImGui.BeginMenu("Edit"))
+            if (ImGui.BeginMenu("Edit"))
             {
                 if (ImGui.BeginMenu("Spawn Entity"))
                 {

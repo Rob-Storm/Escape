@@ -13,7 +13,7 @@ public class WeaponPickup : Entity
         {
             return _weaponPreset;
         }
-        set 
+        set
         {
             _weaponPreset = value;
 
@@ -82,11 +82,12 @@ public class WeaponPickup : Entity
             return;
         }
 
-        if(_weapon.AmmoType != null)
+        if (_weapon.AmmoType != null)
         {
             player.AddAmmo(_weapon.AmmoType!.Value, Ammo);
         }
 
+        player.AddWeapon(_weapon);
         GameplayStatics.PlaySoundAtLocation(PickupSound, Transform.Position, 1f);
         Destroy();
     }

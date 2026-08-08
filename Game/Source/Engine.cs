@@ -62,7 +62,7 @@ public class Engine
 
     private void Update()
     {
-        Time.Update();        
+        Time.Update();
 
         TimerManager.Update();
 

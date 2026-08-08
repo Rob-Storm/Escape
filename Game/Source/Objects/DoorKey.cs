@@ -33,7 +33,7 @@ public class DoorKey : Entity
     {
         Player? player = other.Parent as Player;
 
-        if(player == null)
+        if (player == null)
         {
             return;
         }

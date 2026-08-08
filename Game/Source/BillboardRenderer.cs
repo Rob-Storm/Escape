@@ -25,7 +25,7 @@ public class BillboardRenderer : RenderComponent
             return;
         }
 
-        if(Bounce && !Engine.IsEditor)
+        if (Bounce && !Engine.IsEditor)
         {
             _bounceAmount += 1f * (float)Time.FrameDelta;
             _offset = MathF.Sin(_bounceAmount) * 0.1f;
@@ -33,16 +33,17 @@ public class BillboardRenderer : RenderComponent
 
         Rectangle source = new Rectangle(Vector2.Zero, Texture.Dimensions);
         Vector2 size = new Vector2(transform.Scale.X, transform.Scale.Z);
-        Vector2 origin = new Vector2(0.5f, 0.5f) * size;
 
         Vector3 finalPosition = transform.Position + new Vector3(0, _offset, 0);
 
-        if(AutoSize)
+        if (AutoSize)
         {
             size = Texture.Dimensions;
             size *= Scale / 200f;
         }
-        
+
+        Vector2 origin = new Vector2(0.5f, 0.5f) * size;
+
         Raylib.DrawBillboardPro(camera, Texture, source, finalPosition, Vector3.UnitY, size, origin, 0f, Color.White);
 
         // Todo: fix bug with billboard rotating with camera rotation instead of it's position
