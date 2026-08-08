@@ -9,6 +9,7 @@ namespace Game.Objects;
 public class Player : Character
 {
     public event Action<Dictionary<AmmoType, int>>? OnAmmoChanged;
+    public event Action<WeaponData>? OnWeaponChanged;
 
     public Camera Camera { get; private set; }
     private Vector3 _cameraOffset = Directions.Up * 0.375f;
@@ -17,6 +18,10 @@ public class Player : Character
 
     private HashSet<int> _collectedKeys;
     private Dictionary<AmmoType, int> _ammoInventory;
+
+    private WeaponData _currentWeapon = WeaponData.Pistol();
+
+    private bool _shootCooldownFinished = true;
 
     public Player()
     {
@@ -72,11 +77,9 @@ public class Player : Character
             InteractTrace();
         }
 
-        if(Raylib.IsKeyPressed(KeyboardKey.Space))
+        if(Raylib.IsMouseButtonDown(MouseButton.Left))
         {
-            GameplayStatics.PlaySoundAtLocation(AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"), Camera.Transform.Position, 10f);
-            ShootTrace();
-            Debug.Log("Shoot Trace");
+            TryShoot();
         }
 
         if (moveVector != Vector3.Zero)
@@ -149,13 +152,13 @@ public class Player : Character
 
     public void ShootTrace()
     {
-        if(LineTrace(0.65f, out Entity? hitEntity))
+        if(LineTrace(_currentWeapon.Range, out Entity? hitEntity))
         {
             IDamageable? damageable = hitEntity as IDamageable;
 
             if (damageable != null)
             {
-                damageable.Damage(1);
+                damageable.Damage(_currentWeapon.Damage);
             }
         }
     }
@@ -191,9 +194,47 @@ public class Player : Character
         OnAmmoChanged?.Invoke(_ammoInventory);
     }
 
-    public void TryShoot()
+    private void TryShoot()
     {
+        if(!_shootCooldownFinished)
+        {
+            return;
+        }
 
+        AmmoType? ammo = _currentWeapon.AmmoType;
+
+        // Melee or other infinite-ammo weapon
+        if(ammo == null)
+        {
+            ShootTrace();
+            GameplayStatics.PlaySound2D(_currentWeapon.FireSound);
+            _shootCooldownFinished = false;
+
+            TimerManager.SetTimer(_currentWeapon.FireRate, () => { _shootCooldownFinished = true; });
+            return;
+        }
+
+        // Weapon is empty
+        if (_ammoInventory[ammo!.Value] <= 0)
+        {
+            GameplayStatics.PlaySound2D(AssetManager.Load<Sound>(@"Assets\Sounds\DryFire.wav"), 1f);
+            _shootCooldownFinished = false;
+
+            TimerManager.SetTimer(0.5f, () => { _shootCooldownFinished = true; });
+
+            return;
+        }
+
+        ShootTrace();
+
+        // Normal shoot logic
+        GameplayStatics.PlaySound2D(_currentWeapon.FireSound);
+
+        RemoveAmmo(_currentWeapon.AmmoType!.Value, 1);
+
+        _shootCooldownFinished = false;
+
+        TimerManager.SetTimer(_currentWeapon.FireRate, () => { _shootCooldownFinished = true; });
     }
 
 }

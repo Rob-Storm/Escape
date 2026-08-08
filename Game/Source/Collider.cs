@@ -53,7 +53,7 @@ public class Collider
 
             _overlappingColliders.Add(collider);
 
-            Debug.Log($"{Parent.Name} Begin overlap {collider.Parent}");
+            Debug.Log($"{Parent.Name} Begin overlap {collider.Parent}", channel: LogChannel.Physics);
         }
 
         if (IsColliding && !colliding && _overlappingColliders.Contains(collider))
@@ -62,7 +62,7 @@ public class Collider
 
             _overlappingColliders.Remove(collider);
 
-            Debug.Log($"{Parent.Name} End Overlap {collider.Parent}");
+            Debug.Log($"{Parent.Name} End Overlap {collider.Parent}", channel: LogChannel.Physics);
         }
 
         IsColliding = colliding;

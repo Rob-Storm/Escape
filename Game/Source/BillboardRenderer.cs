@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Game.LevelEditor;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game;
@@ -6,6 +7,11 @@ namespace Game;
 public class BillboardRenderer : RenderComponent
 {
 
+    [ToolTip("Constrains the size to fit the texture dimensions")]
+    public bool AutoSize { get; set; }
+    [ToolTip("Scales the AutoSize dimensions by a scalar value")]
+    public float Scale { get; set; } = 1f;
+    [ToolTip("The sprite will move up and down")]
     public bool Bounce { get; set; }
 
     private float _bounceAmount = 0f;
@@ -31,6 +37,12 @@ public class BillboardRenderer : RenderComponent
 
         Vector3 finalPosition = transform.Position + new Vector3(0, _offset, 0);
 
+        if(AutoSize)
+        {
+            size = Texture.Dimensions;
+            size *= Scale / 200f;
+        }
+        
         Raylib.DrawBillboardPro(camera, Texture, source, finalPosition, Vector3.UnitY, size, origin, 0f, Color.White);
 
         // Todo: fix bug with billboard rotating with camera rotation instead of it's position

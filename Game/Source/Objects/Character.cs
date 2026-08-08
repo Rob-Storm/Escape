@@ -4,7 +4,6 @@ using System.Numerics;
 
 namespace Game.Objects;
 
-[HideFromSpawnMenu]
 public class Character : Entity, IDamageable
 {
     public event Action<int>? OnDamaged;
@@ -12,19 +11,26 @@ public class Character : Entity, IDamageable
 
     public int Health { get; protected set; }
 
-    public Engine? Engine { get; set; }
+    public float MoveSpeed { get; set; } = 1.5f;
 
-    protected float _moveSpeed = 1.5f;
+    public Sound DeathSound { get; set; } = AssetManager.Load<Sound>(@"Assets\Sounds\Die.wav");
+
+    [HideProperty]
     public World? World;
 
     public Character()
     {
         Collider = new Collider(this);
+
+        Renderer = new BillboardRenderer
+        {
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\Man.png")
+        };
     }
 
     protected void Move(Vector3 direction)
     {
-        Vector3 movement = direction * _moveSpeed * (float)Time.FrameDelta;
+        Vector3 movement = direction * MoveSpeed * (float)Time.FrameDelta;
 
         if (CanMove(new Vector3(movement.X, 0, 0)))
         {
@@ -74,6 +80,8 @@ public class Character : Entity, IDamageable
     public void Kill()
     {
         OnKill?.Invoke();
+        GameplayStatics.PlaySoundAtLocation(DeathSound, Transform.Position, 1f);
+        Destroy();
     }
 
     public void Damage(int amount)

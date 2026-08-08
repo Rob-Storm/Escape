@@ -47,9 +47,9 @@ public enum LogChannel
     General,
     Input,
     Asset,
-    Config,
     UserInterface,
     Timer,
+    Physics,
     Editor,
     Raylib
 };

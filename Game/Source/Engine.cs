@@ -11,7 +11,7 @@ public class Engine
     private int _screenWidth = 1280;
     private int _screenHeight = 720;
 
-    private World _world;
+    private World? _world;
 
     public static bool IsEditor { get; private set; } = false;
 
@@ -62,18 +62,20 @@ public class Engine
 
     private void Update()
     {
-        Time.Update();
+        Time.Update();        
 
-        _world.Update();
+        TimerManager.Update();
+
+        _world?.Update();
     }
 
     private void Render()
     {
         Raylib.BeginDrawing();
 
-        _world.Render();
+        _world?.Render();
 
-        _world.Render2D();
+        _world?.Render2D();
 
         if (ShowFPS)
         {

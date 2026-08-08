@@ -27,4 +27,10 @@ public static class GameplayStatics
 
         Raylib.PlaySound(sound);
     }
+
+    public static void PlaySound2D(Sound sound, float volume = 1.0f)
+    {
+        Raylib.SetSoundVolume(sound, volume);
+        Raylib.PlaySound(sound);
+    }
 }
