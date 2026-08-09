@@ -1,5 +1,6 @@
 ﻿using Game.Objects;
 using Raylib_cs;
+using System.Numerics;
 
 namespace Game.GUI;
 
@@ -8,6 +9,8 @@ public class GameUI
     private string _ammoText = string.Empty;
     private string _healthText = string.Empty;
     private string _weaponText = string.Empty;
+
+    private Texture2D _crosshair;
 
     public GameUI(Player player)
     {
@@ -19,6 +22,8 @@ public class GameUI
         Player_OnAmmoChanged(player.GetAmmoInventory());
 
         _weaponText = "None";
+
+        _crosshair = AssetManager.Load<Texture2D>(@"Assets\Textures\Crosshair.png");
     }
 
     private void Player_OnWeaponChanged(WeaponData? weapon)
@@ -46,11 +51,15 @@ public class GameUI
 
     public void Render()
     {
+        Vector2 viewportCenter = Raylib.GetScreenCenter();
+
         Raylib.DrawText("Ammo", 0, 0, 24, Color.White);
         Raylib.DrawText(_ammoText, 0, 25, 24, Color.White);
 
         Raylib.DrawText($"Weapon: {_weaponText}", 175, 0, 24, Color.White);
 
         Raylib.DrawText($"HP: {_healthText}", 500, 0, 24, Color.White);
+
+        Raylib.DrawTexture(_crosshair, (int)viewportCenter.X, (int)viewportCenter.Y, Color.White);
     }
 }

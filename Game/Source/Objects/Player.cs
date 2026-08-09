@@ -81,6 +81,11 @@ public class Player : Character
             InteractTrace();
         }
 
+        if (Raylib.IsKeyPressed(KeyboardKey.Q))
+        {
+            ChangeWeapon(false);
+        }
+
         if (Raylib.IsMouseButtonDown(MouseButton.Left))
         {
             TryShoot();
