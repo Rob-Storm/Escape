@@ -26,9 +26,9 @@ public struct WeaponData
         {
             Name = "Knife",
             Damage = 3,
-            Range = 5f,
-            FireRate = 1f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            Range = 0.5f,
+            FireRate = 0.65f,
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\KnifeSwing.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\Knife.png"),
             AmmoType = null
         };
@@ -42,7 +42,7 @@ public struct WeaponData
             Damage = 5,
             Range = 5f,
             FireRate = 1f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\PistolFire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\Pistol.png"),
             AmmoType = Objects.AmmoType.Pistol
         };
@@ -56,7 +56,7 @@ public struct WeaponData
             Damage = 15,
             Range = 5f,
             FireRate = 1f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\RevolverFire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\Revolver.png"),
             AmmoType = Objects.AmmoType.Revolver
         };
@@ -69,7 +69,7 @@ public struct WeaponData
             Name = "Shotgun",
             Damage = 20,
             Range = 5f,
-            FireRate = 1f,
+            FireRate = 1.25f,
             FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\Shotgun.png"),
             AmmoType = Objects.AmmoType.Shotgun
@@ -83,8 +83,8 @@ public struct WeaponData
             Name = "SMG",
             Damage = 5,
             Range = 5f,
-            FireRate = 0.15f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireRate = 0.2f,
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\PistolFire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\SMG.png"),
             AmmoType = Objects.AmmoType.Pistol
         };
@@ -126,7 +126,7 @@ public struct WeaponData
             Damage = 50,
             Range = 5f,
             FireRate = 2f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\LauncherFire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\GrenadeLauncher.png"),
             AmmoType = Objects.AmmoType.Grenade
         };

@@ -16,6 +16,12 @@ public class BillboardRenderer : RenderComponent
 
     private float _bounceAmount = 0f;
     private float _offset = 0f;
+    public BillboardRenderer()
+    {
+        Random random = new Random();
+
+        _bounceAmount = random.Next(1, 25);
+    }
 
     public override void Render(Camera camera, Transform transform)
     {

@@ -24,13 +24,13 @@ public class Collider
 
     public Color Color { get; private set; } = Color.SkyBlue;
 
-    private HashSet<Collider> _overlappingColliders;
+    public HashSet<Collider> OverlappingColliders { get; protected set; }
 
 
     public Collider(Entity parent)
     {
         Parent = parent;
-        _overlappingColliders = new HashSet<Collider>();
+        OverlappingColliders = new HashSet<Collider>();
     }
 
     public void Update(Transform transform)
@@ -46,26 +46,26 @@ public class Collider
 
     public void SetIsColliding(bool colliding, Collider collider)
     {
-
-        if (!IsColliding && colliding && !_overlappingColliders.Contains(collider))
+        if (colliding)
         {
-            OnBeginOverlap?.Invoke(collider);
+            if (OverlappingColliders.Add(collider))
+            {
+                OnBeginOverlap?.Invoke(collider);
 
-            _overlappingColliders.Add(collider);
+                Debug.Log($"{Parent.Name} Begin overlap {collider.Parent}", channel: LogChannel.Physics);
+            }
+        }
+        else
+        {
+            if (OverlappingColliders.Remove(collider))
+            {
+                OnEndOverlap?.Invoke(collider);
 
-            Debug.Log($"{Parent.Name} Begin overlap {collider.Parent}", channel: LogChannel.Physics);
+                Debug.Log($"{Parent.Name} End overlap {collider.Parent}", channel: LogChannel.Physics);
+            }
         }
 
-        if (IsColliding && !colliding && _overlappingColliders.Contains(collider))
-        {
-            OnEndOverlap?.Invoke(collider);
-
-            _overlappingColliders.Remove(collider);
-
-            Debug.Log($"{Parent.Name} End Overlap {collider.Parent}", channel: LogChannel.Physics);
-        }
-
-        IsColliding = colliding;
+        IsColliding = OverlappingColliders.Count > 0;
     }
 }
 
