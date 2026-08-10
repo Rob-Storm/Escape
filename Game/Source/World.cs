@@ -11,6 +11,8 @@ public class World
     protected List<Entity> _removeEntityList { get; set; }
     protected List<Entity> _addEntityList { get; set; }
 
+    protected List<Entity> _sortedBillboards;
+
     public Cell[,] Cells { get; set; }
 
     protected Player _player;
@@ -28,6 +30,8 @@ public class World
         EntityList = new List<Entity>();
         _removeEntityList = new List<Entity>();
         _addEntityList = new List<Entity>();
+
+        _sortedBillboards = new List<Entity>();
 
         Cells = new Cell[SizeX, SizeY];
     }
@@ -114,6 +118,8 @@ public class World
             }
         }
 
+        SortBillboards();
+
         CheckEntityCollisions();
 
         EntityList.AddRange(_addEntityList);
@@ -138,9 +144,14 @@ public class World
 
         Raylib.BeginMode3D(_camera);
 
-        foreach (Entity entity in EntityList)
+        foreach (Entity entity in EntityList.Where(e => e.Renderer is not BillboardRenderer))
         {
             entity.Render(_camera);
+        }
+
+        foreach(Entity billboard in _sortedBillboards)
+        {
+            billboard.Render(_camera);
         }
 
         foreach (var cellData in GetCells())
@@ -203,4 +214,18 @@ public class World
             }
         }
     }
+
+
+    // Sort the billboards front to back to avoid transparency bugs
+    public void SortBillboards()
+    {
+        List<Entity> billboards = new List<Entity>();
+        billboards.AddRange(EntityList.Where(entity => entity.Renderer is BillboardRenderer));
+
+        billboards.Sort((x, y) => GetDistanceToCamera(y).CompareTo(GetDistanceToCamera(x)));
+
+        _sortedBillboards = billboards;
+    }
+
+    public float GetDistanceToCamera(Entity entity) => Vector3.DistanceSquared(_camera.Transform.Position, entity.Transform.Position);
 }

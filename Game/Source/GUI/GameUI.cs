@@ -60,6 +60,6 @@ public class GameUI
 
         Raylib.DrawText($"HP: {_healthText}", 500, 0, 24, Color.White);
 
-        Raylib.DrawTexture(_crosshair, (int)viewportCenter.X, (int)viewportCenter.Y, Color.White);
+        Raylib.DrawTexture(_crosshair, (int)viewportCenter.X - _crosshair.Width, (int)viewportCenter.Y - _crosshair.Height, Color.White);
     }
 }

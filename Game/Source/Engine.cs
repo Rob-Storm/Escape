@@ -32,7 +32,7 @@ public class Engine
 
             AssetManager.ScanRegistries();
 
-            rlImGui.Setup(true);
+            rlImGui.Setup(true, true);
 
             ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 
