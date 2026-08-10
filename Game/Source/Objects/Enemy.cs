@@ -7,15 +7,9 @@ public class Enemy : Character
 {
     private bool _canAttack = true;
 
-    private Player? _overlappedPlayer;
+    private Player? _player;
 
-    /* AI State:
-     * 
-     * Wander (no player in sight)
-     * Move (get in range of weapon)
-     * Attack (shoot/stab)
-     * 
-     */
+    private AIState _aiState;
 
     public Enemy()
     {
@@ -40,7 +34,19 @@ public class Enemy : Character
     {
         base.Update();
 
-        DamagePlayer();
+        switch(_aiState)
+        {
+            case AIState.Wander:
+                // wander
+                break;
+            case AIState.Move:
+
+                break;
+            case AIState.Attack:
+                DamagePlayer();
+                break;
+        }
+        
     }
 
     private void Collider_OnEndOverlap(Collider other)
@@ -52,7 +58,7 @@ public class Enemy : Character
             return;
         }
 
-        _overlappedPlayer = null;
+        _player = null;
 
         _canAttack = true;
     }
@@ -66,7 +72,7 @@ public class Enemy : Character
             return;
         }
 
-        _overlappedPlayer = player;
+        _player = player;
 
         DamagePlayer();
 
@@ -74,15 +80,31 @@ public class Enemy : Character
 
     private void DamagePlayer()
     {
-        if (!_canAttack || _overlappedPlayer == null)
+        if (!_canAttack || _player == null)
         {
             return;
         }
 
-        _overlappedPlayer.Damage(5);
+        _player.Damage(5);
 
         _canAttack = false;
 
         TimerManager.SetTimer(1f, () => { _canAttack = true; });
     }
+}
+
+
+/* AI State:
+ * 
+ * Wander (no player in sight)
+ * Move (get in range of weapon)
+ * Attack (shoot/stab)
+ * 
+ */
+
+public enum AIState
+{
+    Wander,
+    Move,
+    Attack
 }
