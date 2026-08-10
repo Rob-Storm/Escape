@@ -95,6 +95,8 @@ public class Editor : World
             _debugDrawMode = !_debugDrawMode;
         }
 
+        SortBillboards();
+
     }
 
     public override void Render()
@@ -105,7 +107,7 @@ public class Editor : World
 
         Raylib.BeginMode3D(_camera);
 
-        foreach (Entity entity in EntityList)
+        foreach (Entity entity in EntityList.Where(e => e.Renderer is not BillboardRenderer))
         {
             if (_debugDrawMode && entity.Collider != null)
             {
@@ -113,6 +115,16 @@ public class Editor : World
             }
 
             entity.Render(_camera);
+        }
+
+        foreach (Entity billboard in _sortedBillboards)
+        {
+            if (_debugDrawMode && billboard.Collider != null)
+            {
+                Raylib.DrawBoundingBox(billboard.Collider.BoundingBox, billboard.Collider.Color);
+            }
+
+            billboard.Render(_camera);
         }
 
         foreach (var cellData in GetCells())
