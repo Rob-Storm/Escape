@@ -9,6 +9,14 @@ public class Enemy : Character
 
     private Player? _overlappedPlayer;
 
+    /* AI State:
+     * 
+     * Wander (no player in sight)
+     * Move (get in range of weapon)
+     * Attack (shoot/stab)
+     * 
+     */
+
     public Enemy()
     {
         Collider = new Collider(this)
