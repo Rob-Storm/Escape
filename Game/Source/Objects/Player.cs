@@ -28,6 +28,7 @@ public class Player : Character
     public Player()
     {
         Name = "Player";
+        MoveSpeed = 2.75f;
         Camera = new Camera();
         _collectedKeys = new HashSet<int>();
         _ammoInventory = new Dictionary<AmmoType, int>();

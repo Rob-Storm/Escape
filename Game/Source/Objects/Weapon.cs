@@ -8,7 +8,7 @@ public struct WeaponData
     public int Damage { get; set; } = 1;
     public float Range { get; set; } = 5f;
     public float FireRate { get; set; } = 0.5f;
-    public Sound FireSound { get; set; } = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav");
+    public Sound FireSound { get; set; } = AssetManager.Load<Sound>(@"Assets\Sounds\PistolFire.wav");
     public Texture2D WeaponTexture { get; set; } = AssetManager.Load<Texture2D>(@"Assets\Textures\Pistol.png");
 
     // Melee or infinite-ammo weapons should use null
@@ -70,7 +70,7 @@ public struct WeaponData
             Damage = 20,
             Range = 5f,
             FireRate = 1.25f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShotgunFire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\Shotgun.png"),
             AmmoType = Objects.AmmoType.Shotgun
         };
@@ -98,7 +98,7 @@ public struct WeaponData
             Damage = 20,
             Range = 10f,
             FireRate = 1.5f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\Riflefire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\Rifle.png"),
             AmmoType = Objects.AmmoType.Rifle
         };
@@ -112,7 +112,7 @@ public struct WeaponData
             Damage = 10,
             Range = 10f,
             FireRate = 0.35f,
-            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\ShootGeneric.wav"),
+            FireSound = AssetManager.Load<Sound>(@"Assets\Sounds\AutoRifleFire.wav"),
             WeaponTexture = AssetManager.Load<Texture2D>(@"Assets\Textures\AutoRifle.png"),
             AmmoType = Objects.AmmoType.AutoRifle
         };
