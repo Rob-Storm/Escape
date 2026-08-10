@@ -216,7 +216,7 @@ public class World
     }
 
 
-    // Sort the billboards front to back to avoid transparency bugs
+    // Sort the billboards back to front to avoid transparency bugs
     public void SortBillboards()
     {
         List<Entity> billboards = new List<Entity>();
