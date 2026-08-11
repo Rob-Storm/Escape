@@ -1,6 +1,7 @@
 ﻿using Game.LevelEditor;
 using Raylib_cs;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Game.Objects;
 
@@ -16,6 +17,7 @@ public class Character : Entity, IDamageable
     public Sound DeathSound { get; set; } = AssetManager.Load<Sound>(@"Assets\Sounds\Die.wav");
 
     [HideProperty]
+    [JsonIgnore]
     public World? _world;
 
     public Character()
