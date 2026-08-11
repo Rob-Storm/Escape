@@ -16,16 +16,22 @@ public class Character : Entity, IDamageable
     public Sound DeathSound { get; set; } = AssetManager.Load<Sound>(@"Assets\Sounds\Die.wav");
 
     [HideProperty]
-    public World? World;
+    public World? _world;
 
     public Character()
     {
-        Collider = new Collider(this);
+        Collider = new Collider(this)
+        {
+            CollisionBounds = new Vector3(0.35f, 0.5f, 0.35f),
+            Channel = CollisionChannel.Character
+        };
 
         Renderer = new BillboardRenderer
         {
             Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\Man.png")
         };
+
+        _world = World.Instance;
     }
 
     protected void Move(Vector3 direction)
@@ -53,22 +59,22 @@ public class Character : Entity, IDamageable
             Max = Transform.Position + direction + halfSize
         };
 
-        foreach (var cellData in World!.GetCells())
+        foreach (var cellData in _world!.GetCells())
         {
-            if (World.IsCollidingWithCell(cellData.cell, sweepCollider))
+            if (_world.IsCollidingWithCell(cellData.cell, sweepCollider))
             {
                 return false;
             }
         }
 
-        foreach (Entity entity in World!.EntityList)
+        foreach (Entity entity in _world!.EntityList)
         {
             if (entity == this || !entity.Collider!.Solid)
             {
                 continue;
             }
 
-            if (World.IsCollidingWithEntity(entity, sweepCollider))
+            if (_world.IsCollidingWithEntity(entity, sweepCollider))
             {
                 return false;
             }

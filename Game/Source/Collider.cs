@@ -10,14 +10,13 @@ public class Collider
 
     public Entity Parent { get; init; }
 
+    public CollisionChannel Channel { get; set; }
+
     public BoundingBox BoundingBox { get; protected set; }
 
     public Vector3 CollisionBounds { get; set; } = Vector3.Zero;
 
     // Non-solid colliders will still trigger overlap events, but will not block movement.
-
-    // Possible refactor to use collision channels like Unreal Engine, but that is for
-    // a next iteration of the engine
     public bool Solid { get; set; } = true;
 
     public bool IsColliding { get; protected set; } = false;
@@ -25,6 +24,7 @@ public class Collider
     public Color Color { get; private set; } = Color.SkyBlue;
 
     public HashSet<Collider> OverlappingColliders { get; protected set; }
+
 
 
     public Collider(Entity parent)
@@ -69,4 +69,17 @@ public class Collider
     }
 }
 
+[Flags]
+public enum CollisionChannel
+{
+    None = 0,
+    All = ~None,
 
+    // Cells, terrain, etc.
+    WorldStatic = 1 << 0,
+
+    // Non-static objects that aren't character such as an explosive barrel, window, or collectable
+    WorldDynamic = 1 << 1,
+
+    Character = 1 << 2,
+}

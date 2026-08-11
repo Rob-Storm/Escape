@@ -79,7 +79,7 @@ public class Player : Character
 
         if (Raylib.IsKeyPressed(KeyboardKey.E))
         {
-            InteractTrace();
+            InteractTrace(0.65f);
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Q))
@@ -129,44 +129,18 @@ public class Player : Character
     }
 
     // HACK: Line traces should be done by the engine or world!
-    public bool LineTrace(float range, out Entity? hitEntity)
+
+    public void InteractTrace(float range)
     {
-        Vector3 start;
-        start = Camera.Transform.Position;
-        Ray ray = new Ray(start, Vector3.Normalize(Camera.GetForwardVector()));
+        Vector3 start = Camera.Transform.Position;
 
-        float closestDistance = float.MaxValue;
-        hitEntity = null;
+        Vector3 end = start + (Camera.GetForwardVector() * range);
 
-        foreach (Collider collider in World!.GetCollidables())
+        RayHit trace = _world.LineTrace(start, end, CollisionChannel.WorldDynamic, this);
+
+        if(trace.Hit)
         {
-            if (collider == Collider)
-            {
-                continue;
-            }
-
-            RayCollision hit = Raylib.GetRayCollisionBox(ray, collider.BoundingBox);
-
-            if (!hit.Hit || hit.Distance > range)
-            {
-                continue;
-            }
-
-            if (hit.Distance < closestDistance)
-            {
-                closestDistance = hit.Distance;
-                hitEntity = collider.Parent;
-            }
-        }
-
-        return hitEntity != null;
-    }
-
-    public void InteractTrace()
-    {
-        if (LineTrace(0.65f, out Entity? hitEntity))
-        {
-            IInteractable? interactable = hitEntity as IInteractable;
+            IInteractable? interactable = trace.Collider.Parent as IInteractable;
 
             if (interactable != null)
             {
@@ -175,7 +149,7 @@ public class Player : Character
         }
     }
 
-    public void ShootTrace()
+    public void ShootTrace(float range)
     {
         if(_currentWeapon == null)
         {
@@ -184,9 +158,15 @@ public class Player : Character
 
         WeaponData currentWeapon = _currentWeapon!.Value;
 
-        if (LineTrace(currentWeapon.Range, out Entity? hitEntity))
+        Vector3 start = Camera.Transform.Position;
+
+        Vector3 end = start + (Camera.GetForwardVector() * range);
+
+        RayHit trace = _world.LineTrace(start, end, CollisionChannel.Character, this);
+
+        if(trace.Hit)
         {
-            IDamageable? damageable = hitEntity as IDamageable;
+            IDamageable? damageable = trace.Collider.Parent as IDamageable;
 
             if (damageable != null)
             {
@@ -246,7 +226,7 @@ public class Player : Character
         // Melee or other infinite-ammo weapon
         if (ammo == null)
         {
-            ShootTrace();
+            ShootTrace(currentWeapon.Range);
             GameplayStatics.PlaySound2D(currentWeapon.FireSound);
             _shootCooldownFinished = false;
 
@@ -265,7 +245,7 @@ public class Player : Character
             return;
         }
 
-        ShootTrace();
+        ShootTrace(currentWeapon.Range);
 
         // Normal shoot logic
         GameplayStatics.PlaySound2D(currentWeapon.FireSound);

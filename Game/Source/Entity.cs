@@ -25,10 +25,10 @@ public class Entity
     [JsonIgnore]
     public Collider? Collider { get; set; }
 
-
     public RenderComponent? Renderer { get; set; }
 
     private bool _markedForDelete = false;
+
 
     public Entity()
     {
@@ -41,6 +41,11 @@ public class Entity
         };
 
         Transform.Translate(Directions.Up * 0.5f);
+    }
+
+    public virtual void Start()
+    {
+
     }
 
     public virtual void Update()

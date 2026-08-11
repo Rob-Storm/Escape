@@ -21,7 +21,8 @@ public class Door : Entity, IInteractable
 
         Collider = new Collider(this)
         {
-            CollisionBounds = Vector3.One * 0.5f
+            CollisionBounds = Vector3.One * 0.5f,
+            Channel = CollisionChannel.WorldDynamic
         };
 
         Renderer = new MeshRenderer

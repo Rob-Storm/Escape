@@ -7,6 +7,8 @@ namespace Game;
 
 public class World
 {
+    public static World? Instance { get; protected set; }
+
     public List<Entity> EntityList { get; set; }
     protected List<Entity> _removeEntityList { get; set; }
     protected List<Entity> _addEntityList { get; set; }
@@ -15,18 +17,23 @@ public class World
 
     public Cell[,] Cells { get; set; }
 
-    protected Player _player;
-    protected Camera _camera;
+    protected Player? _player;
+    protected Camera? _camera;
 
     public int SizeX = 25;
     public int SizeY = 25;
 
     protected bool _debugDrawMode = false;
 
-    private GameUI _userInterface;
+    private GameUI? _userInterface;
 
     public World()
     {
+        if(Instance  == null)
+        {
+            Instance = this;
+        }
+
         EntityList = new List<Entity>();
         _removeEntityList = new List<Entity>();
         _addEntityList = new List<Entity>();
@@ -93,7 +100,7 @@ public class World
     public void LoadLevel(Level level)
     {
         _player = new Player();
-        _player.World = this;
+        _player._world = this;
         _camera = _player.Camera;
         EntityList = level.EntityList;
         Cells = level.Cells;
@@ -104,6 +111,11 @@ public class World
         _player.SetYaw(level.StartRotation * -Raylib.DEG2RAD);
 
         EntityList.Add(_player);
+
+        foreach (Entity entity in level.EntityList)
+        {
+            entity.Start();
+        }
     }
 
     public virtual void Update()
@@ -123,6 +135,12 @@ public class World
         CheckEntityCollisions();
 
         EntityList.AddRange(_addEntityList);
+
+        foreach (Entity entity in _addEntityList)
+        {
+            entity.Start();
+        }
+
         _addEntityList.Clear();
 
         foreach (Entity entity in _removeEntityList)
@@ -141,6 +159,11 @@ public class World
     public virtual void Render()
     {
         Raylib.ClearBackground(Color.Black);
+
+        if (_camera == null)
+        {
+            return;
+        }
 
         Raylib.BeginMode3D(_camera);
 
@@ -227,5 +250,67 @@ public class World
         _sortedBillboards = billboards;
     }
 
-    public float GetDistanceToCamera(Entity entity) => Vector3.DistanceSquared(_camera.Transform.Position, entity.Transform.Position);
+    public float GetDistanceToCamera(Entity entity) => Vector3.DistanceSquared(_camera!.Transform.Position, entity.Transform.Position);
+
+
+    public List<Entity> GetEntitiesOfClass(Type filter)
+    {
+        return EntityList.Where(entity => entity.GetType() == filter).ToList();
+    }
+
+    /// <summary>
+    /// Returns the first entity of the given type T
+    /// </summary>
+    /// <typeparam name="T">The type to be filtered</typeparam>
+    /// <returns></returns>
+    public T GetEntityOfType<T>() where T : Entity
+    {
+        return (T)GetEntitiesOfClass(typeof(T)).First();
+    }
+
+    public RayHit LineTrace(Vector3 start, Vector3 end, CollisionChannel channelMask, params Entity[] ignoreEntity)
+    {
+        RayHit result = new RayHit();
+
+        Vector3 direction = Vector3.Normalize(end - start);
+
+        Ray ray = new Ray(start, direction);
+
+        result.Distance = Vector3.Distance(start, end);
+
+        foreach(Collider collider in GetCollidables())
+        {
+            if((collider.Channel & channelMask) == 0)
+            {
+                continue;
+            }
+
+            if(ignoreEntity.Contains(collider.Parent))
+            {
+                continue;
+            }
+
+            RayCollision collision = Raylib.GetRayCollisionBox(ray, collider.BoundingBox);
+
+            if(collision.Hit && collision.Distance < result.Distance)
+            {
+                result.Hit = true;
+                result.Distance = collision.Distance;
+                result.Position = collision.Point;
+                result.Normal = collision.Normal;
+                result.Collider = collider;
+            }    
+        }
+
+        return result;
+    }
+}
+
+public struct RayHit
+{
+    public bool Hit {  get; set; }
+    public float Distance { get; set; }
+    public Vector3 Position { get; set; }
+    public Vector3 Normal { get; set; }
+    public Collider Collider { get; set; }
 }
