@@ -128,8 +128,6 @@ public class Player : Character
         Camera.Update();
     }
 
-    // HACK: Line traces should be done by the engine or world!
-
     public void InteractTrace(float range)
     {
         Vector3 start = Camera.Transform.Position;

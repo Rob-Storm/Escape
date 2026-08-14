@@ -51,12 +51,16 @@ public class Enemy : Character
                 // wander
                 break;
             case AIState.Move:
+
                 if(_player == null)
                 {
                     break;
                 }
 
                 Vector3 moveDirection = Vector3.Normalize(_player.Transform.Position - Transform.Position);
+
+                Transform.Translate(moveDirection * (float)Time.FrameDelta);
+
                 break;
             case AIState.Attack:
                 DamagePlayer();

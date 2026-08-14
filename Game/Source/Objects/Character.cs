@@ -16,6 +16,8 @@ public class Character : Entity, IDamageable
 
     public Sound DeathSound { get; set; } = AssetManager.Load<Sound>(@"Assets\Sounds\Die.wav");
 
+    public Texture2D DeadTexture { get; set; } = AssetManager.Load<Texture2D>(@"Assets\Textures\ManDead.png");
+
     [HideProperty]
     [JsonIgnore]
     public World? _world;
