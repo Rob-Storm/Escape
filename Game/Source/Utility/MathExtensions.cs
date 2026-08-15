@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace Game;
+namespace Game.Utility;
 
 public static class QuaternionExtensions
 {

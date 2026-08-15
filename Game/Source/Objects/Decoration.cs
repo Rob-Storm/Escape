@@ -12,7 +12,8 @@ public class Decoration : Entity
         Collider = new Collider(this)
         {
             CollisionBounds = Vector3.Zero,
-            Solid = false
+            Solid = false,
+            Channel = CollisionChannel.None
         };
 
         Renderer = new BillboardRenderer

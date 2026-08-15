@@ -51,7 +51,7 @@ public class LevelFileService
         context.PlayerStart = Vector2.Zero;
         context.StartRotation = 0f;
 
-        Debug.Log("New level");
+        Debug.Log("New level", channel: LogChannel.Asset);
     }
 
     public class LevelSerializer
@@ -64,7 +64,7 @@ public class LevelFileService
             context.PlayerStart = Vector2.Zero;
             context.StartRotation = 0f;
 
-            Debug.Log("New level");
+            Debug.Log("New level", channel: LogChannel.Asset);
         }
 
         public Level Serialize(EditorContext context)

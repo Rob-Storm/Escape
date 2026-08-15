@@ -274,7 +274,7 @@ public class MapGrid : EditorPanel
             case ToolMode.Room:
                 _startRoomCellX = cellX;
                 _startRoomCellY = cellY;
-                Debug.Log($"Start {cellX} {cellY}");
+                Debug.Log($"Start {cellX} {cellY}", channel: LogChannel.Editor);
                 break;
         }
     }
@@ -325,7 +325,7 @@ public class MapGrid : EditorPanel
             case ToolMode.Draw:
                 break;
             case ToolMode.Room:
-                Debug.Log($"End {cellX} {cellY}");
+                Debug.Log($"End {cellX} {cellY}", channel: LogChannel.Editor);
 
                 _endRoomCellX = cellX;
                 _endRoomCellY = cellY;
@@ -348,7 +348,7 @@ public class MapGrid : EditorPanel
 
     private void CreateRoom(Vector2 start, Vector2 end)
     {
-        Debug.Log($"Building room. Start: {start}. End: {end}");
+        Debug.Log($"Building room. Start: {start}. End: {end}", channel: LogChannel.Editor);
 
         int startX, startY, endX, endY;
 

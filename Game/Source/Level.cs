@@ -51,7 +51,7 @@ public class Level
 
         string contents = JsonSerializer.Serialize(level, options: _options);
 
-        Debug.Log($"Saving level '{Path.GetFileName(fileName)}' to '{fileName}'");
+        Debug.Log($"Saving level '{Path.GetFileName(fileName)}' to '{fileName}'", channel: LogChannel.Asset);
 
         File.WriteAllText(fileName, contents);
 
