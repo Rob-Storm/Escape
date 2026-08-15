@@ -15,6 +15,7 @@ namespace Game;
 [JsonDerivedType(typeof(AmmoPickup), "ammo_pickup")]
 [JsonDerivedType(typeof(WeaponPickup), "weapon_pickup")]
 [JsonDerivedType(typeof(Enemy), "enemy")]
+[JsonDerivedType(typeof(Decoration), "decoration")]
 public class Entity
 {
     // An identifier for the editor

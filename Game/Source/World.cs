@@ -304,6 +304,17 @@ public class World
 
         return result;
     }
+
+    public T Spawn<T>(Transform transform) where T : Entity, new()
+    {
+        T obj = new T();
+
+        obj.Transform = transform;
+
+        _addEntityList.Add(obj);
+
+        return obj;
+    }
 }
 
 public struct RayHit

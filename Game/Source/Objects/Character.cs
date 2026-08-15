@@ -91,7 +91,22 @@ public class Character : Entity, IDamageable
     {
         OnKill?.Invoke();
         GameplayStatics.PlaySoundAtLocation(DeathSound, Transform.Position, 1f);
+
         Destroy();
+
+        if (World.Instance != null)
+        {
+            Decoration decoration = World.Instance.Spawn<Decoration>(Transform);
+
+            if(decoration.Renderer != null)
+            {
+                decoration.Renderer.Texture = DeadTexture;
+            }
+            else
+            {
+                Debug.Log("Renderer on decoration is null", LogLevel.Warning);
+            }
+        }
     }
 
     public void Damage(int amount)
