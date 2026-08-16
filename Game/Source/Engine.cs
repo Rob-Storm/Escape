@@ -21,7 +21,7 @@ public class Engine
 
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
 
-        Raylib.InitWindow(_screenWidth, _screenHeight, isEditorMode ? "Editor" : "Escape");
+        Raylib.InitWindow(_screenWidth, _screenHeight, isEditorMode ? "Editor - No Level Loaded" : "Escape");
         Raylib.InitAudioDevice();
 
         if (isEditorMode)

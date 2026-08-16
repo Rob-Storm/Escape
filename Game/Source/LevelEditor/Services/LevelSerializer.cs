@@ -5,22 +5,46 @@ namespace Game.LevelEditor.Services;
 
 public class LevelFileService
 {
+    public event Action<string>? OnCreateNewLevel;
+    public event Action? OnSaveLevel;
+    public event Action<string>? OnLoadLevel;
+
     private readonly LevelSerializer _serializer = new LevelSerializer();
 
-    public (DialogResult result, string? path) Save(EditorContext context)
+    public (DialogResult? result, string? path) Save(EditorContext context)
     {
-        var result = Dialog.FileSave("hdl", Paths.MapsFolder);
+        string path = context.LastLevelSavePath;
+        Level level;
 
-        if (!result.IsOk)
+        if (!context.HasSavedThisSession)
         {
-            return (result, null);
+            var result = Dialog.FileSave("hdl", Paths.MapsFolder);
+
+            if (!result.IsOk)
+            {
+                return (result, null);
+            }
+
+            level = _serializer.Serialize(context);
+
+            path = Level.SaveToFile(level, result.Path);
+
+            context.HasSavedThisSession = true;
+            context.LastLevelSavePath = path;
+
+            OnSaveLevel?.Invoke();
+
+            return (result, path);
         }
 
-        Level level = _serializer.Serialize(context);
+        level = _serializer.Serialize(context);
 
-        string path = Level.SaveToFile(level, result.Path);
+        Level.SaveToFile(level, path);
 
-        return (result, path);
+        OnSaveLevel?.Invoke();
+
+        return (null, path);
+
     }
 
     public bool Load(EditorContext context)
@@ -37,13 +61,16 @@ public class LevelFileService
         _serializer.Deserialize(context, level);
 
         context.LevelName = Path.GetFileNameWithoutExtension(result.Path);
+        context.HasSavedThisSession = false;
+
+        OnLoadLevel?.Invoke(context.LevelName);
 
         return true;
     }
 
     public void NewLevel(EditorContext context, string name, int sizeX, int sizeY)
     {
-        //context.EntityList.Clear();
+        context.World.EntityList.Clear();
         context.World.SizeX = sizeX;
         context.World.SizeY = sizeY;
         context.World.Cells = new Cell[sizeX, sizeY];
@@ -52,6 +79,10 @@ public class LevelFileService
         context.StartRotation = 0f;
 
         Debug.Log("New level", channel: LogChannel.Asset);
+
+        context.HasSavedThisSession = false;
+
+        OnCreateNewLevel?.Invoke(name);
     }
 
     public class LevelSerializer

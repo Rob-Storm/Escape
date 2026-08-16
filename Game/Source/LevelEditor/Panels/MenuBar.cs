@@ -37,8 +37,11 @@ public class MenuBar : EditorPanel
                 if (ImGui.MenuItem("Run Map", "Ctrl+R"))
                 {
                     var output = _context.LevelFileService.Save(_context);
-
-                    if (output.result.IsOk)
+                    if(output.result == null)
+                    {
+                        _context.PlayModeService.RunLevel(_context.LastLevelSavePath);
+                    }
+                    else if (output.result.IsOk)
                     {
                         _context.PlayModeService.RunLevel(output.result.Path);
                     }

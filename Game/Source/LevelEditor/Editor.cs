@@ -7,6 +7,15 @@ using System.Numerics;
 
 namespace Game.LevelEditor;
 
+/*
+ * Todo:
+ * 
+ * Music asset preview
+ * Crosshair when controlling 3d viewport
+ * Skybox preview
+ * 
+ */
+
 public class Editor : World
 {
     public string LevelName = "Level";
@@ -212,7 +221,7 @@ public class Editor : World
 
             if (output.result.IsOk)
             {
-                // Todo: make this await/async
+                // Todo: make this await/async somehow
                 _context.PlayModeService.RunLevel(output.result.Path);
             }
         }
