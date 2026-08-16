@@ -22,15 +22,34 @@ public class LevelSettings : EditorPanel
     {
         ImGui.Begin("Level Settings", ImGuiWindowFlags.NoDocking);
 
-        ImGui.InputText("Level Name", ref _context.LevelName, 16);
-        ImGui.InputFloat2("Start Position", ref _context.PlayerStart);
-        ImGui.Combo("Start Rotation", ref _startRotationIndex, _directions.Keys.ToArray(), 4);
+        if(ImGui.InputText("Level Name", ref _context.LevelName, 16));
+        {
+            _context.MarkDirty();
+        }
+
+        if(ImGui.InputFloat2("Start Position", ref _context.PlayerStart))
+        {
+            _context.MarkDirty();
+        }
+        
+        if(ImGui.Combo("Start Rotation", ref _startRotationIndex, _directions.Keys.ToArray(), 4))
+        {
+            _context.MarkDirty();
+        }        
 
         _context.StartRotation = _directions.Values.ToArray()[_startRotationIndex];
 
         ImGui.BeginDisabled();
-        ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25);
-        ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25);
+        if(ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25))
+        {
+            _context.MarkDirty();
+        }
+        
+        if(ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25))
+        {
+            _context.MarkDirty();
+        }
+
         ImGui.EndDisabled();
 
         ImGui.End();

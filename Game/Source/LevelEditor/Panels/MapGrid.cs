@@ -270,6 +270,7 @@ public class MapGrid : EditorPanel
                 _context.World.EntityList.Add(instance);
 
                 _context.SelectedObject = instance;
+                _context.MarkDirty();
                 break;
             case ToolMode.Room:
                 _startRoomCellX = cellX;
@@ -299,6 +300,7 @@ public class MapGrid : EditorPanel
 
                 _editor.SetCell(cellX, cellY, newCell);
 
+                _context.MarkDirty();
                 break;
             case ToolMode.Room:
                 _cursorRoomCellX = cellX;
@@ -312,6 +314,8 @@ public class MapGrid : EditorPanel
                     _context.SelectedX = -1;
                     _context.SelectedY = -1;
                 }
+
+                _context.MarkDirty();
                 break;
         }
     }
@@ -340,6 +344,8 @@ public class MapGrid : EditorPanel
 
                 _endRoomCellX = -1;
                 _endRoomCellY = -1;
+
+                _context.MarkDirty();
                 break;
             case ToolMode.Delete:
                 break;

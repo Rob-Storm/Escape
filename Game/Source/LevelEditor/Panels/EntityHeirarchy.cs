@@ -70,6 +70,7 @@ public class EntityHeirarchy : EditorPanel
                             _context.World.EntityList.Add(instance);
 
                             _context.SelectedObject = instance;
+                            _context.MarkDirty();
                         }
                     }
                 }
