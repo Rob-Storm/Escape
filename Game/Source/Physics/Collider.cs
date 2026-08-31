@@ -1,50 +1,36 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace Game;
+namespace Game.Physics;
 
-public class Collider
+public abstract class Collider
 {
     public event Action<Collider>? OnBeginOverlap;
     public event Action<Collider>? OnEndOverlap;
 
-    public Entity Parent { get; init; }
+    public Entity? Parent { get; init; }
 
     public CollisionChannel Channel { get; set; }
-
-    public BoundingBox BoundingBox { get; protected set; }
-
-    public Vector3 CollisionBounds { get; set; } = Vector3.Zero;
 
     // Non-solid colliders will still trigger overlap events, but will not block movement.
     public bool Solid { get; set; } = true;
 
     public bool IsColliding { get; protected set; } = false;
 
-    public Color Color { get; private set; } = Color.SkyBlue;
+    public Color Color { get; protected set; } = Color.SkyBlue;
 
     public HashSet<Collider> OverlappingColliders { get; protected set; }
 
 
-
-    public Collider(Entity parent)
+    public Collider(Entity? parent = null)
     {
         Parent = parent;
         OverlappingColliders = new HashSet<Collider>();
     }
 
-    public void Update(Transform transform)
-    {
-        Vector3 halfSize = CollisionBounds * transform.Scale;
+    public abstract void Update(Transform transform);
 
-        BoundingBox = new BoundingBox
-        {
-            Min = transform.Position - halfSize,
-            Max = transform.Position + halfSize
-        };
-    }
-
-    public void SetIsColliding(bool colliding, Collider collider)
+    public virtual void SetIsColliding(bool colliding, Collider collider)
     {
         if (colliding)
         {
@@ -67,6 +53,8 @@ public class Collider
 
         IsColliding = OverlappingColliders.Count > 0;
     }
+
+    public abstract void DebugDraw(Transform transform);
 }
 
 [Flags]

@@ -1,4 +1,5 @@
 ﻿using Game.LevelEditor;
+using Game.Physics;
 using Raylib_cs;
 using System.Numerics;
 
@@ -19,7 +20,7 @@ public class Door : Entity, IInteractable
         UseSound = AssetManager.Load<Sound>(@"Assets\Sounds\DoorUse.wav");
         LockSound = AssetManager.Load<Sound>(@"Assets\Sounds\DoorLocked.wav");
 
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             CollisionBounds = Vector3.One * 0.5f,
             Channel = CollisionChannel.WorldDynamic

@@ -1,4 +1,5 @@
 ﻿using Game.LevelEditor;
+using Game.Physics;
 using Raylib_cs;
 using System.Numerics;
 
@@ -57,7 +58,7 @@ public class WeaponPickup : Entity
     private WeaponData _weapon;
     public WeaponPickup()
     {
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             CollisionBounds = Vector3.One * 0.5f,
             Solid = false

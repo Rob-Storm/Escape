@@ -20,7 +20,6 @@ public class MenuBar : EditorPanel
     public override void Draw()
     {
         bool openNewPopup = false;
-        bool openLevelSettingsPopup = false;
 
         if (ImGui.BeginMainMenuBar())
         {
@@ -32,7 +31,15 @@ public class MenuBar : EditorPanel
                 }
 
                 if (ImGui.MenuItem("Save", "Ctrl+S")) { _context.LevelFileService.Save(_context); }
-                if (ImGui.MenuItem("Open", "Ctrl+O")) { _context.LevelFileService.Load(_context); }
+                if (ImGui.MenuItem("Open", "Ctrl+O")) 
+                { 
+                    if(_context.IsDirty)
+                    {
+                        ImGui.OpenPopup("Cofirmation");
+                    }
+
+                    _context.LevelFileService.Load(_context);
+                }
 
                 if (ImGui.MenuItem("Run Map", "Ctrl+R"))
                 {
@@ -65,7 +72,7 @@ public class MenuBar : EditorPanel
                             if (ImGui.MenuItem(type.Name))
                             {
                                 ConstructorInfo ctor = type.GetConstructor(new Type[] { })!;
-                                Entity instance = (Entity)ctor.Invoke(new Type[] { });
+                                Entity instance = (Entity)ctor.Invoke(Array.Empty<Type>());
 
                                 instance.Transform.Position = new Vector3(0, 0, 0);
                                 _context.World.EntityList.Add(instance);
@@ -98,7 +105,6 @@ public class MenuBar : EditorPanel
             ImGui.OpenPopup("Create New Level");
         }
 
-
         ShowNewLevelPopup();
     }
 
@@ -128,6 +134,28 @@ public class MenuBar : EditorPanel
 
         _levelSizeX = Math.Clamp(_levelSizeX, 1, 150);
         _levelSizeY = Math.Clamp(_levelSizeY, 1, 150);
+    }
+
+    private bool ShowConfirmationModal()
+    {
+        if(ImGui.BeginPopupModal("Confirmation", ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            ImGui.Text("You have unsaved changes, continue?");
+
+            if(ImGui.Button("Yes"))
+            {
+                ImGui.CloseCurrentPopup();
+                return true;
+            }
+
+            if(ImGui.Button("Cancel"))
+            {
+                ImGui.CloseCurrentPopup();
+                return false;
+            }
+        }
+
+        return false;
     }
 
 }

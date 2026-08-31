@@ -1,4 +1,5 @@
 ﻿using Game.LevelEditor;
+using Game.Physics;
 
 namespace Game.Objects;
 
@@ -11,7 +12,7 @@ public class Projectile : Entity
         {
         };
 
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             Solid = false
         };

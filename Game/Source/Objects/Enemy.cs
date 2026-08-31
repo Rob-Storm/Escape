@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Game.Physics;
+using Raylib_cs;
 using System.Numerics;
 
 namespace Game.Objects;
@@ -13,7 +14,7 @@ public class Enemy : Character
 
     public Enemy()
     {
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             CollisionBounds = new Vector3(0.35f, 0.5f, 0.35f),
             Solid = false,

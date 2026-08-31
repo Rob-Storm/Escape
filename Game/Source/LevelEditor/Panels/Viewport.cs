@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Game.Physics;
+using ImGuiNET;
 using Raylib_cs;
 using rlImGui_cs;
 using System.Numerics;
@@ -125,7 +126,7 @@ public class Viewport : EditorPanel
 
         mouseRay = Raylib.GetScreenToWorldRayEx(localMousePos, _camera, (int)_viewportSize.X, (int)_viewportSize.Y);
 
-        foreach (Collider collider in _context.World.GetCollidables())
+        foreach (BoxCollider collider in _context.World.GetCollidables())
         {
             RayCollision hit = Raylib.GetRayCollisionBox(mouseRay, collider.BoundingBox);
 

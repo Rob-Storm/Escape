@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using Game.Physics;
+using System.Numerics;
 
 namespace Game.Objects;
 
@@ -9,7 +10,7 @@ public class Decoration : Entity
 {
     public Decoration()
     {
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             CollisionBounds = Vector3.Zero,
             Solid = false,

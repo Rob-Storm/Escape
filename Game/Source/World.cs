@@ -1,5 +1,6 @@
 ﻿using Game.GUI;
 using Game.Objects;
+using Game.Physics;
 using Raylib_cs;
 using System.Numerics;
 
@@ -57,7 +58,7 @@ public class World
         return Cells[x, y];
     }
 
-    public IEnumerable<Collider> GetCollidables()
+    public IEnumerable<BoxCollider> GetCollidables()
     {
         foreach (Entity entity in EntityList)
         {
@@ -69,6 +70,11 @@ public class World
             if (cell == null)
             {
                 continue;
+            }
+
+            foreach(BoxCollider collider in cell.Collider.Colliders!)
+            {
+                yield return collider!;
             }
         }
     }
@@ -278,7 +284,7 @@ public class World
 
         result.Distance = Vector3.Distance(start, end);
 
-        foreach(Collider collider in GetCollidables())
+        foreach(BoxCollider collider in GetCollidables())
         {
             if((collider.Channel & channelMask) == 0)
             {
@@ -301,6 +307,8 @@ public class World
                 result.Collider = collider;
             }    
         }
+
+        Debug.Log(result.Hit.ToString(), LogLevel.Log, LogChannel.Physics);
 
         return result;
     }

@@ -22,7 +22,7 @@ public class LevelSettings : EditorPanel
     {
         ImGui.Begin("Level Settings", ImGuiWindowFlags.NoDocking);
 
-        if(ImGui.InputText("Level Name", ref _context.LevelName, 16));
+        if(ImGui.InputText("Level Name", ref _context.LevelName, 16))
         {
             _context.MarkDirty();
         }
@@ -40,15 +40,9 @@ public class LevelSettings : EditorPanel
         _context.StartRotation = _directions.Values.ToArray()[_startRotationIndex];
 
         ImGui.BeginDisabled();
-        if(ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25))
-        {
-            _context.MarkDirty();
-        }
-        
-        if(ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25))
-        {
-            _context.MarkDirty();
-        }
+
+        ImGui.DragInt("LevelSizeX", ref _context.World.SizeX, 1, 1, 25);
+        ImGui.DragInt("LevelSizeY", ref _context.World.SizeY, 1, 1, 25);
 
         ImGui.EndDisabled();
 

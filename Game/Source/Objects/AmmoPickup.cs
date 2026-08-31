@@ -1,4 +1,5 @@
 ﻿using Game.LevelEditor;
+using Game.Physics;
 using Raylib_cs;
 using System.Numerics;
 
@@ -24,7 +25,7 @@ public class AmmoPickup : Entity
             Bounce = true
         };
 
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             CollisionBounds = Vector3.One * 0.5f,
             Solid = false

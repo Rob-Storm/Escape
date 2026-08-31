@@ -1,4 +1,5 @@
 ﻿using Game.LevelEditor;
+using Game.Physics;
 using Raylib_cs;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -24,7 +25,7 @@ public class Character : Entity, IDamageable
 
     public Character()
     {
-        Collider = new Collider(this)
+        Collider = new BoxCollider(this)
         {
             CollisionBounds = new Vector3(0.35f, 0.5f, 0.35f),
             Channel = CollisionChannel.Character

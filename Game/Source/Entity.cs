@@ -1,5 +1,6 @@
 ﻿using Game.LevelEditor;
 using Game.Objects;
+using Game.Physics;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -24,7 +25,7 @@ public class Entity
 
     [HideProperty]
     [JsonIgnore]
-    public Collider? Collider { get; set; }
+    public BoxCollider? Collider { get; set; }
 
     public RenderComponent? Renderer { get; set; }
 

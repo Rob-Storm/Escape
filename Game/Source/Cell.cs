@@ -1,6 +1,8 @@
 ﻿using Game.LevelEditor;
+using Game.Physics;
 using Raylib_cs;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Game;
 
@@ -15,6 +17,9 @@ namespace Game;
 
 public class Cell
 {
+    [JsonIgnore]
+    public Action? OnWallFlagsChanged;
+
     [HideProperty]
     public string NorthWallTexturePath;
 
@@ -41,8 +46,23 @@ public class Cell
     public Texture2D FloorTexture;// => AssetManager.Load<Texture2D>(FloorTexturePath);
     public Texture2D CeilingTexture;// => AssetManager.Load<Texture2D>(CeilingTexturePath);
 
+    public CellCollider Collider;
+
     public Vector3 Position { get; set; }
-    public Walls Walls { get; set; } = Walls.None;
+
+    private Walls _walls;
+
+    [HideProperty]
+    public Walls Walls 
+    {
+        get => _walls;
+
+        set
+        {
+            _walls = value;
+            OnWallFlagsChanged?.Invoke();
+        }
+    }
 
     private Mesh _horizontalPlane;
     private Mesh _verticalPlane;
@@ -56,6 +76,11 @@ public class Cell
     public Cell(int x, int y)
     {
         Position = new Vector3(x, 0, y);
+
+        Collider = new CellCollider(this)
+        {
+            Channel = CollisionChannel.WorldStatic
+        };
 
         _horizontalPlane = Raylib.GenMeshPlane(1.0f, 1.0f, 1, 1);
         _verticalPlane = Raylib.GenMeshPlane(1.0f, 1.5f, 1, 1);
