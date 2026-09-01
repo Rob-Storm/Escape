@@ -107,6 +107,21 @@ public class Cell
         return colliders.ToArray();
     }
 
+    public BoundingBox GetNonWallCollider(bool ceiling)
+    {
+        float thickness = 0.015f;
+        float squareSize = 1f;
+
+        Vector3 dir = Directions.Up;
+
+        // Y of 0 is the floor
+        Vector3 center = ceiling ? Position + dir * 1.5f : Position;
+
+        Vector3 halfExtents = new Vector3(squareSize, thickness, squareSize) / 2;
+
+        return new BoundingBox(center - halfExtents, center + halfExtents);
+    }
+
     public List<BoxCollider> GetBoxColliders()
     {
         List<BoxCollider> colliders = new List<BoxCollider>();
@@ -116,13 +131,16 @@ public class Cell
             colliders.Add(BoxCollider.FromBoundingBox(boundingBox, CollisionChannel.WorldStatic));
         }
 
+        colliders.Add(BoxCollider.FromBoundingBox(GetNonWallCollider(false), CollisionChannel.WorldStatic));
+        colliders.Add(BoxCollider.FromBoundingBox(GetNonWallCollider(true), CollisionChannel.WorldStatic));
+
         return colliders;
     }
 
     public BoundingBox GetWallDirectionCollider(Walls wall)
     {
-        const float thickness = 0.05f;
-        const float height = 1.5f;
+        float thickness = 0.015f;
+        float height = 1.5f;
 
         Vector3 dir = GetDirection(wall);
 

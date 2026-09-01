@@ -155,7 +155,7 @@ public class Player : Character
             return;
         }
 
-        WeaponData currentWeapon = _currentWeapon!.Value;
+        WeaponData currentWeapon = _currentWeapon.Value;
 
         Vector3 start = Camera.Transform.Position;
 
@@ -171,7 +171,7 @@ public class Player : Character
             {
                 damageable.Damage(currentWeapon.Damage);
             }
-            else
+            else // you hit something that cannot be damaged
             {
                 GameplayStatics.PlaySoundAtLocation(AssetManager.Load<Sound>(@"Assets\Sounds\SurfaceHit.wav"), trace.Position, 5f);
             }
