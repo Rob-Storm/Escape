@@ -171,6 +171,10 @@ public class Player : Character
             {
                 damageable.Damage(currentWeapon.Damage);
             }
+            else
+            {
+                GameplayStatics.PlaySoundAtLocation(AssetManager.Load<Sound>(@"Assets\Sounds\SurfaceHit.wav"), trace.Position, 5f);
+            }
         }
     }
 

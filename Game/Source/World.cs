@@ -282,7 +282,7 @@ public class World
         return (T)GetEntitiesOfClass(typeof(T)).First();
     }
 
-    public RayHit LineTrace(Vector3 start, Vector3 end, CollisionChannel channelMask, params Entity[] ignoreEntity)
+    public RayHit LineTrace(Vector3 start, Vector3 end, CollisionChannel channelMask = ~CollisionChannel.None, params Entity[] ignoreEntity)
     {
         RayHit result = new RayHit();
 

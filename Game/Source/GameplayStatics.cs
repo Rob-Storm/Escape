@@ -6,7 +6,7 @@ namespace Game;
 public static class GameplayStatics
 {
     public static Camera Camera;
-    public static void PlaySoundAtLocation(Sound sound, Vector3 location, float maxDist)
+    public static void PlaySoundAtLocation(Sound sound, Vector3 location, float maxDist, float volumeMultiplier = 1f)
     {
         Vector3 direction = Vector3.Subtract(location, Camera.Transform.Position);
         float distance = direction.Length();
@@ -22,7 +22,7 @@ public static class GameplayStatics
         float pan = 0.5f * Vector3.Dot(normalizedDirection, Camera.GetRightVector());
         pan = Math.Clamp(pan, -1f, 1f);
 
-        Raylib.SetSoundVolume(sound, attenuation);
+        Raylib.SetSoundVolume(sound, attenuation * volumeMultiplier);
         Raylib.SetSoundPan(sound, pan);
 
         Raylib.PlaySound(sound);
