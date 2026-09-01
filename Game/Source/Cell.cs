@@ -17,8 +17,7 @@ namespace Game;
 
 public class Cell
 {
-    [JsonIgnore]
-    public Action? OnWallFlagsChanged;
+    public event Action? OnWallFlagsChanged;
 
     [HideProperty]
     public string NorthWallTexturePath;
@@ -46,13 +45,10 @@ public class Cell
     public Texture2D FloorTexture;// => AssetManager.Load<Texture2D>(FloorTexturePath);
     public Texture2D CeilingTexture;// => AssetManager.Load<Texture2D>(CeilingTexturePath);
 
-    public CellCollider Collider;
-
     public Vector3 Position { get; set; }
 
     private Walls _walls;
 
-    [HideProperty]
     public Walls Walls 
     {
         get => _walls;
@@ -76,11 +72,6 @@ public class Cell
     public Cell(int x, int y)
     {
         Position = new Vector3(x, 0, y);
-
-        Collider = new CellCollider(this)
-        {
-            Channel = CollisionChannel.WorldStatic
-        };
 
         _horizontalPlane = Raylib.GenMeshPlane(1.0f, 1.0f, 1, 1);
         _verticalPlane = Raylib.GenMeshPlane(1.0f, 1.5f, 1, 1);
@@ -114,6 +105,18 @@ public class Cell
         }
 
         return colliders.ToArray();
+    }
+
+    public List<BoxCollider> GetBoxColliders()
+    {
+        List<BoxCollider> colliders = new List<BoxCollider>();
+
+        foreach(BoundingBox boundingBox in GetWallColliders())
+        {
+            colliders.Add(BoxCollider.FromBoundingBox(boundingBox, CollisionChannel.WorldStatic));
+        }
+
+        return colliders;
     }
 
     public BoundingBox GetWallDirectionCollider(Walls wall)
@@ -173,10 +176,11 @@ public class Cell
 
     public void RenderBounds(Color cellColor, Color boundColor)
     {
+        
         // walls which may not be visible to the editor camera
-        foreach (BoundingBox collider in GetWallColliders())
+        foreach (BoxCollider collider in GetBoxColliders())
         {
-            Raylib.DrawBoundingBox(collider, boundColor);
+            collider.DebugDraw();
         }
 
         // entire cell bounds

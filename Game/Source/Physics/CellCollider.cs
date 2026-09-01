@@ -11,8 +11,7 @@ namespace Game.Physics;
 public class CellCollider : Collider
 {
     [HideProperty]
-    [JsonIgnore]
-    public Cell? Cell { get; }
+    public Cell Cell { get; set; }
 
     [HideProperty]
     public List<BoxCollider> Colliders { get; private set; }
@@ -22,13 +21,6 @@ public class CellCollider : Collider
         Cell = cell;
 
         Colliders = new List<BoxCollider>();
-
-        if(Cell != null)
-        {
-            cell.OnWallFlagsChanged += BuildCollider;
-            BuildCollider();
-        }
-
     }
 
     public override void Update(Transform transform)
@@ -39,21 +31,17 @@ public class CellCollider : Collider
         }
     }
 
-    public override void DebugDraw(Transform transform)
+    public override void DebugDraw()
     {
         foreach(BoxCollider collider in Colliders)
         {
-            Raylib.DrawBoundingBox(collider.BoundingBox, Color);
+            collider.DebugDraw();
         }
     }
 
-    private void BuildCollider()
+    public void BuildCollider()
     {
-        // keep the floor and ceiling
-        if(Colliders.Count > 2)
-        {
-            Colliders.RemoveRange(2, Colliders.Count - 2);
-        }
+        Colliders.Clear();
 
         foreach (BoundingBox boundingBox in Cell.GetWallColliders())
         {

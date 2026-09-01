@@ -1,13 +1,21 @@
-﻿using Raylib_cs;
+﻿using Game.LevelEditor;
+using Game.Objects;
+using Raylib_cs;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Game.Physics;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(BoxCollider), "collider_box")]
+[JsonDerivedType(typeof(CellCollider), "collider_cell")]
 public abstract class Collider
 {
     public event Action<Collider>? OnBeginOverlap;
+
     public event Action<Collider>? OnEndOverlap;
 
+    [HideProperty]
     public Entity? Parent { get; init; }
 
     public CollisionChannel Channel { get; set; }
@@ -15,10 +23,12 @@ public abstract class Collider
     // Non-solid colliders will still trigger overlap events, but will not block movement.
     public bool Solid { get; set; } = true;
 
+    [HideProperty]
     public bool IsColliding { get; protected set; } = false;
 
     public Color Color { get; protected set; } = Color.SkyBlue;
 
+    [HideProperty]
     public HashSet<Collider> OverlappingColliders { get; protected set; }
 
 
@@ -54,14 +64,13 @@ public abstract class Collider
         IsColliding = OverlappingColliders.Count > 0;
     }
 
-    public abstract void DebugDraw(Transform transform);
+    public abstract void DebugDraw();
 }
 
 [Flags]
 public enum CollisionChannel
 {
     None = 0,
-    All = ~None,
 
     // Cells, terrain, etc.
     WorldStatic = 1 << 0,

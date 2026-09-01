@@ -75,7 +75,7 @@ public class Editor : World
             entity.Update();
         }
 
-        _camera.Update();
+        _camera?.Update();
 
         _viewport.Update();
 
@@ -120,7 +120,7 @@ public class Editor : World
         {
             if (_debugDrawMode && entity.Collider != null)
             {
-                Raylib.DrawBoundingBox(entity.Collider.BoundingBox, entity.Collider.Color);
+                entity.Collider.DebugDraw();
             }
 
             entity.Render(_camera);
@@ -130,7 +130,7 @@ public class Editor : World
         {
             if (_debugDrawMode && billboard.Collider != null)
             {
-                Raylib.DrawBoundingBox(billboard.Collider.BoundingBox, billboard.Collider.Color);
+                billboard.Collider.DebugDraw();
             }
 
             billboard.Render(_camera);

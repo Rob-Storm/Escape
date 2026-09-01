@@ -161,7 +161,7 @@ public class Player : Character
 
         Vector3 end = start + (Camera.GetForwardVector() * range);
 
-        RayHit trace = _world.LineTrace(start, end, CollisionChannel.Character, this);
+        RayHit trace = _world.LineTrace(start, end, ~CollisionChannel.None, this);
 
         if(trace.Hit)
         {

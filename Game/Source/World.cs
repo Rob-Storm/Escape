@@ -16,7 +16,7 @@ public class World
 
     protected List<Entity> _sortedBillboards;
 
-    public Cell[,] Cells { get; set; }
+    public Cell?[,] Cells { get; set; }
 
     protected Player? _player;
     protected Camera? _camera;
@@ -72,14 +72,14 @@ public class World
                 continue;
             }
 
-            foreach(BoxCollider collider in cell.Collider.Colliders!)
+            foreach(BoxCollider collider in cell.GetBoxColliders())
             {
-                yield return collider!;
+                yield return collider;
             }
         }
     }
 
-    public Cell GetCell(Vector2 location)
+    public Cell? GetCell(Vector2 location)
     {
         return Cells[(int)location.X, (int)location.Y];
     }
@@ -97,7 +97,7 @@ public class World
             {
                 if (Cells[x, y] != null)
                 {
-                    yield return (x, y, Cells[x, y]);
+                    yield return (x, y, Cells[x, y])!;
                 }
             }
         }
@@ -186,6 +186,14 @@ public class World
         foreach (var cellData in GetCells())
         {
             cellData.cell.Render();
+
+            if(_debugDrawMode)
+            {
+                if(cellData.cell != null)
+                {
+                    cellData.cell.RenderBounds(Color.SkyBlue, Color.Green);
+                }
+            }
         }
 
         Raylib.EndMode3D();
@@ -286,7 +294,7 @@ public class World
 
         foreach(BoxCollider collider in GetCollidables())
         {
-            if((collider.Channel & channelMask) == 0)
+            if(collider.Channel == CollisionChannel.None)
             {
                 continue;
             }

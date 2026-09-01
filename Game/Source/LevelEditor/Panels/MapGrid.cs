@@ -287,7 +287,11 @@ public class MapGrid : EditorPanel
             case ToolMode.Select:
                 break;
             case ToolMode.Draw:
-                Cell newCell = new Cell(cellX, cellY);
+                Cell newCell = new Cell(cellX, cellY)
+                {
+                    Walls = _context.ToolSettings.Walls
+                };
+
                 newCell.NorthWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.NorthWallTexturePath);
                 newCell.EastWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.EastWallTexturePath);
                 newCell.WestWallTexture = AssetManager.Load<Texture2D>(_context.ToolSettings.SouthWallTexturePath);

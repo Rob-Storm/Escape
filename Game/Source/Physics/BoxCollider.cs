@@ -12,6 +12,7 @@ public class BoxCollider : Collider
 
     public Vector3 CollisionBounds { get; set; } = Vector3.Zero;
 
+    public Vector3 LocalPosition { get; protected set; } = Vector3.Zero;
 
     public BoxCollider(Entity? parent = null)
     {
@@ -21,22 +22,26 @@ public class BoxCollider : Collider
 
     public override void Update(Transform transform)
     {
+        Vector3 center = transform.Position + LocalPosition;
         Vector3 halfSize = CollisionBounds * transform.Scale;
 
         BoundingBox = new BoundingBox
         {
-            Min = transform.Position - halfSize,
-            Max = transform.Position + halfSize
+            Min = center - halfSize,
+            Max = center + halfSize
         };
     }
 
-    public override void DebugDraw(Transform transform)
+    public override void DebugDraw()
     {
-        Raylib.DrawBoundingBox(BoundingBox, Color);
+        Raylib.DrawBoundingBox(BoundingBox, Color.Green);
     }
 
     public static BoxCollider FromBoundingBox(BoundingBox box, CollisionChannel channel)
     {
-        return new BoxCollider() { CollisionBounds = Vector3.Abs(box.Min), Channel = channel };
+        Vector3 center = (box.Min + box.Max) * 0.5f;
+        Vector3 halfExtents = (box.Max - box.Min) * 0.5f;
+
+        return new BoxCollider() { LocalPosition = center, CollisionBounds = halfExtents, Channel = channel, BoundingBox = box };
     }
 }

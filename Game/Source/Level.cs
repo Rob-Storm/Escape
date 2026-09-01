@@ -2,6 +2,7 @@
 using Raylib_cs;
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Game;
 
@@ -27,6 +28,7 @@ public class Level
         {
             WriteIndented = true,
             IncludeFields = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
         };
 
 
