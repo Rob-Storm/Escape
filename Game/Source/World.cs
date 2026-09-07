@@ -1,6 +1,7 @@
 ﻿using Game.GUI;
 using Game.Objects;
 using Game.Physics;
+using Game.Graphics;
 using Raylib_cs;
 using System.Numerics;
 
@@ -277,10 +278,7 @@ public class World
     /// </summary>
     /// <typeparam name="T">The type to be filtered</typeparam>
     /// <returns></returns>
-    public T GetEntityOfType<T>() where T : Entity
-    {
-        return (T)GetEntitiesOfClass(typeof(T)).First();
-    }
+    public T GetEntityOfType<T>() where T : Entity => (T)GetEntitiesOfClass(typeof(T)).First();
 
     public RayHit LineTrace(Vector3 start, Vector3 end, CollisionChannel channelMask = ~CollisionChannel.None, params Entity[] ignoreEntity)
     {

@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Text.Json.Serialization;
 
-namespace Game;
+namespace Game.Graphics;
 
 public class MeshRenderer : RenderComponent
 {

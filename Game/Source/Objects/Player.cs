@@ -248,9 +248,9 @@ public class Player : Character
             return;
         }
 
+        // Normal shoot logic
         ShootTrace(currentWeapon.Range);
 
-        // Normal shoot logic
         GameplayStatics.PlaySound2D(currentWeapon.FireSound);
 
         RemoveAmmo(currentWeapon.AmmoType!.Value, 1);
@@ -262,12 +262,19 @@ public class Player : Character
 
     public void AddWeapon(WeaponData weapon)
     {
-        if(_weaponInventory.Contains(weapon))
+        if (_weaponInventory.Contains(weapon))
         {
             return;
         }
 
+        bool autoChange = _weaponInventory.Count < 1;
+
         _weaponInventory.Add(weapon);
+
+        if (autoChange)
+        {
+            ChangeWeapon(false);
+        }
     }
 
     public void RemoveWeapon(WeaponData weapon)
@@ -298,7 +305,7 @@ public class Player : Character
             NextWeapon(currentWeaponIndex);
         }
 
-        OnWeaponChanged?.Invoke(_currentWeapon.Value);
+        OnWeaponChanged?.Invoke(_currentWeapon!.Value);
     }
 
     private void PreviousWeapon(int weaponIndex)

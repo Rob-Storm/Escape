@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Text.Json.Serialization;
 
-namespace Game;
+namespace Game.Graphics;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(MeshRenderer), "mesh")]
