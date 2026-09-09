@@ -1,5 +1,5 @@
-﻿using Game.Physics;
-using Game.Graphics;
+﻿using Game.Graphics;
+using Game.Physics;
 using System.Numerics;
 
 namespace Game.Objects;
@@ -7,6 +7,7 @@ namespace Game.Objects;
 /// <summary>
 /// An object with a visual appearance that does nothing
 /// </summary>
+
 public class Decoration : Entity
 {
     public Decoration()

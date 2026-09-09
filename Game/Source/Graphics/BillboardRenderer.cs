@@ -4,13 +4,9 @@ using System.Numerics;
 
 namespace Game.Graphics;
 
-public class BillboardRenderer : RenderComponent
+public class BillboardRenderer : SpriteRenderer
 {
 
-    [ToolTip("Constrains the size to fit the texture dimensions")]
-    public bool AutoSize { get; set; }
-    [ToolTip("Scales the AutoSize dimensions by a scalar value")]
-    public float Scale { get; set; } = 1f;
     [ToolTip("The sprite will move up and down")]
     public bool Bounce { get; set; }
 

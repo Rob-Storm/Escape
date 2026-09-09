@@ -51,7 +51,7 @@ public class World
         {
             return null;
         }
-        if (x > SizeX || y > SizeY)
+        if (x >= SizeX || y >= SizeY)
         {
             return null;
         }
@@ -174,7 +174,7 @@ public class World
 
         Raylib.BeginMode3D(_camera);
 
-        foreach (Entity entity in EntityList.Where(e => e.Renderer is not BillboardRenderer))
+        foreach (Entity entity in EntityList.Where(e => e.Renderer is not SpriteRenderer))
         {
             entity.Render(_camera);
         }
@@ -257,12 +257,7 @@ public class World
     // Sort the billboards back to front to avoid transparency bugs
     public void SortBillboards()
     {
-        List<Entity> billboards = new List<Entity>();
-        billboards.AddRange(EntityList.Where(entity => entity.Renderer is BillboardRenderer));
-
-        billboards.Sort((x, y) => GetDistanceToCamera(y).CompareTo(GetDistanceToCamera(x)));
-
-        _sortedBillboards = billboards;
+        _sortedBillboards = EntityList.Where(e => e.Renderer is SpriteRenderer).OrderByDescending(GetDistanceToCamera).ToList();
     }
 
     public float GetDistanceToCamera(Entity entity) => Vector3.DistanceSquared(_camera!.Transform.Position, entity.Transform.Position);
