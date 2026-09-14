@@ -1,4 +1,5 @@
-﻿using Game.LevelEditor;
+﻿using Game.Graphics;
+using Game.LevelEditor;
 using Game.Physics;
 using Game.Utility;
 using Raylib_cs;
@@ -167,14 +168,30 @@ public class Player : Character
         {
             IDamageable? damageable = trace.Collider.Parent as IDamageable;
 
+            Color effectTint = Color.White;
+
             if (damageable != null)
             {
                 damageable.Damage(currentWeapon.Damage);
+                effectTint = Color.Red;
             }
             else // you hit something that cannot be damaged
             {
                 GameplayStatics.PlaySoundAtLocation(AssetManager.Load<Sound>(@"Assets\Sounds\SurfaceHit.wav"), trace.Position, 5f);
             }
+
+            Vector3 spawnPos = trace.Position - (Vector3.Normalize(GetForwardVector()) * 0.3f);
+
+            Effect particleEffect = World.Instance.Spawn<Effect>(new Transform(spawnPos, Transform.Rotation, Vector3.One));
+
+            particleEffect.DestroyOnFinish = true;
+            particleEffect.Renderer.Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\HitEffect.png");
+            var renderer = (AnimatedBillboardRenderer)particleEffect.Renderer;
+            renderer.FrameSize = new Vector2(32);
+            renderer.Loop = false;
+            renderer.PlaybackSpeed = 0.045f;
+            renderer.Tint = effectTint;
+            particleEffect.Play();
         }
     }
 

@@ -48,7 +48,6 @@ public class TimerManager
 
             if (handle.CurrentTicks >= handle.Delay)
             {
-                Debug.Log($"Execute timer callback {handle}", channel: LogChannel.Timer);
                 handle.Callback?.Invoke();
 
                 if (!handle.Loop)

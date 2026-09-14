@@ -13,12 +13,17 @@ public class Effect : Decoration
         Renderer = new AnimatedBillboardRenderer()
         {
             AutoSize = true,
-            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\SpriteSheetText.png")
+            Texture = AssetManager.Load<Texture2D>(@"Assets\Textures\SpriteSheetTest.png")
         };
+    }
 
-        if(DestroyOnFinish)
+    public void Play()
+    {
+        if (DestroyOnFinish)
         {
             ((AnimatedBillboardRenderer)Renderer).OnEndReached += Destroy;
         }
+
+        ((AnimatedBillboardRenderer)Renderer).Play();
     }
 }

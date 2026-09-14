@@ -11,6 +11,8 @@ public abstract class RenderComponent
 {
     public Texture2D Texture { get; set; }
 
+    public Color Tint { get; set; } = Color.White;
+
     protected RenderComponent()
     {
         

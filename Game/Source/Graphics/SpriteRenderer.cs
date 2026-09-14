@@ -6,16 +6,16 @@ namespace Game.Graphics;
 public abstract class SpriteRenderer : RenderComponent
 {
     [ToolTip("Constrains the size to fit the texture dimensions")]
-    public bool AutoSize { get; set; } = true;
+    public bool AutoSize { get; set; } = false;
     [ToolTip("Scales the AutoSize dimensions by a scalar value")]
     public float Scale { get; set; } = 1f;
 
-    protected SpriteRenderer()
+    public SpriteRenderer()
     {
         
     }
 
-    protected SpriteRenderer(Texture2D texture) : base(texture)
+    public SpriteRenderer(Texture2D texture) : base(texture)
     {
         
     }

@@ -1,10 +1,11 @@
 ﻿using Game.LevelEditor;
 using Raylib_cs;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Game.Graphics;
 
-public class AnimatedBillboardRenderer : SpriteRenderer
+public class AnimatedBillboardRenderer : SpriteRenderer, IJsonOnDeserialized
 {
     public event Action? OnEndReached;
 
@@ -12,42 +13,38 @@ public class AnimatedBillboardRenderer : SpriteRenderer
     public Vector2 FrameSize { get; set; }
 
     [ToolTip("The time each frame is held")]
-    public float PlaybackSpeed = 1;
+    public float PlaybackSpeed { get; set; }
 
-    private int _currentFrame = 1;
+    [ToolTip("The time each frame is held")]
+    public bool Loop { get; set; } = true;
+
+    private int _currentFrame = 0;
     private int _totalFrames;
 
-    public AnimatedBillboardRenderer()
+    public void Play()
     {
-        if(!Engine.IsEditor)
-        {
-            TimerManager.SetTimer(PlaybackSpeed, AdvanceFrame, true);
-        }
-    }
-
-    public AnimatedBillboardRenderer(Texture2D texture) : base(texture)
-    {
-        //_totalFrames = (int)FrameSize.X / texture.Width;
-
-        //if (!Engine.IsEditor)
-        //{
-        //    TimerManager.SetTimer(PlaybackSpeed, AdvanceFrame, true);
-        //}
+        TimerManager.SetTimer(PlaybackSpeed, AdvanceFrame, true);
     }
 
     public void AdvanceFrame()
     {
-        _totalFrames = (int)(Texture.Width / FrameSize.X);
+        _totalFrames = (int)(Texture.Width / FrameSize.X) - 1;
 
         if (_currentFrame >= _totalFrames)
         {
-            _currentFrame = 1;
-            OnEndReached?.Invoke();
+            if(Loop)
+            {
+                _currentFrame = -1;
+            }
+            else
+            {
+                OnEndReached?.Invoke();
+                return;
+            }
         }
-        else
-        {
-            _currentFrame++;
-        }
+
+        _currentFrame++;
+
     }
 
     public override void Render(Camera camera, Transform transform)
@@ -60,11 +57,19 @@ public class AnimatedBillboardRenderer : SpriteRenderer
             Height = FrameSize.Y
         };
 
-        Raylib.DrawBillboardRec(camera, Texture, source, transform.Position, Vector2.One, Color.White);
+        Raylib.DrawBillboardRec(camera, Texture, source, transform.Position, Vector2.One, Tint);
     }
 
     public override void DebugRender(Camera camera, Transform transform)
     {
 
+    }
+
+    public void OnDeserialized()
+    {
+        if (!Engine.IsEditor)
+        {
+            Play();
+        }
     }
 }

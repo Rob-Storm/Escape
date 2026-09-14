@@ -29,6 +29,7 @@ public class PropertyInspector : EditorPanel
             { typeof(Vector2), DrawVector2},
             { typeof(Vector3), DrawVector3},
             { typeof(Quaternion), DrawQuaternion},
+            { typeof(Color), DrawColor},
             { typeof(AssetTypeInfo), DrawAsset}
 
             // enum and enum flags are checked and handled explicitly
@@ -352,6 +353,21 @@ public class PropertyInspector : EditorPanel
 
             propertyValue = Quaternion.Normalize(Quaternion.CreateFromYawPitchRoll(euler.X * Raylib.DEG2RAD, euler.Y * Raylib.DEG2RAD, euler.Z * Raylib.DEG2RAD));
 
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool DrawColor(object owner, ref object propertyValue, string propertyName)
+    {
+        Color property = (Color)propertyValue;
+        Vector4 vec4 = property.ToVector4();
+
+        if(ImGui.ColorEdit4(propertyName, ref vec4, ImGuiColorEditFlags.None))
+        {
+            property = vec4.ToColor();
+            propertyValue = property;
             return true;
         }
 

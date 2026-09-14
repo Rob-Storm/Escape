@@ -3,6 +3,19 @@ using System.Numerics;
 
 namespace Game.Utility;
 
+public static class ColorExtensions
+{
+    public static Vector4 ToVector4(this Color color)
+    {
+        return new Vector4(color.R, color.G, color.B, color.A);
+    }
+
+    public static Color ToColor(this Vector4 vector4)
+    {
+        return new Color(vector4.X, vector4.Y, vector4.Z, vector4.W);
+    }
+}
+
 public static class QuaternionExtensions
 {
     /// <summary>

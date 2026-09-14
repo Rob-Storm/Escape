@@ -46,7 +46,7 @@ public class BillboardRenderer : SpriteRenderer
 
         Vector2 origin = new Vector2(0.5f, 0.5f) * size;
 
-        Raylib.DrawBillboardPro(camera, Texture, source, finalPosition, Vector3.UnitY, size, origin, 0f, Color.White);
+        Raylib.DrawBillboardPro(camera, Texture, source, finalPosition, Vector3.UnitY, size, origin, 0f, Tint);
 
         // Todo: fix bug with billboard rotating with camera rotation instead of it's position
     }

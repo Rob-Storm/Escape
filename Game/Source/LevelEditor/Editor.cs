@@ -116,7 +116,7 @@ public class Editor : World
 
         Raylib.BeginMode3D(_camera);
 
-        foreach (Entity entity in EntityList.Where(e => e.Renderer is not BillboardRenderer))
+        foreach (Entity entity in EntityList.Where(e => e.Renderer is not SpriteRenderer))
         {
             if (_debugDrawMode && entity.Collider != null)
             {
