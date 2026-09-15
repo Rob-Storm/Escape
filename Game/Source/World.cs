@@ -123,6 +123,11 @@ public class World
         {
             entity.Start();
         }
+
+        if(!Engine.IsEditor)
+        {
+            GameplayStatics.ChangeMusicTrack(level.BackgroundMusic);
+        }
     }
 
     public virtual void Update()

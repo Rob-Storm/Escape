@@ -200,31 +200,6 @@ public class Editor : World
             _levelSettings.Draw();
         }
 
-        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.S))
-        {
-            _context.LevelFileService.Save(_context);
-        }
-
-        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.N))
-        {
-
-        }
-
-        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.O))
-        {
-            _context.LevelFileService.Load(_context);
-        }
-
-        if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGuiKey.R))
-        {
-            var output = _context.LevelFileService.Save(_context);
-
-            if (output.result.IsOk)
-            {
-                // Todo: make this await/async somehow
-                _context.PlayModeService.RunLevel(output.result.Path);
-            }
-        }
 
         rlImGui.End();
     }

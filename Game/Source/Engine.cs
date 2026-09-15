@@ -11,7 +11,7 @@ public class Engine
     private int _screenWidth = 1280;
     private int _screenHeight = 720;
 
-    private World? _world;
+    private World? _world;    
 
     public static bool IsEditor { get; private set; } = false;
 
@@ -23,6 +23,8 @@ public class Engine
 
         Raylib.InitWindow(_screenWidth, _screenHeight, isEditorMode ? "Editor - No Level Loaded" : "Escape");
         Raylib.InitAudioDevice();
+
+        GameplayStatics.MusicPlayer = new MusicPlayer();
 
         if (isEditorMode)
         {
@@ -65,6 +67,8 @@ public class Engine
         Time.Update();
 
         TimerManager.Update();
+
+        GameplayStatics.MusicPlayer.Update();
 
         _world?.Update();
     }

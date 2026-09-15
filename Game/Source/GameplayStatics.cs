@@ -6,6 +6,8 @@ namespace Game;
 public static class GameplayStatics
 {
     public static Camera Camera;
+    public static MusicPlayer MusicPlayer;
+
     public static void PlaySoundAtLocation(Sound sound, Vector3 location, float maxDist, float volumeMultiplier = 1f)
     {
         Vector3 direction = Vector3.Subtract(location, Camera.Transform.Position);
@@ -32,5 +34,9 @@ public static class GameplayStatics
     {
         Raylib.SetSoundVolume(sound, volume);
         Raylib.PlaySound(sound);
+    }
+
+    public static void ChangeMusicTrack(Music music)
+    {
     }
 }
